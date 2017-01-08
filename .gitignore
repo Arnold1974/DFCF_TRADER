@@ -1,6 +1,8 @@
 #json files
-*.json
+*.json*
 
+#Word文档
+*.doc
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
