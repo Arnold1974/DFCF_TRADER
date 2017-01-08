@@ -25,6 +25,15 @@ s.headers.update({'Content-Type': 'application/x-www-form-urlencoded','X-Request
 Assets=s.post('https://jy.xzsec.com/Com/GetAssets',{'moneyType':'RMB'});
 print "可用资金：" + str(Assets.json()["Data"][0]["Kyzj"])
 print "可取资金：" + str(Assets.json()["Data"][0]["Kqzj"])
+print "人民币总资产：" + str(Assets.json()["Data"][0]["RMBZzc"])
+print "总资产：" + str(Assets.json()["Data"][0]["Zzc"])
+print "冻结资金：" + str(Assets.json()["Data"][0]["Djzj"])
+print "资金余额：" + str(Assets.json()["Data"][0]["Zjye"])
+print "总市值：" + str(Assets.json()["Data"][0]["Zxsz"])
+
+StockList=s.post('https://jy.xzsec.com/Search/GetStockList',{'qqhs':'1000','dwc':''});
+if len(StockList.json()["Data"])==0:
+    print "Stock Position:  0"
 
 
 #print(r.text, '\n{}\n'.format('*'*79), r.encoding)
