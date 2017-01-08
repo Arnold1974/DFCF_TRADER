@@ -5,7 +5,7 @@ import json
 
 
 s = requests.session()
-res=s.post('http://www.qingdaoport.net/user/login',json.load(file("account.json")));
+res=s.post('http://www.qingdaoport.net/user/login',json.load(file("./config/account.json")));
 #换成抓取的地址
 r=s.get('http://www.qingdaoport.net/ywzx/zhcx/uni_cbklbcx.dw');
 print r.url
