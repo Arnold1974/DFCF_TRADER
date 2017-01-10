@@ -1,8 +1,11 @@
-#json files
+﻿#json files
 *.json*
 
 #Word文档
 *.doc
+
+#图像文件
+*.jpg
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
