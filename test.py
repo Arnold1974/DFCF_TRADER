@@ -1,4 +1,4 @@
-#conding=utf8
+#-*- coding:utf-8 -*-
 
 import requests
 import json
