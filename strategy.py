@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 
 import requests
-
+import json
 
 s = requests.session()
 headers = {'Host': 'www.iwencai.com',
@@ -47,15 +47,19 @@ params_2={
         "query":"DDE大单净量大于0.25；涨跌幅大于10%；市盈率小于45；非st股；非创业板；总市值从小到大排列",
         "newType":"0"
        }
-s.get('http://www.iwencai.com/log/my?info=ts|1、qs|backtest_myquery_start、w|query:DDE>3@holdDay:2@date:2015-06-15-2016-12-13@upperIncome:20@lowerIncome:10@fallIncome:3@stockHoldCount:1、tid|stockpick、DestinationURL|http://www.iwencai.com/traceback/strategy#DDE%3E3/2/2015-06-15/2016-12-13/0.001/20/10/3/1&logName=pick&qid=')       
+s.get('http://www.iwencai.com/log/my?info=ts|1、qs|backtest_myquery_start、w|query:DDE>3@holdDay:2@date:2015-06-15-2016-12-13@upperIncome:20@lowerIncome:10@fallIncome:3@stockHoldCount:1、tid|stockpick、DestinationURL|http://www.iwencai.com/traceback/strategy#DDE%3E3/2/2015-06-15/2016-12-13/0.001/20/10/3/1&logName=pick&qid=')  
+print s.cookies     
 #r=s.post('http://www.iwencai.com/traceback/strategy/submit',data=params_1,headers=headers)
 s.headers.update({'Content-Type': 'application/x-www-form-urlencoded','X-Requested-With':'XMLHttpRequest', \
                   'charset':'UTF-8',
-                   'Cookie':' PHPSESSID=p09r4qlvriir6une3g5unjtoi5; cid=p09r4qlvriir6une3g5unjtoi51484061014; ComputerID=p09r4qlvriir6une3g5unjtoi5170110+231014; Hm_lvt_78c58f01938e4d85eaf619eae71b4ed1=1484061068; Hm_lpvt_78c58f01938e4d85eaf619eae71b4ed1=1484064205; Hm_lvt_57a0e026e5e0e1e90bcea3f298e48e74=1484061068; Hm_lpvt_57a0e026e5e0e1e90bcea3f298e48e74=1484064205'
+                  'Cookie':'cid=p09r4qlvriir6une3g5unjtoi51484061014; ComputerID=p09r4qlvriir6une3g5unjtoi5170110+231014; Hm_lvt_78c58f01938e4d85eaf619eae71b4ed1=1484061068,1484105103; Hm_lvt_57a0e026e5e0e1e90bcea3f298e48e74=1484061068,1484105103; PHPSESSID=i006a7vf37vdjgh0cr8lngkg47; Hm_lpvt_57a0e026e5e0e1e90bcea3f298e48e74=1484105250; Hm_lpvt_78c58f01938e4d85eaf619eae71b4ed1=1484105249; guideState=1'
                  })
 
 
-r=s.post('http://www.iwencai.com/traceback/strategy/transaction',data=params_2,headers=headers);
+mycookie={'cid':'p09r4qlvriir6une3g5unjtoi51484061014','ComputerID':'p09r4qlvriir6une3g5unjtoi5170110+231014','Hm_lvt_78c58f01938e4d85eaf619eae71b4ed1':'1484061068,1484105103','Hm_lvt_57a0e026e5e0e1e90bcea3f298e48e74':'1484061068,1484105103','PHPSESSID':'i006a7vf37vdjgh0cr8lngkg47','Hm_lpvt_57a0e026e5e0e1e90bcea3f298e48e74':'1484105250', 'Hm_lpvt_78c58f01938e4d85eaf619eae71b4ed1':'1484105249','guideState':'1'}
+print s.Cookie
+r=s.post('http://www.iwencai.com/traceback/strategy/transaction',data=json.dumps(params_2),headers=headers);
+
 
 print r.text
 #print s.cookies
@@ -63,7 +67,3 @@ if r.json()["success"]==False:
     print "获取失败"
 print r.json()["data"]
 
-#print(r.text, '\n{}\n'.format('*'*79), r.encoding)
-#r.encoding = 'GBK'
-#print(r.text, '\n{}\n'.format('*'*79), r.encoding)
-#print r.encoding

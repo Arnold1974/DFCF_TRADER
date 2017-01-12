@@ -37,6 +37,9 @@ if len(StockList.json()["Data"])==0:
     print "Stock Position:  0"
 print 'Done!'
 
+from log import TestRotating
+TestRotating()
+
 #print(r.text, '\n{}\n'.format('*'*79), r.encoding)
 #r.encoding = 'GBK'
 #print(r.text, '\n{}\n'.format('*'*79), r.encoding)
