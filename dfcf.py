@@ -30,10 +30,14 @@ print "总资产：" + str(Assets.json()["Data"][0]["Zzc"])
 print "冻结资金：" + str(Assets.json()["Data"][0]["Djzj"])
 print "资金余额：" + str(Assets.json()["Data"][0]["Zjye"])
 print "总市值：" + str(Assets.json()["Data"][0]["Zxsz"])
-
+print "--------------------- \n"
 StockList=s.post('https://jy.xzsec.com/Search/GetStockList',{'qqhs':'1000','dwc':''});
 if len(StockList.json()["Data"])==0:
     print "Stock Position:  0"
+else:
+    for _ in xrange(len(StockList.json()["Data"])):
+        print "证券代码：%s" % str(StockList.json()["Data"][0]["Zqdm"])
+
 
 GetOrdersData=s.post('https://jy.xzsec.com/Search/GetOrdersData',{'qqhs':'20','dwc':''});
 if len(GetOrdersData.json()["Data"])==0:

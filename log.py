@@ -45,7 +45,7 @@ def TestRotating():
     my_logger = logging.getLogger('MyLogger')
     my_logger.setLevel(logging.DEBUG)
     # Add the log message handler to the logger
-    handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,mode='a',maxBytes=20, backupCount=5)
+    handler = logging.handlers.RotatingFileHandler(LOG_FILENAME,mode='a',maxBytes=1024**2, backupCount=5)
     my_logger.addHandler(handler)
     # Log some messages
     for i in range(20):
