@@ -6,9 +6,12 @@ import json
 class DFCF_Trader(object):
     def __init__(self):
         self.s = requests.session()
+
+#登陆
     def login(self):
         self.__authorization()
     def __authorization(self):
+        self.login_message=""
         headers = {'Host': 'jy.xzsec.com',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:50.0) Gecko/20100101 Firefox/50.0',
                    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -36,7 +39,7 @@ class DFCF_Trader(object):
         print "冻结资金：" + str(Assets.json()["Data"][0]["Djzj"])
         print "资金余额：" + str(Assets.json()["Data"][0]["Zjye"])
         print "总市值：" + str(Assets.json()["Data"][0]["Zxsz"])
-        print "--------------------- \n"
+        print "----------------------------------------------------- \n"
 
 #持仓列表
     def getstocklist(self):    
@@ -88,8 +91,28 @@ class DFCF_Trader(object):
         
 if __name__=="__main__":
     user=DFCF_Trader()
-    user.login()
+    try:
+        user.login()
+    except:#ConnectionError:
+        print "Connection lost!"
+        import sys
+        sys.exit()
+    
     print user.login_message
+    
+    
+    import time,sys,os
+    for i in xrange(5):
+        user.getstocklist()
+        #sys.stdout.write("\r%200s %30d" % (user.stocklist_message,i) )
+        #sys.stdout.write( "File transfer progress :[%3d] percent complete!\r" % i )
+        sys.stdout.write ("abc: %3d \n" % i)      
+      
+        #sys.stdout.flush()
+        time.sleep(1)
+    os.system("pause")
+    
+    
     user.getassets()
     user.getstocklist()
     print user.stocklist_message
