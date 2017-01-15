@@ -50,7 +50,7 @@ class DFCF_Trader(object):
         else:
             for i in xrange(len(StockList.json()["Data"])):
                 for key  in StockList.json()["Data"][i]:
-                    self.stocklist_message += key +":%s \n" % StockList.json()["Data"][i][key]
+                    self.stocklist_message += key +":%s  " % StockList.json()["Data"][i][key]
 
 #当日委托
     def getordersdata(self):
@@ -120,14 +120,16 @@ if __name__=="__main__":
     
     user.getrevokelist()
     import time,sys,os
-    for i in xrange(2):
+
+    for i in xrange(50):
         user.getstocklist()
-        #sys.stdout.write("\r%200s %30d" % (user.stocklist_message,i) )
-        #sys.stdout.write( "File transfer progress :[%3d] percent complete!\r" % i )
-        sys.stdout.write ("abc: %3d \n" % i)      
-      
-        #sys.stdout.flush()
-        time.sleep(1)
+        
+        sys.stdout.write("\r [%r] %200s" % (time.ctime(), user.stocklist_message))
+        #sys.stdout.write( "\rFile transfer progress :[%3d] percent complete!" % i )
+        #sys.stdout.write ("\rProcessing: [%2d%%]" % i)      
+        sys.stdout.flush()
+        time.sleep(.1)
+    #raw_input('input:')
     #os.system("pause")
     
     
