@@ -73,7 +73,25 @@ class DFCF_Trader(object):
             for i in xrange(len(DealData.json()["Data"])):
                 for key  in DealData.json()["Data"][i]:
                     self.dealdata_message += key +":%s \n" % DealData.json()["Data"][i][key]
-        
+       
+       
+#撤单列表
+    def getrevokelist(self):
+        self.revokelist_message=""
+        RevokeList=self.s.post('https://jy.xzsec.com/Trade/GetRevokeList')
+        if len(RevokeList.json()["Data"])==0:
+            print "Revoke List: %2d" % (0)
+        else:
+            for i in xrange(len(RevokeList.json()["Data"])):
+                for key  in RevokeList.json()["Data"][i]:
+                    self.revokelist_message += key +":%s \n" % RevokeList.json()["Data"][i][key]
+
+#撤单
+    def revoke(self):    
+        RevokeOrders=self.s.post('https://jy.xzsec.com/Trade/RevokeOrders',{'revokes':'20170110_209948'})
+        print RevokeOrders.json()["20170110"]
+
+
 #buy
     def buy(self,stockcode,stockname,price):
         GetKyzjAndKml=self.s.post('https://jy.xzsec.com/Trade/GetKyzjAndKml', \
@@ -100,9 +118,9 @@ if __name__=="__main__":
     
     print user.login_message
     
-    
+    user.getrevokelist()
     import time,sys,os
-    for i in xrange(5):
+    for i in xrange(2):
         user.getstocklist()
         #sys.stdout.write("\r%200s %30d" % (user.stocklist_message,i) )
         #sys.stdout.write( "File transfer progress :[%3d] percent complete!\r" % i )
@@ -110,7 +128,7 @@ if __name__=="__main__":
       
         #sys.stdout.flush()
         time.sleep(1)
-    os.system("pause")
+    #os.system("pause")
     
     
     user.getassets()
