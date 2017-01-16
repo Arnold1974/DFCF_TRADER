@@ -68,7 +68,7 @@ class DFCF_Trader(object):
         self.dealdata_message=""
         DealData=self.s.post('https://jy.xzsec.com/Search/GetDealData',{'qqhs':'20','dwc':''});
         if len(DealData.json()["Data"])==0:
-            print "Orders:  0"
+            print "Deals:  0"
         else:
             for i in xrange(len(DealData.json()["Data"])):
                 for key  in DealData.json()["Data"][i]:
@@ -87,23 +87,25 @@ class DFCF_Trader(object):
                     self.revokelist_message += key +":%s \n" % RevokeList.json()["Data"][i][key]
 
 #撤单
-    def revoke(self):    
-        RevokeOrders=self.s.post('https://jy.xzsec.com/Trade/RevokeOrders',{'revokes':'20170110_209948'})
-        print RevokeOrders.json()["20170110"]
+    def revoke(self,wtbh):    
+        RevokeOrders=self.s.post('https://jy.xzsec.com/Trade/RevokeOrders',{'revokes':wtbh})
+        print RevokeOrders.json()
 
 
-#buy
-    def buy(self,stockcode,stockname,price):
+#下单
+    def deal(self,stockcode,stockname,price,tradetype):
         GetKyzjAndKml=self.s.post('https://jy.xzsec.com/Trade/GetKyzjAndKml', \
-                             {'stockCode':stockcode,'price':price,'tradeType':'B','stockName':stockname});
+                             {'stockCode':stockcode,'stockName':stockname,'price':price,'tradeType':tradetype});
         print GetKyzjAndKml.json()["Data"]["Kmml"]
         Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
         print Kmml, type(Kmml)
         
         SubmitTrade=self.s.post('https://jy.xzsec.com/Trade/SubmitTrade', \
-                           {'stockCode':stockcode,'price':price,'amount':'100','tradeType':'B','stockName':'平煤股份'}
+                           {'stockCode':stockcode,'price':price, \
+                           'amount':GetKyzjAndKml.json()["Data"]["Kmml"], \
+                           'tradeType':tradetype,'stockName':stockname}
                            )       
-
+        print "委托编号: [%s]" %  SubmitTrade.json()["Data"][0]["Wtbh"],
 
 
         
@@ -119,9 +121,9 @@ if __name__=="__main__":
     print user.login_message
     
     user.getrevokelist()
+    print user.revokelist_message
     import time,sys,os
-
-    for i in xrange(50):
+    for i in xrange(0):
         user.getstocklist()
         
         sys.stdout.write("\r [%r] %200s" % (time.ctime(), user.stocklist_message))
@@ -132,19 +134,17 @@ if __name__=="__main__":
     #raw_input('input:')
     #os.system("pause")
     
-    
-    user.getassets()
-    user.getstocklist()
-    print user.stocklist_message
+    print "-----------"    
     user.getordersdata()
-    print "-----------"
     print user.ordersdata_message
-    print '###########'
+    print "***********"
     user.getdealdata()
     print user.dealdata_message
 
+    user.deal('600692','亚通股份','18.6','S')
+    #user.revoke('20170116_132537')
            
-        #----华丽的分割线 ：)  ---------------
+#----华丽的分割线 ：)  ---------------
 '''        
 s = requests.session()
 headers = {'Host': 'jy.xzsec.com',
