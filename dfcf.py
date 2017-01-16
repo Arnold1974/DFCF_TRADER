@@ -2,16 +2,28 @@
 
 import requests
 import json
+import threading,time
 
 class DFCF_Trader(object):
     def __init__(self):
         self.s = requests.session()
+        
+        self.login_flag=False        
+        thread_1 = threading.Thread(target=self.login,name='login thread')
+        thread_1.setDaemon(True)
+        thread_1.start()
 
 #登陆
     def login(self):
-        self.__authorization()
+        while True:
+            if not self.login_flag:
+                print '[%s] logging in [%s]' % (time.strftime('%H:%M:%S'),threading.current_thread().name)
+                try:
+                    self.__authorization()
+                except:  
+                    print "connection lost!"
+            time.sleep(1)
     def __authorization(self):
-        self.login_message=""
         headers = {'Host': 'jy.xzsec.com',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:50.0) Gecko/20100101 Firefox/50.0',
                    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -23,15 +35,31 @@ class DFCF_Trader(object):
                    } 
         self.s.headers.update(headers) 
         res=self.s.post('https://jy.xzsec.com//Login/Authentication',json.load(file("./config/dfcf.json")))
+        
+        self.login_flag=True if res.json()["Status"]==0 else False         
+        self.login_message=res.json()
+        '''
         self.login_message= "message(%s), Status(%s)" % (res.json()["Message"], res.json()["Status"])
         for i in xrange(len(res.json()["Data"])):
             for key  in res.json()["Data"][i]:
                     self.login_message += key +" %s" % res.json()["Data"][i][key]
-        return res.json()["Status"]
+        '''        
+        return self.login_message
         
 #资产列表
     def getassets(self):
-        Assets=self.s.post('https://jy.xzsec.com/Com/GetAssets',{'moneyType':'RMB'});
+        try:
+            Assets=self.s.post('https://jy.xzsec.com/Com/GetAssets',{'moneyType':'RMB'},timeout=3);
+        except:
+            print "getassets connection lost!"
+            self.login_flag=False
+            return False
+        if Assets.json()["Status"]!=0:
+            self.login_flag=False
+            return False
+        return Assets.json()["Data"][0]
+        
+        '''    
         print "可用资金：" + str(Assets.json()["Data"][0]["Kyzj"])
         print "可取资金：" + str(Assets.json()["Data"][0]["Kqzj"])
         print "人民币总资产：" + str(Assets.json()["Data"][0]["RMBZzc"])
@@ -40,7 +68,7 @@ class DFCF_Trader(object):
         print "资金余额：" + str(Assets.json()["Data"][0]["Zjye"])
         print "总市值：" + str(Assets.json()["Data"][0]["Zxsz"])
         print "----------------------------------------------------- \n"
-
+        '''
 #持仓列表
     def getstocklist(self):    
         self.stocklist_message=""
@@ -110,20 +138,37 @@ class DFCF_Trader(object):
 
         
 if __name__=="__main__":
-    user=DFCF_Trader()
-    try:
-        user.login()
-    except:#ConnectionError:
-        print "Connection lost!"
-        import sys
-        sys.exit()
+    import sys
+    import pandas as pd    
+
+    stdi, stdo, stde = sys.stdin, sys.stdout, sys.stderr  # 获取标准输入、标准输出和标准错误输出
+    reload(sys)
+    sys.stdin, sys.stdout, sys.stderr = stdi, stdo, stde  # 保持标准输入、标准输出和标准错误输出
+    sys.setdefaultencoding('utf8')
+
+
+    user=DFCF_Trader()    
+    while True:
+        if user.login_flag==True:
+            assets=user.getassets()
+            if assets:
+                assets.update(user.login_message['Data'][0])
+                sys.stdout.write( "\r %(khmc)s <%(Syspm1)s> Logged at: %(Date)s-%(Time)s \
+                                   总资产:%(Zzc)s  可用资金: %(Kyzj)s 可取资金: %(Kqzj)s \
+                                   冻结资金:%(Djzj)s 资金余额: %(Zjye)s 总市值: %(Zxsz)s " % assets)
+              
+            df=pd.DataFrame(user.login_message['Data'])            
+            df=df.ix[:,[0,5,1,6]]
+            df.columns = ['Date', 'Time','Account','Name']       
+            #print user.login_message['Data']
+            #print "qiwsir is in %(khmc)r"%user.login_message['Data']
+            #sys.stdout.write( "\r %(khmc)s <%(Syspm1)s> Logged at: %(Date)s-%(Time)s "  \
+            #                  % user.login_message['Data'][0])
+        time.sleep(1)
+        #user.login_flag=False
     
-    print user.login_message
-    
-    user.getrevokelist()
-    print user.revokelist_message
-    import time,sys,os
-    for i in xrange(0):
+'''     import time,sys
+    for i in xrange(10):
         user.getstocklist()
         
         sys.stdout.write("\r [%r] %200s" % (time.ctime(), user.stocklist_message))
@@ -131,9 +176,10 @@ if __name__=="__main__":
         #sys.stdout.write ("\rProcessing: [%2d%%]" % i)      
         sys.stdout.flush()
         time.sleep(.1)
-    #raw_input('input:')
-    #os.system("pause")
-    
+
+
+    user.getrevokelist()
+    print user.revokelist_message
     print "-----------"    
     user.getordersdata()
     print user.ordersdata_message
@@ -143,7 +189,7 @@ if __name__=="__main__":
 
     user.deal('600692','亚通股份','18.6','S')
     #user.revoke('20170116_132537')
-           
+'''           
 #----华丽的分割线 ：)  ---------------
 '''        
 s = requests.session()
