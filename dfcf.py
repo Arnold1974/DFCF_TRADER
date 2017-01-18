@@ -9,7 +9,7 @@ class DFCF_Trader(object):
         self.s = requests.session()
         
         self.login_flag=False        
-        thread_1 = threading.Thread(target=self.login,name='login thread')
+        thread_1 = threading.Thread(target=self.login,name='Thread-login')
         thread_1.setDaemon(True)
         thread_1.start()
 
@@ -17,11 +17,11 @@ class DFCF_Trader(object):
     def login(self):
         while True:
             if not self.login_flag:
-                print '[%s] logging in [%s]' % (time.strftime('%H:%M:%S'),threading.current_thread().name)
+                print '[%s] %s' % (time.strftime('%H:%M:%S'),threading.current_thread().name)
                 try:
                     self.__authorization()
                 except:  
-                    print "connection lost!"
+                    print "login connection lost!"
             time.sleep(1)
     def __authorization(self):
         headers = {'Host': 'jy.xzsec.com',
@@ -146,8 +146,10 @@ if __name__=="__main__":
     sys.stdin, sys.stdout, sys.stderr = stdi, stdo, stde  # 保持标准输入、标准输出和标准错误输出
     sys.setdefaultencoding('utf8')
 
-
-    user=DFCF_Trader()    
+    print threading.active_count()
+    print threading.enumerate()
+    
+    user=DFCF_Trader()
     while True:
         if user.login_flag==True:
             assets=user.getassets()
