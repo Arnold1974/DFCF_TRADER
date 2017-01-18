@@ -17,11 +17,11 @@ class DFCF_Trader(object):
     def login(self):
         while True:
             if not self.login_flag:
-                print '[%s] %s' % (time.strftime('%H:%M:%S'),threading.current_thread().name)
+                print '[%s] %s \n' % (time.strftime('%H:%M:%S'),threading.current_thread().name)
                 try:
                     self.__authorization()
-                except:  
-                    print "login connection lost!"
+                except Exception:  
+                    print "\n login connection lost!"
             time.sleep(1)
     def __authorization(self):
         headers = {'Host': 'jy.xzsec.com',
@@ -50,8 +50,8 @@ class DFCF_Trader(object):
     def getassets(self):
         try:
             Assets=self.s.post('https://jy.xzsec.com/Com/GetAssets',{'moneyType':'RMB'},timeout=3);
-        except:
-            print "getassets connection lost!"
+        except Exception:
+            print "\n getassets connection lost!"
             self.login_flag=False
             return False
         if Assets.json()["Status"]!=0:
@@ -155,9 +155,10 @@ if __name__=="__main__":
             assets=user.getassets()
             if assets:
                 assets.update(user.login_message['Data'][0])
-                sys.stdout.write( "\r %(khmc)s <%(Syspm1)s> Logged at: %(Date)s-%(Time)s \
-                                   总资产:%(Zzc)s  可用资金: %(Kyzj)s 可取资金: %(Kqzj)s \
-                                   冻结资金:%(Djzj)s 资金余额: %(Zjye)s 总市值: %(Zxsz)s " % assets)
+                sys.stdout.write( "\r%(khmc)s <%(Syspm1)s>\tLogged at: %(Date)s-%(Time)s \
+                                    **************************************************** \
+                                   总资产:%(Zzc)s\t可用资金:%(Kyzj)s\t可取资金:%(Kqzj)s\t \
+                                   冻结资金:%(Djzj)s\t资金余额: %(Zjye)s \t总市值: %(Zxsz)s " % assets)
               
             df=pd.DataFrame(user.login_message['Data'])            
             df=df.ix[:,[0,5,1,6]]
