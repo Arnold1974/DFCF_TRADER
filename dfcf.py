@@ -15,11 +15,13 @@ class DFCF_Trader(object):
 
 #登陆
     def login(self):
+        print '[%s] : %s start' % (time.strftime('%H:%M:%S'),threading.current_thread().name)
         while True:
             if not self.login_flag:
-                print '[%s] %s \n' % (time.strftime('%H:%M:%S'),threading.current_thread().name)
+                print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Logging...')
                 try:
                     self.__authorization()
+                    print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Login Success!')
                 except Exception:  
                     print "\n login connection lost!"
             time.sleep(1)
@@ -59,16 +61,7 @@ class DFCF_Trader(object):
             return False
         return Assets.json()["Data"][0]
         
-        '''    
-        print "可用资金：" + str(Assets.json()["Data"][0]["Kyzj"])
-        print "可取资金：" + str(Assets.json()["Data"][0]["Kqzj"])
-        print "人民币总资产：" + str(Assets.json()["Data"][0]["RMBZzc"])
-        print "总资产：" + str(Assets.json()["Data"][0]["Zzc"])
-        print "冻结资金：" + str(Assets.json()["Data"][0]["Djzj"])
-        print "资金余额：" + str(Assets.json()["Data"][0]["Zjye"])
-        print "总市值：" + str(Assets.json()["Data"][0]["Zxsz"])
-        print "----------------------------------------------------- \n"
-        '''
+
 #持仓列表
     def getstocklist(self):    
         self.stocklist_message=""
@@ -105,37 +98,48 @@ class DFCF_Trader(object):
        
 #撤单列表
     def getrevokelist(self):
-        self.revokelist_message=""
-        RevokeList=self.s.post('https://jy.xzsec.com/Trade/GetRevokeList')
+        try:
+            RevokeList=self.s.post('https://jy.xzsec.com/Trade/GetRevokeList',timeout=3)
+        except Exception:
+            self.login_flag=False
+        list=[]
         if len(RevokeList.json()["Data"])==0:
             print "Revoke List: %2d" % (0)
-        else:
+        else:           
             for i in xrange(len(RevokeList.json()["Data"])):
-                for key  in RevokeList.json()["Data"][i]:
-                    self.revokelist_message += key +":%s \n" % RevokeList.json()["Data"][i][key]
+                list.append(RevokeList.json()["Data"][i]["Wtrq"]+"_"+ \
+                            RevokeList.json()["Data"][i]["Wtbh"])                    
+        return list
 
 #撤单
     def revoke(self,wtbh):    
         RevokeOrders=self.s.post('https://jy.xzsec.com/Trade/RevokeOrders',{'revokes':wtbh})
-        print RevokeOrders.json()
-
+        return RevokeOrders
 
 #下单
     def deal(self,stockcode,stockname,price,tradetype):
         GetKyzjAndKml=self.s.post('https://jy.xzsec.com/Trade/GetKyzjAndKml', \
                              {'stockCode':stockcode,'stockName':stockname,'price':price,'tradeType':tradetype});
-        print GetKyzjAndKml.json()["Data"]["Kmml"]
         Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
         print Kmml, type(Kmml)
         
         SubmitTrade=self.s.post('https://jy.xzsec.com/Trade/SubmitTrade', \
                            {'stockCode':stockcode,'price':price, \
                            'amount':GetKyzjAndKml.json()["Data"]["Kmml"], \
-                           'tradeType':tradetype,'stockName':stockname}
+                           'tradeType':tradetype} #,'stockName':stockname
                            )       
         print "委托编号: [%s]" %  SubmitTrade.json()["Data"][0]["Wtbh"],
 
-
+#获取实时行情
+    def getquote(self):
+        params={
+                'id':'000619',
+                'callback':'jQuery18302588442438663068_1484803703313',
+                '_':str(time.time()).replace(".","")
+               }
+        quote=self.s.get('https://hsmarket.eastmoney.com/api/SHSZQuoteSnapshot',params = params)
+        print params['_']
+        return eval(quote.text)
         
 if __name__=="__main__":
     import sys
@@ -146,11 +150,14 @@ if __name__=="__main__":
     sys.stdin, sys.stdout, sys.stderr = stdi, stdo, stde  # 保持标准输入、标准输出和标准错误输出
     sys.setdefaultencoding('utf8')
 
-    print threading.active_count()
-    print threading.enumerate()
+    print "Active Threading: %d" % threading.active_count()
     
     user=DFCF_Trader()
-    while True:
+
+    if user.login_flag==True:
+        print "begin buy"
+        user.deal("000619","海螺型材","13.4","B")
+    while 0:
         if user.login_flag==True:
             assets=user.getassets()
             if assets:
@@ -168,7 +175,7 @@ if __name__=="__main__":
             #sys.stdout.write( "\r %(khmc)s <%(Syspm1)s> Logged at: %(Date)s-%(Time)s "  \
             #                  % user.login_message['Data'][0])
         time.sleep(1)
-        #user.login_flag=False
+
     
 '''     import time,sys
     for i in xrange(10):
