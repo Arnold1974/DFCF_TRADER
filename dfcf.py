@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import requests
-import json
+import json,re
 import threading,time
 
 class DFCF_Trader(object):
@@ -131,15 +131,14 @@ class DFCF_Trader(object):
         print "委托编号: [%s]" %  SubmitTrade.json()["Data"][0]["Wtbh"],
 
 #获取实时行情
-    def getquote(self):
+    def getquote(self,stockcode):
         params={
-                'id':'000619',
-                'callback':'jQuery18302588442438663068_1484803703313',
-                '_':str(time.time()).replace(".","")
+                'id':stockcode,
+                'callback':'',#'jQuery18302588442438663068_1484803703313',
+                '_':'' # repr(time.time()).replace(".","")
                }
         quote=self.s.get('https://hsmarket.eastmoney.com/api/SHSZQuoteSnapshot',params = params)
-        print params['_']
-        return eval(quote.text)
+        return eval(re.search(r'{.*}',quote.text).group())
         
 if __name__=="__main__":
     import sys
@@ -157,7 +156,7 @@ if __name__=="__main__":
     if user.login_flag==True:
         print "begin buy"
         user.deal("000619","海螺型材","13.4","B")
-    while 0:
+    while False:
         if user.login_flag==True:
             assets=user.getassets()
             if assets:
