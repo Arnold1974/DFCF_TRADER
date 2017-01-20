@@ -3,6 +3,7 @@
 import requests
 import json,re
 import threading,time
+from winsound import Beep
 
 class DFCF_Trader(object):
     def __init__(self):
@@ -22,7 +23,8 @@ class DFCF_Trader(object):
                 try:
                     self.__authorization()
                     print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Login Success!')
-                except Exception:  
+                except Exception:
+                    Beep(300,150)
                     print "\n login connection lost!"
             time.sleep(1)
     def __authorization(self):
@@ -156,7 +158,7 @@ if __name__=="__main__":
     if user.login_flag==True:
         print "begin buy"
         user.deal("000619","海螺型材","13.4","B")
-    while False:
+    while True:
         if user.login_flag==True:
             assets=user.getassets()
             if assets:
