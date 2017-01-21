@@ -167,7 +167,7 @@ if __name__=="__main__":
                                     **************************************************** \
                                    总资产:%(Zzc)s\t可用资金:%(Kyzj)s\t可取资金:%(Kqzj)s\t \
                                    冻结资金:%(Djzj)s\t资金余额: %(Zjye)s \t总市值: %(Zxsz)s " % assets)
-              
+                sys.stdout.flush()
             df=pd.DataFrame(user.login_message['Data'])            
             df=df.ix[:,[0,5,1,6]]
             df.columns = ['Date', 'Time','Account','Name']       
