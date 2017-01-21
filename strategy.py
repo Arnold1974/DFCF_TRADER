@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 
-import requests
 
+import requests
 
 STRATEGY_4_DAYS="http://www.iwencai.com/stockpick/load-data"
 STRATEGY_URL='http://www.iwencai.com/traceback/strategy/submit'
@@ -9,7 +9,11 @@ TRANSACTION_URL='http://www.iwencai.com/traceback/strategy/transaction'
 QUERY="非st; 收盘价在5元至30元之间; 总市值小于6000000000; 涨幅0%-6%; 15日区间涨跌幅<6%; 换手率<3.5%; 量比小于1.5; 市盈率(pe)<400;  boll突破中轨; dde大单净额流入; 一阳三线; a股市值(不含限售股)从小到大排列"
 
 class Strategy(object):
-    
+    """
+    利用同花顺回测引擎获取策略所需股票.
+
+    返回数据为JSON类型.
+    """
     def __init__(self):
         self.s = requests.session()
         headers={
@@ -39,28 +43,35 @@ class Strategy(object):
                }
         r=self.s.get(STRATEGY_4_DAYS,params=params)
         #print r.json()["data"]["result"]["result"][0][1]
-        print r.json()["data"]["result"]["result"][0][1]
-
+        return r.json()["data"]["result"]["result"]
 
 
     def traceback(self):
         url="http://www.iwencai.com/traceback/strategy/submit"
         params={
                 "query":QUERY,
-                "daysForSaleStrategy":"20,30,40,50,60",
-                "startDate":"2014-01-01",
-                "endDate":"2017-01-11",
+                "daysForSaleStrategy":"4",
+                "startDate":"2017-01-01",
+                "endDate":"2017-01-20",
                 "fell":"0.001",
-                "upperIncome":"40",
-                "lowerIncome":"20",
-                "fallIncome":"10",
-                "stockHoldCount":"2"               
+                "upperIncome":"20",
+                "lowerIncome":"8",
+                "fallIncome":"5",
+                "stockHoldCount":"1"               
                }
         r=self.s.post(url,data=params)
-        return r.json()
-       
+        #print r.json()['data']['stockData']['list']['data'][0]['codeName']
+        if r.json()['data']['stockData']['list']['stockNum']!=0:
+            return r.json()['data']['stockData']['list']
+        else:
+            return False
        
     def transaction(self):
+        '''
+        return: (JSON)
+        stock_code, bought_at,sold_at,buying_price,selling_price
+        hold_for, signal_return_rate,stock_name               
+        '''
         params_2={
                 "stime":"2017-01-01",
                 "etime":"2027-10-20",
@@ -79,19 +90,27 @@ class Strategy(object):
                 "newType":"0"
                  }
         r=self.s.post(TRANSACTION_URL,data=params_2)
-        print r.json()["data"][0]["stock_name"], \
-              r.json()["data"][0]["bought_at"], \
-              r.json()["data"][0]["sold_at"]
-       
+        if r.json()['success']!='false':
+            return r.json()["data"]
+
+        else:
+           return False
        
 if __name__=="__main__":
     #pickstock=Strategy()
     #pickstock.pickstock()
     
     test=Strategy()
-    print test.traceback()['data']['stockData']['list']['data'][0]['codeName']
-    test.transaction()
-
+    print test.pickstock()[0][1]
+    #print test.traceback()
+    r=test.transaction()
+    if r is not False:
+        for i in xrange(len(r)):        
+            result=r[i]
+            print "%s %s %8s %s %s %s" % (result["stock_name"], \
+                  result["bought_at"], result["sold_at"], \
+                  result["buying_price"],result["selling_price"], \
+                  result["signal_return_rate"]) 
 
 
 

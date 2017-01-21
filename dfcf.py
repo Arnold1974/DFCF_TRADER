@@ -9,6 +9,7 @@ class DFCF_Trader(object):
     def __init__(self):
         self.s = requests.session()
         
+        self.tradetime_flag=False
         self.login_flag=False        
         thread_1 = threading.Thread(target=self.login,name='Thread-login')
         thread_1.setDaemon(True)
@@ -26,7 +27,14 @@ class DFCF_Trader(object):
                 except Exception:
                     Beep(300,150)
                     print "\n login connection lost!"
-            time.sleep(1)
+           
+           #获取交易时间段
+            if  time.localtime().tm_wday in range(0,5) and \
+                (time.localtime().tm_hour in range(10,15) or \
+                time.localtime().tm_hour==9 and  time.localtime().tm_min in range(15,60)):
+                print 'Trade Time...'        
+                    
+            time.sleep(.5)
     def __authorization(self):
         headers = {'Host': 'jy.xzsec.com',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:50.0) Gecko/20100101 Firefox/50.0',
