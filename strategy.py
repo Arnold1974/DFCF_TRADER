@@ -1,7 +1,14 @@
 #-*- coding:utf-8 -*-
 
-
 import requests
+import sys
+
+stdi, stdo, stde = sys.stdin, sys.stdout, sys.stderr  # 获取标准输入、标准输出和标准错误输出
+reload(sys)
+sys.stdin, sys.stdout, sys.stderr = stdi, stdo, stde  # 保持标准输入、标准输出和标准错误输出
+sys.setdefaultencoding('utf8')
+
+
 
 STRATEGY_4_DAYS="http://www.iwencai.com/stockpick/load-data"
 STRATEGY_URL='http://www.iwencai.com/traceback/strategy/submit'
@@ -96,14 +103,27 @@ class Strategy(object):
         else:
            return False
     
-    def trade_cal():
-    '''
-            交易日历
-    isOpen=1是交易日，isOpen=0为休市
-    '''
+    def trade_cal(self):
+        '''
+                交易日历
+        isOpen=1是交易日，isOpen=0为休市
+        '''
         import pandas as pd
-        df=pd.read_csv("http://218.244.146.57/static/calAll.csv")
-        print df
+        df= pd.read_csv("http://218.244.146.57/static/calAll.csv")
+        buy_date='2017/01/26'
+        print df.ix[list(df['calendarDate']).index(buy_date),'isOpen']        
+        
+        #return pd.read_csv("http://218.244.146.57/static/calAll.csv")
+        def test():
+            index=df[df['calendarDate']==buy_date].index[0]
+            i=0
+            while i<3:
+                index+=1
+                if df.ix[index,'isOpen'] == 1:
+                    i+=1
+            print "%s 买入后, 应该卖出的第四个交易日为: %s" % (buy_date, df.ix[index,'calendarDate'])   
+        test()
+
 if __name__=="__main__":
     #pickstock=Strategy()
     #pickstock.pickstock()
