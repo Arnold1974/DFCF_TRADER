@@ -95,7 +95,15 @@ class Strategy(object):
 
         else:
            return False
-       
+    
+    def trade_cal():
+    '''
+            交易日历
+    isOpen=1是交易日，isOpen=0为休市
+    '''
+        import pandas as pd
+        df=pd.read_csv("http://218.244.146.57/static/calAll.csv")
+        print df
 if __name__=="__main__":
     #pickstock=Strategy()
     #pickstock.pickstock()
