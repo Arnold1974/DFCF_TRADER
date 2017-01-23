@@ -8,12 +8,11 @@ reload(sys)
 sys.stdin, sys.stdout, sys.stderr = stdi, stdo, stde  # 保持标准输入、标准输出和标准错误输出
 sys.setdefaultencoding('utf8')
 
-
-
-STRATEGY_4_DAYS="http://www.iwencai.com/stockpick/load-data"
+PICKSTOCK_URL="http://www.iwencai.com/stockpick/load-data"
 STRATEGY_URL='http://www.iwencai.com/traceback/strategy/submit'
 TRANSACTION_URL='http://www.iwencai.com/traceback/strategy/transaction'
-QUERY="非st; 收盘价在5元至30元之间; 总市值小于6000000000; 涨幅0%-6%; 15日区间涨跌幅<6%; 换手率<3.5%; 量比小于1.5; 市盈率(pe)<400;  boll突破中轨; dde大单净额流入; 一阳三线; a股市值(不含限售股)从小到大排列"
+QUERY_4_DAYS="非st; 收盘价在5元至30元之间; 总市值小于6000000000; 涨幅0%-6%; 15日区间涨跌幅<6%; 换手率<3.5%; 量比小于1.5; 市盈率(pe)<400;  boll突破中轨; dde大单净额流入; 一阳三线; a股市值(不含限售股)从小到大排列"
+QUERY_2_DAYS="DDE大单净量大于0.25；涨跌幅大于10%；市盈率小于45；非st股；非创业板；上市日期>30；总市值从小到大排列"
 
 class Strategy(object):
     """
@@ -45,10 +44,10 @@ class Strategy(object):
                 "querytype":"",
                 "searchfilter":"",
                 "tid":"stockpick",
-                "w":QUERY,
+                "w":QUERY_4_DAYS,
                 "queryarea":"" 
                }
-        r=self.s.get(STRATEGY_4_DAYS,params=params)
+        r=self.s.get(PICKSTOCK_URL,params=params)
         #print r.json()["data"]["result"]["result"][0][1]
         return r.json()["data"]["result"]["result"]
 
@@ -56,7 +55,7 @@ class Strategy(object):
     def traceback(self):
         url="http://www.iwencai.com/traceback/strategy/submit"
         params={
-                "query":QUERY,
+                "query":QUERY_4_DAYS,
                 "daysForSaleStrategy":"4",
                 "startDate":" ",
                 "endDate":" ",
@@ -93,7 +92,7 @@ class Strategy(object):
                 "endDate":" ",
                 "startDate":" ",
                 "daysForSaleStrategy":"4",
-                "query":QUERY,
+                "query":QUERY_4_DAYS,
                 "newType":"0"
                  }
         r=self.s.post(TRANSACTION_URL,data=params_2)
