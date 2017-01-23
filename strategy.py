@@ -58,8 +58,8 @@ class Strategy(object):
         params={
                 "query":QUERY,
                 "daysForSaleStrategy":"4",
-                "startDate":"2017-01-01",
-                "endDate":"2017-01-20",
+                "startDate":" ",
+                "endDate":" ",
                 "fell":"0.001",
                 "upperIncome":"20",
                 "lowerIncome":"8",
@@ -103,14 +103,14 @@ class Strategy(object):
         else:
            return False
     
-    def trade_cal(self):
+    def trade_calendar(self):
         '''
                 交易日历
         isOpen=1是交易日，isOpen=0为休市
         '''
         import pandas as pd
         df= pd.read_csv("http://218.244.146.57/static/calAll.csv")
-        buy_date='2017/01/26'
+        buy_date='2017/01/18'
         print df.ix[list(df['calendarDate']).index(buy_date),'isOpen']        
         
         #return pd.read_csv("http://218.244.146.57/static/calAll.csv")
@@ -129,8 +129,12 @@ if __name__=="__main__":
     #pickstock.pickstock()
     
     test=Strategy()
-    print test.pickstock()[0][1]
-    #print test.traceback()
+    print "即时选股: %s \n" % test.pickstock()[0][1] if len(test.pickstock())!=0 else "[]"
+    
+    
+    print test.traceback()["stockDate"] + "选出: "+ test.traceback()["data"][0]["codeName"]
+    
+    
     r=test.transaction()
     if r is not False:
         for i in xrange(len(r)):        
