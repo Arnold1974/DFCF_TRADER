@@ -43,7 +43,7 @@ sys.setdefaultencoding('utf8')
                 "queryarea":"" 
                  },
 
-"tracback_params":{
+"traceback_params":{
                 "query":"",
                 "daysForSaleStrategy":"4",
                 "startDate":" ",
@@ -108,12 +108,14 @@ class Strategy(object):
 
 
     def traceback(self):
-        tracback_params=self.config["tracback_params"]
-        tracback_params.update({"query":self.query,"daysForSaleStrategy":self.hold_days})
-        tracback_params.update({"upperIncome":self.upperIncome,
+        traceback_params=self.config["tracback_params"]
+        traceback_params.update({"query":self.query,
+                                "daysForSaleStrategy":self.hold_days})
+        traceback_params.update({"upperIncome":self.upperIncome,
                                 "lowerIncome":self.lowerIncome,
                                 "fallIncome":self.fallIncome}) 
-        r=self.s.post(self.config["STRATEGY_URL"],data=tracback_params)
+        
+        r=self.s.post(self.config["STRATEGY_URL"],data=traceback_params)
         #print r.json()['data']['stockData']['list']['data'][0]['codeName']
         if r.json()['data']['stockData']['list']['stockNum']!=0:
             return r.json()['data']['stockData']['list']
@@ -127,14 +129,17 @@ class Strategy(object):
         hold_for, signal_return_rate,stock_name               
         '''
         transaction_params=self.config["transaction_params"]
-        transaction_params.update({"query":self.query})
+        transaction_params.update({"query":self.query,
+                                   "hold_for":self.hold_days,
+                                   "daysForSaleStrategy":self.hold_days})
         transaction_params.update({"upperIncome":self.upperIncome,
                                    "lowerIncome":self.lowerIncome,
                                     "fallIncome":self.fallIncome}) 
+                          
         r=self.s.post(self.config["TRANSACTION_URL"],data=transaction_params)
+        
         if r.json()['success']!='false':
             return r.json()["data"]
-
         else:
            return False
     
@@ -160,14 +165,14 @@ class Strategy(object):
         test()
 
 if __name__=="__main__":
-    #pickstock=Strategy()
-    #pickstock.pickstock()
-    
     test=Strategy("QUERY_4_DAYS")
-    print "即时选股: %s \n" % test.pickstock()[0][1] if len(test.pickstock())!=0 else "[]"
     
-    if test.traceback()!=False:
-        print test.traceback()["stockDate"] + "选出: "+ test.traceback()["data"][0]["codeName"]
+    result=test.pickstock()
+    print "即时选股: %s \n" % result[0][1] if len(result)!=0 else "[]"
+    
+    result= test.traceback()
+    if result!=False:
+        print result["stockDate"] + "选出: "+ result["data"][0]["codeName"]
     else:
         print "[]"
     
