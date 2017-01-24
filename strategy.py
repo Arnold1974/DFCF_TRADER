@@ -8,6 +8,63 @@ reload(sys)
 sys.stdin, sys.stdout, sys.stderr = stdi, stdo, stde  # 保持标准输入、标准输出和标准错误输出
 sys.setdefaultencoding('utf8')
 
+
+{
+"PICKSTOCK_URL":"http://www.iwencai.com/stockpick/load-data",
+"STRATEGY_URL":'http://www.iwencai.com/traceback/strategy/submit',
+"TRANSACTION_URL":'http://www.iwencai.com/traceback/strategy/transaction',
+"QUERY_4_DAYS":"非st; 收盘价在5元至30元之间; 总市值小于6000000000; 涨幅0%-6%; 15日区间涨跌幅<6%; 换手率<3.5%; 量比小于1.5; 市盈率(pe)<400;  boll突破中轨; dde大单净额流入; 一阳三线; a股市值(不含限售股)从小到大排列",
+"QUERY_2_DAYS":"DDE大单净量大于0.25；涨跌幅大于10%；市盈率小于45；非st股；非创业板；上市日期>30；总市值从小到大排列",
+"pickstock_params":{
+                "typed":"0",
+                "preParams":"",
+                "ts":"1",
+                "f":"1",
+                "qs":"result_original",
+                "selfsectsn":"",
+                "querytype":"",
+                "searchfilter":"",
+                "tid":"stockpick",
+                "w":"",
+                "queryarea":"" 
+                 },
+
+"tracback_params":{
+                "query":"",
+                "daysForSaleStrategy":"4",
+                "startDate":" ",
+                "endDate":" ",
+                "fell":"0.001",
+                "upperIncome":"20",
+                "lowerIncome":"8",
+                "fallIncome":"5",
+                "stockHoldCount":"1"
+                 },
+  
+"transaction_params":{
+                "stime":"2017-01-01",
+                "etime":"2027-10-20",
+                "hold_for":"4",
+                "sort":"desc",
+                "title":"bought_at",
+                "stockHoldCount":"1",
+                "fallIncome":"5",
+                "lowerIncome":"8",
+                "upperIncome":"20",
+                "fell":"0.001",
+                "endDate":" ",
+                "startDate":" ",
+                "daysForSaleStrategy":"4",
+                "query":"",
+                "newType":"0"
+                 }               
+
+}
+
+
+
+
+
 PICKSTOCK_URL="http://www.iwencai.com/stockpick/load-data"
 STRATEGY_URL='http://www.iwencai.com/traceback/strategy/submit'
 TRANSACTION_URL='http://www.iwencai.com/traceback/strategy/transaction'
@@ -130,9 +187,10 @@ if __name__=="__main__":
     test=Strategy()
     print "即时选股: %s \n" % test.pickstock()[0][1] if len(test.pickstock())!=0 else "[]"
     
-    
-    print test.traceback()["stockDate"] + "选出: "+ test.traceback()["data"][0]["codeName"]
-    
+    if test.traceback()!=False:
+        print test.traceback()["stockDate"] + "选出: "+ test.traceback()["data"][0]["codeName"]
+    else:
+        print "[]"
     
     r=test.transaction()
     if r is not False:
