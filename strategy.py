@@ -139,7 +139,7 @@ if __name__=="__main__":
                   result["signal_return_rate"]) 
 
     a1=TradeCalendar()
-    a1.trade_calendar("2017/01/25",2)
+    a1.trade_calendar("2017/01/26",2)
 
 
 

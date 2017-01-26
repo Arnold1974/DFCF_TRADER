@@ -24,9 +24,10 @@ class DFCF_Trader(object):
                 try:
                     self.__authorization()
                     print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Login Success!')
+                    Beep(450,150)
                 except Exception:
-                    Beep(300,150)
-                    print "\n login connection lost!"
+                    Beep(600,500)
+                    print "\nLogin connection lost!"
            
            #获取交易时间段
             if  time.localtime().tm_wday in range(0,5) and \
