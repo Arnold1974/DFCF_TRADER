@@ -3,7 +3,8 @@
 import sys
 import requests
 import json,re
-import threading,time
+import threading
+import time
 from winsound import Beep
 
 class DFCF_Trader(object):
@@ -18,6 +19,7 @@ class DFCF_Trader(object):
 
 #登陆
     def login(self):
+   
         print '[%s] : %s start' % (time.strftime('%H:%M:%S'),threading.current_thread().name)
         while True:
             if not self.login_flag:
