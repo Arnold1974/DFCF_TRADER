@@ -1,20 +1,21 @@
 #-*- coding:utf-8 -*-
-'''
-import logging
+
+import logging,sys
 
 logger = logging.getLogger("Trader")
 logger.setLevel(logging.DEBUG)
 
 #  这里进行判断，如果logger.handlers列表为空，则添加，否则，直接去写日志
-if not logger.handlers:
+if  not logger.handlers:
     # 建立一个filehandler来把日志记录在文件里，级别为debug以上
-    fh = logging.FileHandler("./log/sample.log",mode='w')
+    fh = logging.FileHandler("./log/trade.log",mode='w')
     fh.setLevel(logging.INFO)
     # 建立一个streamhandler来把日志打在CMD窗口上，级别为error以上
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
     # 设置日志格式
-    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    formatter = logging.Formatter("%(asctime)s - %(funcName)s - %(levelname)s - %(message)s")
+    formatter.datefmt='%a,%Y-%m-%d %H:%M:%S'
     ch.setFormatter(formatter)
     fh.setFormatter(formatter)
     #将相应的handler添加在logger对象中
@@ -22,20 +23,33 @@ if not logger.handlers:
     logger.addHandler(fh)
 # 开始打日志
 
+def import_log_funcs():
+    '''Import the common log functions from the global logger to the module.'''
+    global logger
+ 
+    curr_mod = sys.modules[__name__]
+    log_funcs = ['debug', 'info', 'warning', 'error', 'critical',
+                 'exception']
+ 
+    for func_name in log_funcs:
+        func = getattr(logger, func_name)
+        setattr(curr_mod, func_name, func)
+ 
+import_log_funcs()
+
+
+
 def log(message):
-    logger.error(message)
-    
-logger.debug("debug message")
-logger.info("info message")
-logger.warn("warn message")
-logger.error("error message")
-logger.critical("critical message")
+    logger.debug(message)    
+    logger.debug("debug message")
+    logger.info("info message")
+    logger.warn("warn message")
+    logger.error("error message")
+    logger.critical("critical message")
 
-logger.handlers.pop()
-logger.handlers.pop()
-logging.shutdown()
 
-    '''
+
+
 def TestRotating():
     import logging
     import logging.handlers
@@ -53,5 +67,9 @@ def TestRotating():
     my_logger.handlers.pop()
     logging.shutdown() 
 
-TestRotating()       
-#log("aaa")
+if __name__=="__main__":
+    #TestRotating()       
+    log("aaa")
+    #logger.handlers.pop()
+    #logger.handlers.pop()
+    logging.shutdown()

@@ -45,7 +45,13 @@ class Strategy(object):
                                 "fallIncome":self.fallIncome}) 
         
         r=self.s.post(self.config["STRATEGY_URL"],data=traceback_params)
+
+        if r.json()['success']==False:
+            print r.json()['data']['crmMessage']
+            print u"抱歉，服务器繁忙，请稍后再试！"
+            return False
         #print r.json()['data']['stockData']['list']['data'][0]['codeName']
+        
         if r.json()['data']['stockData']['list']['stockNum']!=0:
             return r.json()['data']['stockData']['list']
         else:
@@ -66,11 +72,12 @@ class Strategy(object):
                                     "fallIncome":self.fallIncome}) 
                           
         r=self.s.post(self.config["TRANSACTION_URL"],data=transaction_params)
-        
-        if r.json()['success']!='false':
+
+        if r.json()['success']!=False:
             return r.json()["data"]
         else:
-           return False
+            print r.json()['data']['crmMessage']  #请求超时
+            return False
     
     def trade_calendar(self):
         '''
@@ -121,7 +128,7 @@ if __name__=="__main__":
     test=Strategy("QUERY_4_DAYS")
     
     result=test.pickstock()
-    print u"即时选股: %s \n" % result[0][1] if len(result)!=0 else "[]"
+    print u"即时选股: %s \n" % (result[0][1] if len(result)!=0 else "[]")
     
     result= test.traceback()
     if result!=False:

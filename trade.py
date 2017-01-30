@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 
+import sys
 import requests
 import json,re
 import threading,time
@@ -11,9 +12,9 @@ class DFCF_Trader(object):
         
         self.tradetime_flag=False
         self.login_flag=False        
-        thread_1 = threading.Thread(target=self.login,name='Thread-login')
-        thread_1.setDaemon(True)
-        thread_1.start()
+        self.thread_1 = threading.Thread(target=self.login,name='Thread-login')
+        self.thread_1.setDaemon(True)
+        self.thread_1.start()
 
 #登陆
     def login(self):
@@ -28,14 +29,8 @@ class DFCF_Trader(object):
                 except Exception:
                     Beep(600,500)
                     print "\nLogin connection lost!"
-           
-           #获取交易时间段
-            if  time.localtime().tm_wday in range(0,5) and \
-                (time.localtime().tm_hour in range(10,15) or \
-                time.localtime().tm_hour==9 and  time.localtime().tm_min in range(15,60)):
-                print 'Trade Time...'        
-                    
             time.sleep(.5)
+            
     def __authorization(self):
         headers = {'Host': 'jy.xzsec.com',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:50.0) Gecko/20100101 Firefox/50.0',
@@ -152,7 +147,6 @@ class DFCF_Trader(object):
         return eval(re.search(r'{.*}',quote.text).group())
         
 if __name__=="__main__":
-    import sys
     import pandas as pd    
 
     stdi, stdo, stde = sys.stdin, sys.stdout, sys.stderr  # 获取标准输入、标准输出和标准错误输出
