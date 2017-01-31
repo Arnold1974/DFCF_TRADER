@@ -4,7 +4,7 @@ import sys
 import requests
 import json,re
 import threading
-import time
+import time,log
 from winsound import Beep
 
 class DFCF_Trader(object):
@@ -23,10 +23,12 @@ class DFCF_Trader(object):
         print '[%s] : %s start' % (time.strftime('%H:%M:%S'),threading.current_thread().name)
         while True:
             if not self.login_flag:
-                print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Logging...')
+                #print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Logging...')
+                log.info('Logging...')
                 try:
                     self.__authorization()
-                    print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Login Success!')
+                    #print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Login Success!')
+                    log.info('Login Success!')
                     Beep(450,150)
                 except Exception:
                     Beep(600,500)

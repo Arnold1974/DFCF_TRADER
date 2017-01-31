@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
-
-from log import logger as log
+import log
+#from log import logger as log
 from strategy import Strategy
 from trade import DFCF_Trader
 import sys
@@ -19,7 +19,7 @@ def get_trade_time():
 
     
 
-if __name__=="__main__":
+def run():
     strategy=Strategy("QUERY_4_DAYS")
     trader=DFCF_Trader()
 
@@ -27,9 +27,9 @@ if __name__=="__main__":
         trader.__init__()
 
     result=strategy.pickstock()
-    log.info(u"即时选股: %s \n" % (result[0][1] if len(result)!=0 else "[]"))
+    log.info(u"即时选股: %s " % (result[0][1] if len(result)!=0 else "[]"))
     result= strategy.traceback()
-    log.info("%s 选出: %s" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
+    log.info(u"[%s]选出:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
     r=strategy.transaction()
     if r is not False:
         for i in xrange(len(r)):        
@@ -43,4 +43,5 @@ if __name__=="__main__":
             sys.stdout.write("\r[Time]: %10s \t [Thread-active]: %s" % (time.strftime("%Y-%m-%d %X",time.localtime()),trader.thread_1.isAlive()))
             time.sleep(1)
             
-            
+if __name__=="__main__":
+    run()            

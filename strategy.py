@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 
 import requests
-import sys
+import sys,log
 import json
 
 
@@ -106,7 +106,6 @@ if __name__=="__main__":
    
     result=test.pickstock()
     print u"即时选股: %s \n" % (result[0][1] if len(result)!=0 else "[]")
-    
     result= test.traceback()
     if result!=False:
         print result["stockDate"] + "选出: "+ result["data"][0]["codeName"]

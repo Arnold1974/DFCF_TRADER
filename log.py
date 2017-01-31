@@ -8,14 +8,14 @@ logger.setLevel(logging.DEBUG)
 #  这里进行判断，如果logger.handlers列表为空，则添加，否则，直接去写日志
 if  not logger.handlers:
     # 建立一个filehandler来把日志记录在文件里，级别为debug以上
-    fh = logging.FileHandler("./log/trade.log",mode='w')
+    fh = logging.FileHandler("./log/trade.log",mode='a')
     fh.setLevel(logging.INFO)
     # 建立一个streamhandler来把日志打在CMD窗口上，级别为error以上
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
     # 设置日志格式
     formatter = logging.Formatter("%(asctime)s - %(funcName)s - %(levelname)s - %(message)s")
-    formatter.datefmt='%a,%Y-%m-%d %H:%M:%S'
+    formatter.datefmt='[%Y-%m-%d %H:%M:%S]'
     ch.setFormatter(formatter)
     fh.setFormatter(formatter)
     #将相应的handler添加在logger对象中
@@ -26,7 +26,7 @@ if  not logger.handlers:
 def import_log_funcs():
     '''Import the common log functions from the global logger to the module.'''
     global logger
- 
+    
     curr_mod = sys.modules[__name__]
     log_funcs = ['debug', 'info', 'warning', 'error', 'critical',
                  'exception']
