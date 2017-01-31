@@ -42,3 +42,5 @@ if __name__=="__main__":
         if trader.login_flag==True:
             sys.stdout.write("\r[Time]: %10s \t [Thread-active]: %s" % (time.strftime("%Y-%m-%d %X",time.localtime()),trader.thread_1.isAlive()))
             time.sleep(1)
+            
+            
