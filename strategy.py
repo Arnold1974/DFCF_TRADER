@@ -26,7 +26,7 @@ class Strategy(object):
         self.upperIncome=str(upperIncome)
         self.lowerIncome=str(lowerIncome)
         self.fallIncome=str(fallIncome)
-        print u"策略持股天数: %s days \t 止损止盈：%s|%s|%s" % (self.hold_days,self.upperIncome,self.lowerIncome,self.fallIncome)
+        print u"\n[策略]: %s days \t [止损止盈]：%s|%s|%s" % (self.hold_days,self.upperIncome,self.lowerIncome,self.fallIncome)
         
     def pickstock(self):
         pickstock_params=self.config["pickstock_params"]
@@ -122,8 +122,7 @@ if __name__=="__main__":
                   result["buying_price"],result["selling_price"], \
                   result["signal_return_rate"]) 
 
-    a1=TradeCalendar()
-    a1.trade_calendar("2017/01/26",2)
+
 
 
 
