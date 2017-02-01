@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 
 import requests
-import sys,log
+import sys
 import json
 
 
@@ -79,26 +79,7 @@ class Strategy(object):
             print r.json()['data']['crmMessage']  #请求超时
             return False
     
-    def trade_calendar(self):
-        '''
-                交易日历
-        isOpen=1是交易日，isOpen=0为休市
-        '''
-        import pandas as pd
-        df= pd.read_csv(self.config["TRADE_CALENDAR_URL"])
-        buy_date='2017/01/18'
-        print df.ix[list(df['calendarDate']).index(buy_date),'isOpen']        
-        
-        #return pd.read_csv("http://218.244.146.57/static/calAll.csv")
-        def test():
-            index=df[df['calendarDate']==buy_date].index[0]
-            i=0
-            while i<3:
-                index+=1
-                if df.ix[index,'isOpen'] == 1:
-                    i+=1
-            print u"%s 买入后, 应该卖出的第四个交易日为: %s" % (buy_date, df.ix[index,'calendarDate'])   
-        test()
+
  
         
 if __name__=="__main__":
