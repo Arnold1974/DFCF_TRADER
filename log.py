@@ -14,7 +14,7 @@ if  not logger.handlers:
     ch = logging.StreamHandler()
     ch.setLevel(logging.DEBUG)
     # 设置日志格式
-    formatter = logging.Formatter("%(asctime)s - %(funcName)s - %(levelname)s - %(message)s")
+    formatter = logging.Formatter("%(asctime)s - %(funcName)s-%(levelname)s: %(message)s")
     formatter.datefmt='[%Y-%m-%d %H:%M:%S]'
     ch.setFormatter(formatter)
     fh.setFormatter(formatter)

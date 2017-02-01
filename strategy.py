@@ -22,12 +22,16 @@ class Strategy(object):
         self.config=json.load(file("./config/strategy.json"))
         self.s.headers.update(self.config["headers"])
         self.query=self.config[arg_query]
+        self.stockHoldCount=self.config['transaction_params']['stockHoldCount']
         self.hold_days=arg_query.split("_")[1]
         self.upperIncome=str(upperIncome)
         self.lowerIncome=str(lowerIncome)
         self.fallIncome=str(fallIncome)
-        print u"\n[策略]: %s days \t [止损止盈]：%s|%s|%s" % (self.hold_days,self.upperIncome,self.lowerIncome,self.fallIncome)
-        
+        print '\n{0:-^60}'.format('')
+        print u"[策略]: %s days \t [止损止盈]：%s|%s|%s \t [满仓]：%s 只" % (self.hold_days,self.upperIncome,self.lowerIncome,self.fallIncome,self.stockHoldCount)
+        print '{0:-^60}\n'.format('')
+        self.success= True
+    
     def pickstock(self):
         pickstock_params=self.config["pickstock_params"]
         pickstock_params.update({"w":self.query})

@@ -20,7 +20,7 @@ class DFCF_Trader(object):
 #登陆
     def login(self):
    
-        print '[%s] : %s start' % (time.strftime('%H:%M:%S'),threading.current_thread().name)
+        log.info('%s Active...' % threading.current_thread().name)
         while True:
             if not self.login_flag:
                 #print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Logging...')
@@ -28,11 +28,11 @@ class DFCF_Trader(object):
                 try:
                     self.__authorization()
                     #print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Login Success!')
-                    log.info('Login Success!')
+                    log.info('Login Success') if self.login_flag==True else log.info('Login Failed')
                     Beep(450,150)
                 except Exception:
                     Beep(600,500)
-                    print "\nLogin connection lost!"
+                    log.info("Login connection lost !!!")
             time.sleep(.5)
             
     def __authorization(self):
