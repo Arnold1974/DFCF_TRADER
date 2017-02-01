@@ -30,7 +30,8 @@ class TradeCalendar(object):
                 i+=1
         print u"%s买入后, 应该卖出的第%d个交易日为: %s" % (buy_date, hold_days, self.df.ix[index, 'calendarDate'])   
 
-    def trade_day(self,buy_date=time.strftime("%Y/%m/%d",time.localtime())):
+    def trade_day(self):
+        buy_date=time.strftime("%Y/%m/%d",time.localtime())
         return self.df.ix[list(self.df['calendarDate']).index(buy_date),'isOpen']        
 
      
