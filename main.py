@@ -21,10 +21,10 @@ def none_trade_day():
         assets=trader.getassets()
         if assets:
             assets.update(trader.login_message['Data'][0])
-            sys.stdout.write( "\r%(khmc)s [%(Syspm1)s]\tLogged at: [%(Date)s-%(Time)s] \
-                                **************************************************** \
-                               总资产:%(Zzc)s\t可用资金:%(Kyzj)s\t可取资金:%(Kqzj)s\t \
-                               冻结资金:%(Djzj)s\t资金余额: %(Zjye)s \t总市值: %(Zxsz)s " % assets)
+            print "\n%(khmc)s [%(Syspm1)s]\tLogged at: [%(Date)s-%(Time)s]" % assets
+            print "****************************************************" % assets
+            print "总资产:%(Zzc)s\t可用资金:%(Kyzj)s\t可取资金:%(Kqzj)s\t" % assets
+            print "冻结资金:%(Djzj)s\t资金余额: %(Zjye)s \t总市值: %(Zxsz)s" % assets
             sys.stdout.flush()
         df=pd.DataFrame(trader.login_message['Data'])            
         df=df.ix[:,[0,5,1,6]]
@@ -36,6 +36,30 @@ def none_trade_day():
     while not calendar.trade_day():
         #sys.stdout.write("\r "+time.ctime())
         time.sleep(1)           
+
+def none_trade_time():
+    if trader.login_flag==True:
+        assets=trader.getassets()
+        if assets:
+            assets.update(trader.login_message['Data'][0])
+            print "\n%(khmc)s [%(Syspm1)s]\t    Logged at: [%(Date)s-%(Time)s]" % assets
+            print '{0:-^60}'.format('')
+            print "总资产: %(Zzc)10s\t可用资金: %(Kyzj)9s\t 可取资金: %(Kqzj)9s" % assets
+            print "总市值: %(Zxsz)10s\t冻结资金: %(Djzj)9s\t 资金余额: %(Zjye)9s" % assets
+            print '{0:-^60}'.format('')
+            
+            sys.stdout.flush()
+        df=pd.DataFrame(trader.login_message['Data'])            
+        df=df.ix[:,[0,5,1,6]]
+        df.columns = ['Date', 'Time','Account','Name']       
+
+    while not calendar.trade_time():
+        if int(time.time()) % 2:
+             sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"--> None Trade Time !"))           
+        else:
+             sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"-->                  "))
+        time.sleep(1)
+    
 
 def monitor():
     result=strategy.pickstock()
@@ -84,7 +108,7 @@ def thread_login_keep_alive():
 
 def run():
     while trader.login_flag<>True:
-        time.sleep(.5)
+        time.sleep(1)
 
     while True:
         # 是否开市的日期
@@ -94,14 +118,13 @@ def run():
             time.sleep(1)
             continue
         elif not calendar.trade_time():
-            print "Trade day, NONE Trade time"
-            test();break
-            time.sleep(1)
-            continue
+            none_trade_time()
+            
         else: #进入交易时间
+
             print '\n{0:-^60}'.format(' Trade Time ')
             #monitor()
-            test();break
+            #test();break
             time.sleep(.5)
 
 if __name__=="__main__":

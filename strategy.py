@@ -87,7 +87,7 @@ class Strategy(object):
  
         
 if __name__=="__main__":
-    test=Strategy("QUERY_2_DAYS")
+    test=Strategy("QUERY_4_DAYS")
    
     result=test.pickstock()
     print u"即时选股: %s" % (result[0][1] if len(result)!=0 else "[]")
