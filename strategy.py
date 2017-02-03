@@ -98,11 +98,12 @@ if __name__=="__main__":
         print "[]"
     
     r=test.transaction()
+    print '\n{0:-^60}'.format(' protfolie value ')
     if r is not False:
         portfolio=1
         for i in xrange(len(r)-1,-1,-1):
             result=r[i]
-            print "%s %s %8s %6s %6s %6s   %1.3f" % (result["stock_name"], \
+            print "%s %s %8s  %6s %6s %6s   %1.3f" % (result["stock_name"], \
                   result["bought_at"], result["sold_at"], \
                   result["buying_price"],result["selling_price"], \
                   result["signal_return_rate"], \

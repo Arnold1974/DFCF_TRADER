@@ -69,16 +69,14 @@ def run():
         if not calendar.trade_day():
             print '\n{0:-^60}'.format('NONE TRADE DAY')
             none_trade_day()
-            time.sleep(1)
             continue
         elif not calendar.trade_time():
             print "Trade day, NONE Trade time"
-            time.sleep(1)
             continue
         else: #进入交易时间
-            print 'trade time'
+            print '\ntrade time'
             monitor()
-            time.sleep(.5)
+        time.sleep(.5)
 
 if __name__=="__main__":
     run()            
