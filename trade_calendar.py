@@ -46,6 +46,6 @@ class TradeCalendar(object):
          
 if __name__=="__main__":
     test=TradeCalendar()
-    test.trade_calendar("2017/12/26",2)   
+    test.trade_calendar("2017/02/03",2)   
     print test.trade_day()    
     print test.trade_time()

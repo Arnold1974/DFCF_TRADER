@@ -14,23 +14,7 @@ time.sleep(.5)
 trader=DFCF_Trader()
 calendar=TradeCalendar()
 
-def monitor():
-    result=strategy.pickstock()
-    log.info(u"即时选股: %s " % (result[0][1] if len(result)!=0 else "[]"))
-    result= strategy.traceback()
-    log.info(u"[%s]选出:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
-    r=strategy.transaction()
-    if r is not False:
-        for i in xrange(len(r)):        
-            result=r[i]
-            print "%s %s %8s %s %s %s" % (result["stock_name"], \
-                  result["bought_at"], result["sold_at"], \
-                  result["buying_price"],result["selling_price"], \
-                  result["signal_return_rate"])   
-    while True:   
-        if trader.login_flag==True:
-            sys.stdout.write("\r[Time]: %10s \t [Thread-active]: %s" % (time.strftime("%Y-%m-%d %X",time.localtime()),trader.thread_1.isAlive()))
-            time.sleep(1)
+
             
 def none_trade_day():
     if trader.login_flag==True:
@@ -53,30 +37,48 @@ def none_trade_day():
         #sys.stdout.write("\r "+time.ctime())
         time.sleep(1)           
 
-def thread_login_keep_alive():
-    while True:
-        if trader.thread_1.isAlive()==False:
-            trader.__init__()
-            time.sleep(2)    
-    time.slppe(1)
+def monitor():
+    result=strategy.pickstock()
+    log.info(u"即时选股: %s " % (result[0][1] if len(result)!=0 else "[]"))
+    result= strategy.traceback()
+    log.info(u"[%s]选出:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
+    r=strategy.transaction()
+    if r is not False:
+        for i in xrange(len(r)):        
+            result=r[i]
+            print "%s %s %8s %s %s %s" % (result["stock_name"], \
+                  result["bought_at"], result["sold_at"], \
+                  result["buying_price"],result["selling_price"], \
+                  result["signal_return_rate"])   
+    while True:   
+        if trader.login_flag==True:
+            sys.stdout.write("\r[Time]: %10s \t [Thread-active]: %s" % (time.strftime("%Y-%m-%d %X",time.localtime()),trader.thread_1.isAlive()))
+            time.sleep(1)
 
+def thread_login_keep_alive():
+    if trader.thread_1.isAlive()==False:
+        trader.__init__()
+        time.sleep(2)    
 
 def run():
     while trader.login_flag<>True:
         time.sleep(.5)
 
+    while True:
         # 是否开市的日期
         if not calendar.trade_day():
             print '\n{0:-^60}'.format('NONE TRADE DAY')
             none_trade_day()
+            time.sleep(1)
             continue
         elif not calendar.trade_time():
             print "Trade day, NONE Trade time"
+            time.sleep(1)
             continue
         else: #进入交易时间
-            print '\ntrade time'
+            print 'trade time'
             monitor()
-        time.sleep(.5)
+            time.sleep(.5)
 
 if __name__=="__main__":
     run()            
