@@ -131,8 +131,8 @@ class DFCF_Trader(object):
         GetKyzjAndKml=self.s.post('https://jy.xzsec.com/Trade/GetKyzjAndKml', \
                              {'stockCode':stockcode,'stockName':stockname,'price':price,'tradeType':tradetype});
         Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
-        print Kmml, type(Kmml)
-        
+        print u"可买卖量 %s" % Kmml
+
         SubmitTrade=self.s.post('https://jy.xzsec.com/Trade/SubmitTrade', \
                            {'stockCode':stockcode,'price':price, \
                            'amount':GetKyzjAndKml.json()["Data"]["Kmml"], \
@@ -162,9 +162,7 @@ if __name__=="__main__":
     
     user=DFCF_Trader()
 
-    if user.login_flag==True:
-        print "begin buy"
-        user.deal("000619","海螺型材","13.4","B")
+
     while True:
         if user.login_flag==True:
             assets=user.getassets()

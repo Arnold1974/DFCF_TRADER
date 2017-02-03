@@ -9,7 +9,7 @@ import sys
 import time
 import pandas as pd
 
-strategy=Strategy("QUERY_4_DAYS")
+strategy=Strategy("QUERY_2_DAYS")
 time.sleep(.5)
 trader=DFCF_Trader()
 calendar=TradeCalendar()
@@ -55,6 +55,28 @@ def monitor():
             sys.stdout.write("\r[Time]: %10s \t [Thread-active]: %s" % (time.strftime("%Y-%m-%d %X",time.localtime()),trader.thread_1.isAlive()))
             time.sleep(1)
 
+def test():
+    if trader.login_flag==True:
+        result= strategy.traceback()
+        code=result["data"][0]["code"]
+        codename= result["data"][0]["codeName"]
+        quote=trader.getquote(code)
+
+        print quote['name'],quote['code'],quote['topprice'],quote['bottomprice'],\
+              quote['realtimequote']['open'],quote['realtimequote']['time'],\
+              quote['realtimequote']['currentPrice'],\
+              quote['realtimequote']['zd'],\
+              quote['realtimequote']['zdf'],\
+              quote['fivequote']['buy1'],\
+              quote['fivequote']['sale1']
+              
+  
+        if result!=False:
+            print "Begin Buy: " + codename
+            
+            trader.deal(code,codename,quote['fivequote']['sale5'],'B')
+            #trader.deal("000619","海螺型材","13.4","B")
+
 def thread_login_keep_alive():
     if trader.thread_1.isAlive()==False:
         trader.__init__()
@@ -73,11 +95,13 @@ def run():
             continue
         elif not calendar.trade_time():
             print "Trade day, NONE Trade time"
+            test();break
             time.sleep(1)
             continue
         else: #进入交易时间
-            print 'trade time'
-            monitor()
+            print '\n{0:-^60}'.format(' Trade Time ')
+            #monitor()
+            test();break
             time.sleep(.5)
 
 if __name__=="__main__":

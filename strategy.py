@@ -93,12 +93,12 @@ if __name__=="__main__":
     print u"即时选股: %s" % (result[0][1] if len(result)!=0 else "[]")
     result= test.traceback()
     if result!=False:
-        print result["stockDate"] + "选出: "+ result["data"][0]["codeName"]
+        print result["stockDate"] + " 选出: "+ result["data"][0]["codeName"] + " < "+result["data"][0]["code"]+" >"
     else:
         print "[]"
     
     r=test.transaction()
-    print '\n{0:-^60}'.format(' protfolie value ')
+    print '\n{0:-^60}'.format('Portfolie Value ')
     if r is not False:
         portfolio=1
         for i in xrange(len(r)-1,-1,-1):
