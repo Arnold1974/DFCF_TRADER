@@ -87,10 +87,10 @@ class Strategy(object):
  
         
 if __name__=="__main__":
-    test=Strategy("QUERY_4_DAYS")
+    test=Strategy("QUERY_2_DAYS")
    
     result=test.pickstock()
-    print u"即时选股: %s \n" % (result[0][1] if len(result)!=0 else "[]")
+    print u"即时选股: %s" % (result[0][1] if len(result)!=0 else "[]")
     result= test.traceback()
     if result!=False:
         print result["stockDate"] + "选出: "+ result["data"][0]["codeName"]
@@ -99,13 +99,15 @@ if __name__=="__main__":
     
     r=test.transaction()
     if r is not False:
-        for i in xrange(len(r)):        
+        portfolio=1
+        for i in xrange(len(r)-1,-1,-1):
             result=r[i]
-            print "%s %s %8s %s %s %s" % (result["stock_name"], \
+            print "%s %s %8s %6s %6s %6s   %1.3f" % (result["stock_name"], \
                   result["bought_at"], result["sold_at"], \
                   result["buying_price"],result["selling_price"], \
-                  result["signal_return_rate"]) 
-
+                  result["signal_return_rate"], \
+                  (1+float(result["signal_return_rate"])/100)*portfolio)                       
+            portfolio *= 1+float(result["signal_return_rate"])/100
 
 
 

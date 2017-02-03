@@ -53,14 +53,18 @@ def none_trade_day():
         #sys.stdout.write("\r "+time.ctime())
         time.sleep(1)           
 
+def thread_login_keep_alive():
+    while True:
+        if trader.thread_1.isAlive()==False:
+            trader.__init__()
+            time.sleep(2)    
+    time.slppe(1)
+
 
 def run():
     while trader.login_flag<>True:
         time.sleep(.5)
-    while True:
-        if trader.thread_1.isAlive()==False:
-            trader.__init__()
-            time.sleep(2)
+
         # 是否开市的日期
         if not calendar.trade_day():
             print '\n{0:-^60}'.format('NONE TRADE DAY')
@@ -68,7 +72,7 @@ def run():
             time.sleep(1)
             continue
         elif not calendar.trade_time():
-            print "NONE Trade time"
+            print "Trade day, NONE Trade time"
             time.sleep(1)
             continue
         else: #进入交易时间
