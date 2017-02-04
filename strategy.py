@@ -28,10 +28,10 @@ class Strategy(object):
         self.lowerIncome=str(lowerIncome)
         self.fallIncome=str(fallIncome)
         print '\n{0:-^60}'.format('')
-        print u"[策略]: %s days \t [止损止盈]：%s|%s|%s \t [满仓]：%s 只" % (self.hold_days,self.upperIncome,self.lowerIncome,self.fallIncome,self.stockHoldCount)
+        print u"[策略]: %s days \t   [止损止盈]：%s|%s|%s \t [满仓]：%s 只" % (self.hold_days,self.upperIncome,self.lowerIncome,self.fallIncome,self.stockHoldCount)
         print '{0:-^60}\n'.format('')
         self.success= True
-    
+
     #即时选股
     def pickstock(self):
         pickstock_params=self.config["pickstock_params"]
@@ -104,7 +104,7 @@ if __name__=="__main__":
     else:
         print "[]"
     
-    r=test.transaction(stime='2015-01-01',etime='2015-12-31')
+    r=test.transaction(stime='2015-01-01',etime='2016-12-31')
     print '\n{0:-^60}'.format('Portfolie Value ')
     if r is not False:
         portfolio=1
