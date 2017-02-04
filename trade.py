@@ -69,10 +69,14 @@ class DFCF_Trader(object):
             else:
                 try:
                     return Assets.json()["Data"][0]                    
-                except ValueError:
+                except ValueError: 
                     self.login_flag=False
                     time.sleep(2)
-                    continue           
+                    continue
+                except TypeError: #Status:-1; Message:'服务器异常'
+                    print u"\n <getassets> 服务器异常!"
+                    time.sleep(2)
+                    continue                   
                 '''                
                 if Assets.json()["Status"]!=0: #Status:-2 ; Message:"会话已超时，请重新登录!"
                     self.login_flag=False
@@ -203,7 +207,7 @@ if __name__=="__main__":
             #print "qiwsir is in %(khmc)r"%user.login_message['Data']
             #sys.stdout.write( "\r %(khmc)s <%(Syspm1)s> Logged at: %(Date)s-%(Time)s "  \
             #                  % user.login_message['Data'][0])
-        time.sleep(1)
+        time.sleep(3)
 
     
 '''     import time,sys
