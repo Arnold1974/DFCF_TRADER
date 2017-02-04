@@ -21,11 +21,13 @@ def none_trade_day():
         assets=trader.getassets()
         if assets:
             assets.update(trader.login_message['Data'][0])
+            print '\033[1;36m'
             print "\n%(khmc)s [%(Syspm1)s]\t    Logged at: [%(Date)s-%(Time)s]" % assets
             print '{0:-^60}'.format('')
             print "总资产: %(Zzc)10s\t可用资金: %(Kyzj)9s\t 可取资金: %(Kqzj)9s" % assets
             print "总市值: %(Zxsz)10s\t冻结资金: %(Djzj)9s\t 资金余额: %(Zjye)9s" % assets
             print '{0:-^60}'.format('')
+            print '\033[0m'
             sys.stdout.flush()
         df=pd.DataFrame(trader.login_message['Data'])            
         df=df.ix[:,[0,5,1,6]]
@@ -114,7 +116,7 @@ def run():
     while True:
         # 是否开市的日期
         if not calendar.trade_day():
-            print '\n{0:-^60}'.format('NONE TRADE DAY')
+            print '\n{0:-^72}'.format('\033[20;43mNONE TRADE DAY\033[0m')
             none_trade_day()
             continue
         elif not calendar.trade_time():
@@ -122,7 +124,7 @@ def run():
             continue
         else: #进入交易时间
 
-            print '\n{0:-^60}'.format(' Trade Time ')
+            print '\n{0:-^72}'.format('\033[20;43mTRADE TIME\033[0m')
             #monitor()
             #test();break
             time.sleep(.5)
