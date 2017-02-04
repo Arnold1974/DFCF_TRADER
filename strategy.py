@@ -44,30 +44,25 @@ class Strategy(object):
     def traceback(self):
         traceback_params=self.config["traceback_params"]
         traceback_params.update({"query":self.query,
-                                "daysForSaleStrategy":self.hold_days})
-        traceback_params.update({"upperIncome":self.upperIncome,
+                                "daysForSaleStrategy":self.hold_days,
+                                "upperIncome":self.upperIncome,
                                 "lowerIncome":self.lowerIncome,
-                                "fallIncome":self.fallIncome}) 
-        
+                                "fallIncome":self.fallIncome})        
         while True:
             try:
-                r=self.s.post(self.config["STRATEGY_URL"],data=traceback_params)#,timeout=3)
+                r=self.s.post(self.config["STRATEGY_URL"],data=traceback_params,timeout=3)
             except Exception as e:
                 print e;time.sleep(2)
-            else:
-                break
-
-        
-        if r.json()['success']==False:
-            print r.json()['data']['crmMessage']
-            print u"抱歉，服务器繁忙，请稍后再试！"
-            return False
-        #print r.json()['data']['stockData']['list']['data'][0]['codeName']
-        
-        if r.json()['data']['stockData']['list']['stockNum']!=0:
-            return r.json()['data']['stockData']['list']
-        else:
-            return False
+            else:       
+                if r.json()['success']==False:
+                    print r.json()['data']['crmMessage']
+                    print u"抱歉，服务器繁忙，请稍后再试！"
+                    continue
+                #print r.json()['data']['stockData']['list']['data'][0]['codeName']               
+                if r.json()['data']['stockData']['list']['stockNum']!=0:
+                    return r.json()['data']['stockData']['list']
+                else:
+                    return False
     
     #策略回测   
     def transaction(self,stime='2015-01-01',etime='2027-01-01'):
