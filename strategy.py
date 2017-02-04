@@ -32,6 +32,7 @@ class Strategy(object):
         print '{0:-^60}\n'.format('')
         self.success= True
     
+    #即时选股
     def pickstock(self):
         pickstock_params=self.config["pickstock_params"]
         pickstock_params.update({"w":self.query})
@@ -39,7 +40,7 @@ class Strategy(object):
         #print r.json()["data"]["result"]["result"][0][1]
         return r.json()["data"]["result"]["result"]
 
-
+    #回测选股
     def traceback(self):
         traceback_params=self.config["traceback_params"]
         traceback_params.update({"query":self.query,
@@ -50,7 +51,7 @@ class Strategy(object):
         
         while True:
             try:
-                r=self.s.post(self.config["STRATEGY_URL"],data=traceback_params,timeout=3)
+                r=self.s.post(self.config["STRATEGY_URL"],data=traceback_params)#,timeout=3)
             except Exception as e:
                 print e;time.sleep(2)
             else:
@@ -67,8 +68,9 @@ class Strategy(object):
             return r.json()['data']['stockData']['list']
         else:
             return False
-       
-    def transaction(self):
+    
+    #策略回测   
+    def transaction(self,stime='2015-01-01',etime='2027-01-01'):
         '''
         return: (JSON)
         stock_code, bought_at,sold_at,buying_price,selling_price
@@ -80,7 +82,10 @@ class Strategy(object):
                                    "daysForSaleStrategy":self.hold_days})
         transaction_params.update({"upperIncome":self.upperIncome,
                                    "lowerIncome":self.lowerIncome,
-                                    "fallIncome":self.fallIncome}) 
+                                   "fallIncome":self.fallIncome,
+                                   "stime":stime,
+                                   "startDate":stime,
+                                   "etime":etime}) 
                           
         r=self.s.post(self.config["TRANSACTION_URL"],data=transaction_params)
 
@@ -94,7 +99,7 @@ class Strategy(object):
  
         
 if __name__=="__main__":
-    test=Strategy("QUERY_2_DAYS")
+    test=Strategy("QUERY_4_DAYS")
    
     result=test.pickstock()
     print u"即时选股: %s" % (result[0][1] if len(result)!=0 else "[]")
@@ -104,7 +109,7 @@ if __name__=="__main__":
     else:
         print "[]"
     
-    r=test.transaction()
+    r=test.transaction(stime='2015-01-01',etime='2015-12-31')
     print '\n{0:-^60}'.format('Portfolie Value ')
     if r is not False:
         portfolio=1
