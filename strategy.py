@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 
 import requests
-import sys
+import sys,time
 import json
 
 
@@ -48,8 +48,15 @@ class Strategy(object):
                                 "lowerIncome":self.lowerIncome,
                                 "fallIncome":self.fallIncome}) 
         
-        r=self.s.post(self.config["STRATEGY_URL"],data=traceback_params)
+        while True:
+            try:
+                r=self.s.post(self.config["STRATEGY_URL"],data=traceback_params,timeout=3)
+            except Exception as e:
+                print e;time.sleep(2)
+            else:
+                break
 
+        
         if r.json()['success']==False:
             print r.json()['data']['crmMessage']
             print u"抱歉，服务器繁忙，请稍后再试！"
@@ -87,7 +94,7 @@ class Strategy(object):
  
         
 if __name__=="__main__":
-    test=Strategy("QUERY_4_DAYS")
+    test=Strategy("QUERY_2_DAYS")
    
     result=test.pickstock()
     print u"即时选股: %s" % (result[0][1] if len(result)!=0 else "[]")
@@ -103,7 +110,7 @@ if __name__=="__main__":
         portfolio=1
         for i in xrange(len(r)-1,-1,-1):
             result=r[i]
-            print "%s %s %8s  %6s %6s %6s   %1.3f" % (result["stock_name"], \
+            print "%s  %s %8s  %6s %6s %6s   %1.3f" % (result["stock_name"], \
                   result["bought_at"], result["sold_at"], \
                   result["buying_price"],result["selling_price"], \
                   result["signal_return_rate"], \
