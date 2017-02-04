@@ -104,7 +104,7 @@ if __name__=="__main__":
     else:
         print "[]"
     
-    r=test.transaction(stime='2015-01-01',etime='2016-12-31')
+    r=test.transaction(stime='2015-01-01',etime='2017-12-31')
     print '\n{0:-^60}'.format('Portfolie Value ')
     if r is not False:
         portfolio=1

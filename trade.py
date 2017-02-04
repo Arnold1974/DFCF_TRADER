@@ -12,14 +12,14 @@ class DFCF_Trader(object):
         self.s = requests.session()
         
         self.tradetime_flag=False
-        self.login_flag=False        
+        self.login_flag=False
         self.thread_1 = threading.Thread(target=self.login,name='Thread-login')
         self.thread_1.setDaemon(True)
         self.thread_1.start()
 
 #登陆
     def login(self):
-   
+
         log.info('%s Active...' % threading.current_thread().name)
         while True:
             if not self.login_flag:
@@ -60,29 +60,52 @@ class DFCF_Trader(object):
         
 #资产列表
     def getassets(self):
-        try:
-            Assets=self.s.post('https://jy.xzsec.com/Com/GetAssets',{'moneyType':'RMB'},timeout=3);
-        except Exception:
-            print "\n getassets connection lost!"
-            self.login_flag=False
-            return False
-        if Assets.json()["Status"]!=0:
-            self.login_flag=False
-            return False
-        return Assets.json()["Data"][0]
-        
+        while True:
+            try:
+                Assets=self.s.post('https://jy.xzsec.com/Com/GetAssets',{'moneyType':'RMB'},timeout=3)
+            except Exception:
+                print "\n <getassets> connection lost!"
+                time.sleep(1)
+            else:
+                try:
+                    return Assets.json()["Data"][0]                    
+                except ValueError:
+                    self.login_flag=False
+                    time.sleep(2)
+                    continue           
+                '''                
+                if Assets.json()["Status"]!=0: #Status:-2 ; Message:"会话已超时，请重新登录!"
+                    self.login_flag=False
+                    time.sleep(2)
+                    continue
+                return Assets.json()["Data"][0]
+                '''
 
 #持仓列表
-    def getstocklist(self):    
-        self.stocklist_message=""
-        StockList=self.s.post('https://jy.xzsec.com/Search/GetStockList',{'qqhs':'1000','dwc':''});
-        if len(StockList.json()["Data"])==0:
-            print "Stock Position:  0"
-        else:
-            for i in xrange(len(StockList.json()["Data"])):
-                for key  in StockList.json()["Data"][i]:
-                    self.stocklist_message += key +":%s  " % StockList.json()["Data"][i][key]
-
+    def getstocklist(self):
+        while True:
+            try:
+                StockList=self.s.post('https://jy.xzsec.com/Search/GetStockList',{'qqhs':'1000','dwc':''});
+            except Exception:
+                print "\n <getstocklist> connection lost!"
+                time.sleep(1)
+            else:
+                try:
+                    return StockList.json()["Data"]                    
+                except ValueError:
+                    self.login_flag=False
+                    time.sleep(2)
+                    continue  
+            '''    
+            self.stocklist_message=""
+            StockList=self.s.post('https://jy.xzsec.com/Search/GetStockList',{'qqhs':'1000','dwc':''});
+            if len(StockList.json()["Data"])==0:
+                print "Stock Position:  0"
+            else:
+                for i in xrange(len(StockList.json()["Data"])):
+                    for key  in StockList.json()["Data"][i]:
+                        self.stocklist_message += key +":%s  " % StockList.json()["Data"][i][key]
+           '''
 #当日委托
     def getordersdata(self):
         self.ordersdata_message=""
@@ -171,7 +194,7 @@ if __name__=="__main__":
                 sys.stdout.write( "\r%(khmc)s <%(Syspm1)s>\tLogged at: %(Date)s-%(Time)s \
                                     **************************************************** \
                                    总资产:%(Zzc)s\t可用资金:%(Kyzj)s\t可取资金:%(Kqzj)s\t \
-                                   冻结资金:%(Djzj)s\t资金余额: %(Zjye)s \t总市值: %(Zxsz)s " % assets)
+                                   冻结资金:%(Djzj)s\t    资金余额:%(Zjye)s   总市值: %(Zxsz)s " % assets)
                 sys.stdout.flush()
             df=pd.DataFrame(user.login_message['Data'])            
             df=df.ix[:,[0,5,1,6]]

@@ -30,10 +30,22 @@ def show_assets():
         print "总市值: %(Zxsz)10s\t冻结资金: %(Djzj)9s\t 资金余额: %(Zjye)9s" % assets
         print '{0:-^60}'.format('')
         print '\033[0m'
-          
+
+def show_stocklist():
+    stocklist=trader.getstocklist()
+    if len(stocklist)==0:
+        print "\033[1;35mStock Position:  0 \033[0m\n"
+    else:
+        for i in xrange(len(stocklist)):
+            for key  in stocklist[i]:
+                print '\033[1;36m'+key + ":%s" % stocklist[i][key]+'\033[0m'
+  
+
+
 def none_trade_day():
     print '\n{0:-^72}'.format('\033[20;43mNONE TRADE DAY\033[0m')    
     show_assets()
+    show_stocklist()
         #df=pd.DataFrame(trader.login_message['Data'])            
         #df=df.ix[:,[0,5,1,6]]
         #df.columns = ['Date', 'Time','Account','Name']       
@@ -53,6 +65,7 @@ def none_trade_day():
 def none_trade_time():
     print '\n{0:-^72}'.format('\033[20;46mNONE TRADE TIME\033[0m')    
     show_assets()
+    show_stocklist()
     while not calendar.trade_time():
         if int(time.time()) % 2:
              sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"--> None Trade Time !"))           
