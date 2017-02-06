@@ -49,6 +49,11 @@ class DFCF_Trader(object):
         self.s.headers.update(headers) 
         res=self.s.post('https://jy.xzsec.com//Login/Authentication',json.load(file("./config/dfcf.json")))
         
+        #获取 validatekey：
+        get_validatekey=self.s.get('https://jy.xzsec.com/Trade/Buy')
+        if re.search(r'em_validatekey.*?>',get_validatekey.text).group():
+            self.validatekey= re.search(r'em_validatekey.*?>',get_validatekey.text).group()[37:73]
+        
         self.login_flag=True if res.json()["Status"]==0 else False         
         self.login_message=res.json()
         '''
@@ -161,7 +166,7 @@ class DFCF_Trader(object):
         Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
         print u"可买卖量 %s" % Kmml
 
-        SubmitTrade=self.s.post('https://jy.xzsec.com/Trade/SubmitTrade', \
+        SubmitTrade=self.s.post('https://jy.xzsec.com/Trade/SubmitTrade'+'?validatekey='+self.validatekey, \
                            {'stockCode':stockcode,'price':price, \
                            'amount':GetKyzjAndKml.json()["Data"]["Kmml"], \
                            'tradeType':tradetype} #,'stockName':stockname
@@ -175,8 +180,15 @@ class DFCF_Trader(object):
                 'callback':'',#'jQuery18302588442438663068_1484803703313',
                 '_':'' # repr(time.time()).replace(".","")
                }
-        quote=self.s.get('https://hsmarket.eastmoney.com/api/SHSZQuoteSnapshot',params = params)
+        while True:
+            try:
+                quote=self.s.get('https://hsmarket.eastmoney.com/api/SHSZQuoteSnapshot',params = params)
+                break
+            except Exception as e:
+                print e;time.sleep(1)
+                continue
         return eval(re.search(r'{.*}',quote.text).group())
+        
         
 if __name__=="__main__":
     import pandas as pd    
@@ -188,24 +200,24 @@ if __name__=="__main__":
 
 
     
-    user=DFCF_Trader()
+    test=DFCF_Trader()
 
     while True:
         
-        if user.login_flag==True:
+        if test.login_flag==True:
             print "\nActive Threads: [%02d] \n" % threading.active_count()
             for i in xrange(threading.active_count()):
                 print threading.enumerate()[i]
             print ''
-            assets=user.getassets()
+            assets=test.getassets()
             if assets:
-                assets.update(user.login_message['Data'][0])
+                assets.update(test.login_message['Data'][0])
                 sys.stdout.write( "\r%(khmc)s <%(Syspm1)s>\tLogged at: %(Date)s-%(Time)s \
                                     **************************************************** \
                                    总资产:%(Zzc)s\t可用资金:%(Kyzj)s\t可取资金:%(Kqzj)s\t \
                                    冻结资金:%(Djzj)s\t    资金余额:%(Zjye)s   总市值: %(Zxsz)s " % assets)
                 sys.stdout.flush()
-            df=pd.DataFrame(user.login_message['Data'])            
+            df=pd.DataFrame(test.login_message['Data'])            
             df=df.ix[:,[0,5,1,6]]
             df.columns = ['Date', 'Time','Account','Name']       
             #print user.login_message['Data']

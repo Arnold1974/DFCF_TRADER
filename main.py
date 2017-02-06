@@ -9,7 +9,7 @@ import sys
 import time
 import pandas as pd
 
-strategy=Strategy("QUERY_2_DAYS")
+strategy=Strategy("QUERY_4_DAYS")
 time.sleep(.5)
 trader=DFCF_Trader()
 calendar=TradeCalendar()
@@ -135,14 +135,14 @@ def trade_time():
         
         #trader.deal(code,codename,quote['fivequote']['sale5'],'B')
         #trader.deal("000619","海螺型材","13.4","B")
-    while calendar.trade_time():
-        quote=trader.getquote(code)
-        sys.stdout.write("\r%s %s: %s  %s" % \
-                         (time.strftime("%Y-%m-%d %X"),\
-                          quote['name'],\
-                          quote['realtimequote']['currentPrice'],\
-                          quote['realtimequote']['zdf']))
-        time.sleep(1)        
+        while calendar.trade_time():
+            quote=trader.getquote(code)
+            sys.stdout.write("\r%s %s: %s  %s" % \
+                             (time.strftime("%Y-%m-%d %X"),\
+                              quote['name'],\
+                              quote['realtimequote']['currentPrice'],\
+                              quote['realtimequote']['zdf']))
+            time.sleep(1)        
         
 #----------------------------------------------------------------------------------------------
 def run():
@@ -158,9 +158,6 @@ def run():
             none_trade_time()
             continue
         else: #进入交易时间  calendar.trade_day() & calendar.trade_time()
-
-
-            #monitor()
             trade_time()
             #time.sleep(.5)
               
