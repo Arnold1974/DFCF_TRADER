@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+#西藏同信证券股份有限公司
 
 import sys
 import requests
@@ -64,7 +65,7 @@ class DFCF_Trader(object):
             try:
                 Assets=self.s.post('https://jy.xzsec.com/Com/GetAssets',{'moneyType':'RMB'},timeout=3)
             except Exception:
-                print "\n <getassets> connection lost!"
+                print "\n<getassets> Connection Lost, Re-Connecting..."
                 time.sleep(1)
             else:
                 try:
@@ -185,13 +186,17 @@ if __name__=="__main__":
     sys.stdin, sys.stdout, sys.stderr = stdi, stdo, stde  # 保持标准输入、标准输出和标准错误输出
     sys.setdefaultencoding('utf8')
 
-    print "Active Threading: %d" % threading.active_count()
+
     
     user=DFCF_Trader()
 
-
     while True:
+        
         if user.login_flag==True:
+            print "\nActive Threads: [%02d] \n" % threading.active_count()
+            for i in xrange(threading.active_count()):
+                print threading.enumerate()[i]
+            print ''
             assets=user.getassets()
             if assets:
                 assets.update(user.login_message['Data'][0])
@@ -204,11 +209,10 @@ if __name__=="__main__":
             df=df.ix[:,[0,5,1,6]]
             df.columns = ['Date', 'Time','Account','Name']       
             #print user.login_message['Data']
-            #print "qiwsir is in %(khmc)r"%user.login_message['Data']
             #sys.stdout.write( "\r %(khmc)s <%(Syspm1)s> Logged at: %(Date)s-%(Time)s "  \
             #                  % user.login_message['Data'][0])
-        time.sleep(3)
-
+            break
+        time.sleep(1)
     
 '''     import time,sys
     for i in xrange(10):

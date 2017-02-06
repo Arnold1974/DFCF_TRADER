@@ -40,10 +40,22 @@ def show_stocklist():
             for key  in stocklist[i]:
                 print '\033[1;36m'+key + ":%s" % stocklist[i][key]+'\033[0m'
   
-
+def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
+    r=strategy.transaction(start_day,end_day)
+    print '\n{0:-^60}'.format('Portfolie Value ')
+    if r is not False:
+        portfolio=1
+        for i in xrange(len(r)-1,-1,-1):
+            result=r[i]
+            print "%s  %s %8s  %6s %6s %6s   %1.3f" % (result["stock_name"], \
+                  result["bought_at"], result["sold_at"], \
+                  result["buying_price"],result["selling_price"], \
+                  result["signal_return_rate"], \
+                  (1+float(result["signal_return_rate"])/100)*portfolio)                       
+            portfolio *= 1+float(result["signal_return_rate"])/100    
 
 def none_trade_day():
-    print '\n{0:-^72}'.format('\033[20;43mNONE TRADE DAY\033[0m')    
+    print '\n\n{0:-^72}'.format('\033[20;43mNONE TRADE DAY\033[0m')    
     show_assets()
     show_stocklist()
         #df=pd.DataFrame(trader.login_message['Data'])            
@@ -63,7 +75,7 @@ def none_trade_day():
         time.sleep(1)           
 
 def none_trade_time():
-    print '\n{0:-^72}'.format('\033[20;46mNONE TRADE TIME\033[0m')    
+    print '\n\n{0:-^72}'.format('\033[20;46mNONE TRADE TIME\033[0m')    
     show_assets()
     show_stocklist()
     while not calendar.trade_time():
@@ -93,29 +105,45 @@ def monitor():
             time.sleep(1)
 
 def trade_time():
+    print '\n\n{0:-^72}'.format('\033[20;43mTRADE TIME\033[0m')
+    show_transaction(start_day='2017-01-01', end_day='2017-12-31')
+    show_assets()  
+    
     result= strategy.traceback()
-    code=result["data"][0]["code"]
-    codename= result["data"][0]["codeName"]
-    quote=trader.getquote(code)
+    if result==False:
+        print 'Select None'
+    else:
+        code=result["data"][0]["code"]
+        codename= result["data"][0]["codeName"]
 
-
-    log.info(u"[%s]选出:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
-
-    print quote['name'],quote['code'],quote['topprice'],quote['bottomprice'],\
-          quote['realtimequote']['open'],quote['realtimequote']['time'],\
-          quote['realtimequote']['currentPrice'],\
-          quote['realtimequote']['zd'],\
-          quote['realtimequote']['zdf'],\
-          quote['fivequote']['buy1'],\
-          quote['fivequote']['sale1']
+        
+        print "%s选出:%s ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"],calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
+        #log.info(u"[%s]选出:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
+        
+        quote=trader.getquote(code)       
+        print quote['name'],quote['code'],quote['topprice'],quote['bottomprice'],\
+              quote['realtimequote']['open'],quote['realtimequote']['time'],\
+              quote['realtimequote']['currentPrice'],\
+              quote['realtimequote']['zd'],\
+              quote['realtimequote']['zdf'],\
+              quote['fivequote']['buy1'],\
+              quote['fivequote']['sale1']
           
   
     if result!=False:
         print "Begin Buy: " + codename
         
-        trader.deal(code,codename,quote['fivequote']['sale5'],'B')
+        #trader.deal(code,codename,quote['fivequote']['sale5'],'B')
         #trader.deal("000619","海螺型材","13.4","B")
-  
+    while calendar.trade_time():
+        quote=trader.getquote(code)
+        sys.stdout.write("\r%s %s: %s  %s" % \
+                         (time.strftime("%Y-%m-%d %X"),\
+                          quote['name'],\
+                          quote['realtimequote']['currentPrice'],\
+                          quote['realtimequote']['zdf']))
+        time.sleep(1)        
+        
 #----------------------------------------------------------------------------------------------
 def run():
     while trader.login_flag<>True:
@@ -129,11 +157,15 @@ def run():
         elif not calendar.trade_time():
             none_trade_time()
             continue
-        else: #进入交易时间
-            print '\n{0:-^72}'.format('\033[20;43mTRADE TIME\033[0m')
-            #monitor()
-            #trade_time();break
-            time.sleep(.5)
+        else: #进入交易时间  calendar.trade_day() & calendar.trade_time()
 
+
+            #monitor()
+            trade_time()
+            #time.sleep(.5)
+              
 if __name__=="__main__":
-    run()            
+    try:
+        run()
+    except KeyboardInterrupt:
+        print '\n\nCtrl-C Entered'

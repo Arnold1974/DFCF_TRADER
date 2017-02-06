@@ -50,7 +50,7 @@ class Strategy(object):
                                 "fallIncome":self.fallIncome})        
         while True:
             try:
-                r=self.s.post(self.config["STRATEGY_URL"],data=traceback_params,timeout=3)
+                r=self.s.post(self.config["STRATEGY_URL"],data=traceback_params,timeout=5)
             except Exception as e:
                 print e;time.sleep(2)
             else:       
@@ -90,7 +90,7 @@ class Strategy(object):
             print r.json()['data']['crmMessage']  #请求超时
             return False
     
-
+ 
  
         
 if __name__=="__main__":
@@ -104,7 +104,7 @@ if __name__=="__main__":
     else:
         print "[]"
     
-    r=test.transaction(stime='2015-01-01',etime='2017-12-31')
+    r=test.transaction(stime='2017-01-01',etime='2017-12-31')
     print '\n{0:-^60}'.format('Portfolie Value ')
     if r is not False:
         portfolio=1
