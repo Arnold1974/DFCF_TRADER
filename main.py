@@ -40,8 +40,11 @@ def show_stocklist():
     else:
         for i in xrange(len(stocklist)):
             print '%(Zqmc)s 可用数量:%(Kysl)s 盈亏比例:%(Ykbl)s 累计盈亏:%(Ljyk)s' % stocklist[i]
-        for i in xrange(len(trader.gethisdealdata())):
-            print trader.gethisdealdata()[i]
+        if len(trader.gethisdealdata())!=0:
+            if trader.gethisdealdata()[-1]['Zqmc']==stocklist[i]['Zqmc'] and trader.gethisdealdata()[-1]['Mmlb_bs']=='B':
+                buy_date=trader.gethisdealdata()[-1]['Cjrq']
+                buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
+                print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4)) 
                 
 def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
     r=strategy.transaction(start_day,end_day)

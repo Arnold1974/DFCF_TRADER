@@ -161,7 +161,6 @@ class DFCF_Trader(object):
                     time.sleep(2)
                     continue  
 
-
        
 #撤单列表
     def getrevokelist(self):
@@ -222,12 +221,9 @@ if __name__=="__main__":
     sys.stdin, sys.stdout, sys.stderr = stdi, stdo, stde  # 保持标准输入、标准输出和标准错误输出
     sys.setdefaultencoding('utf8')
 
-
-    
     test=DFCF_Trader()
-
+    
     while True:
-        
         if test.login_flag==True:
             print "\nActive Threads: [%02d] \n" % threading.active_count()
             for i in xrange(threading.active_count()):
