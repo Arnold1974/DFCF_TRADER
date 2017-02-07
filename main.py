@@ -25,7 +25,7 @@ def show_assets():
     if assets:
         assets.update(trader.login_message['Data'][0])
         print '\033[1;36m'
-        print "\n%(khmc)s [%(Syspm1)s]\t    Logged at: [%(Date)s-%(Time)s]" % assets
+        print "%(khmc)s [%(Syspm1)s]\t    Logged at: [%(Date)s-%(Time)s]" % assets
         print '{0:-^60}'.format('')
         print "总资产: %(Zzc)10s\t可用资金: %(Kyzj)9s\t 可取资金: %(Kqzj)9s" % assets
         print "总市值: %(Zxsz)10s\t冻结资金: %(Djzj)9s\t 资金余额: %(Zjye)9s" % assets
@@ -39,12 +39,20 @@ def show_stocklist():
         return False
     else:
         for i in xrange(len(stocklist)):
-            print '%(Zqmc)s 可用数量:%(Kysl)s 盈亏比例:%(Ykbl)s 累计盈亏:%(Ljyk)s' % stocklist[i]
+            print '持仓:%(Zqmc)s<%(Zqdm)s>  可用数量:%(Kysl)s  盈亏比例:%(Ykbl)s  累计盈亏:%(Ljyk)s' % stocklist[i]
         if len(trader.gethisdealdata())!=0:
             if trader.gethisdealdata()[-1]['Zqmc']==stocklist[i]['Zqmc'] and trader.gethisdealdata()[-1]['Mmlb_bs']=='B':
                 buy_date=trader.gethisdealdata()[-1]['Cjrq']
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
-                print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4)) 
+                
+                for i in xrange(int(strategy.hold_days)):
+                    show=calendar.trade_calendar(buy_date,i+1)
+                    if show==time.strftime('%Y/%m/%d',time.localtime()):
+                        print '\033[2;43m %s \033[0m' % show,
+                    else:
+                        print show,
+                print '\n\n'    
+                #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4)) 
                 
 def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
     r=strategy.transaction(start_day,end_day)
