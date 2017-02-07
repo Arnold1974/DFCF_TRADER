@@ -8,6 +8,7 @@ from trade_calendar import TradeCalendar
 import sys
 import time
 import pandas as pd
+import winsound
 
 strategy=Strategy("QUERY_4_DAYS")
 time.sleep(.5)
@@ -35,11 +36,13 @@ def show_stocklist():
     stocklist=trader.getstocklist()
     if len(stocklist)==0:
         print "\033[1;35mStock Position:  0 \033[0m\n"
+        return False
     else:
         for i in xrange(len(stocklist)):
-            for key  in stocklist[i]:
-                print '\033[1;36m'+key + ":%s" % stocklist[i][key]+'\033[0m'
-  
+            print '%(Zqmc)s 可用数量:%(Kysl)s 盈亏比例:%(Ykbl)s 累计盈亏:%(Ljyk)s' % stocklist[i]
+        for i in xrange(len(trader.gethisdealdata())):
+            print trader.gethisdealdata()[i]
+                
 def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
     r=strategy.transaction(start_day,end_day)
     print '\n{0:-^60}'.format('Portfolie Value ')
@@ -116,6 +119,7 @@ def trade_time():
         code=result["data"][0]["code"]
         codename= result["data"][0]["codeName"]
 
+        show_stocklist()
         
         print "%s选出:%s ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"],calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
         #log.info(u"[%s]选出:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
@@ -132,7 +136,7 @@ def trade_time():
   
     if result!=False:
         print "Begin Buy: " + codename
-        
+        winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
         #trader.deal(code,codename,quote['fivequote']['sale5'],'B')
         #trader.deal("000619","海螺型材","13.4","B")
         while calendar.trade_time():
