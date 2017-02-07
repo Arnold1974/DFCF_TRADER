@@ -94,7 +94,7 @@ class Strategy(object):
  
         
 if __name__=="__main__":
-    test=Strategy("QUERY_4_DAYS")
+    test=Strategy("QUERY_2_DAYS",25,5,10) # 2天策略： 25|5|10
    
     result=test.pickstock()
     print u"即时选股: %s" % (result[0][1] if len(result)!=0 else "[]")
@@ -104,7 +104,7 @@ if __name__=="__main__":
     else:
         print "[]"
     
-    r=test.transaction(stime='2017-01-01',etime='2017-12-31')
+    r=test.transaction(stime='2016-01-01',etime='2016-12-31')
     print '\n{0:-^60}'.format('Portfolie Value ')
     if r is not False:
         portfolio=1
