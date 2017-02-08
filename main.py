@@ -166,15 +166,12 @@ def trade_time():
             winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
             #trader.deal(code,codename,quote['fivequote']['sale5'],'B')
             #trader.deal("000619","海螺型材","13.4","B")
+            
+            pricemonitor.stockcode=code
+            pricemonitor.show=True
             while calendar.trade_time():
-                quote=trader.getquote(code)
-                sys.stdout.write("\r%s %s: %s  %s" % \
-                                 (time.strftime("%Y-%m-%d %X"),\
-                                  quote['name'],\
-                                  quote['realtimequote']['currentPrice'],\
-                                  quote['realtimequote']['zdf']))
                 time.sleep(1)        
-        
+            pricemonitor.show=False        
 #----------------------------------------------------------------------------------------------
 def run():
     while trader.login_flag<>True:

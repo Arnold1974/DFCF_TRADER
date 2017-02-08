@@ -8,7 +8,6 @@ import winsound
 
 class PriceMonitor(object):
     def __init__(self,stockcode='600000'):
-        winsound.PlaySound('./wav/price monitor CN.wav',winsound.SND_ASYNC)
         self.thread_2 = threading.Thread(target=self.getquote,name='Thread__Monitor__Price')
         self.thread_2.setDaemon(True)
         self.thread_2.start()
