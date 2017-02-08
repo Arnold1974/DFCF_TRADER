@@ -5,6 +5,7 @@ import log
 from strategy import Strategy
 from trade import DFCF_Trader
 from trade_calendar import TradeCalendar
+from monitor import PriceMonitor
 import sys
 import time
 import pandas as pd
@@ -14,6 +15,7 @@ strategy=Strategy("QUERY_4_DAYS")
 time.sleep(.5)
 trader=DFCF_Trader()
 calendar=TradeCalendar()
+pricemonitor=PriceMonitor()
 
 #%%
 def thread_login_keep_alive():
