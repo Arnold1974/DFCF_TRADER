@@ -45,15 +45,15 @@ def show_stocklist():
                 buy_date=trader.gethisdealdata()[-1]['Cjrq']
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
                 
-                for i in xrange(int(strategy.hold_days)):
-                    show=calendar.trade_calendar(buy_date,i+1)
+                for j in xrange(int(strategy.hold_days)):
+                    show=calendar.trade_calendar(buy_date,j+1)
                     if show==time.strftime('%Y/%m/%d',time.localtime()):
                         print '\033[2;43m %s \033[0m' % show,
                     else:
                         print show,
                 print '\n\n'    
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4)) 
-    return True
+    return stocklist[i]['Zqdm']
            
 def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
     r=strategy.transaction(start_day,end_day)
@@ -101,41 +101,40 @@ def none_trade_time():
         time.sleep(1)
     
 
-def monitor():
+def monitor(code):
     '''
-    如果选出的股票在下一个交易日出现停牌、开盘涨跌幅小于-9%、一字板涨跌停、
-    则不买这只股票
-    止盈条件：上涨后回撤止盈:当收益率大于止盈条件时，将不会在持股周期到期日卖出股票，
-    而会等回撤一定百分比（用户自己设定的值）后卖出。例如：本来持有4天卖出的股票，
-    但是到了第3天，已经收益25%(用户设定的止盈条件是大于20%时，回撤5%止盈)，则会继续持有，
-    到期不卖出了。当该股收益最高点出现后，从次日起只要收益从最高点回撤大于5%时就会卖出止盈。
+    如果选出的股票在下一个交易日出现停牌、开盘涨跌幅小于-9%、一字板涨跌停、 则取消买入这只股票
+    上涨后回撤止盈: 持股期内当收益率触发止盈条件时(某交易日时点出现即触发，而不是收盘价），
+    当日便不卖出，而是等下个交易日出现止盈回撤条件触发。
+    例如：本来持有4天卖出的股票，
+    但是到了第3天，某时点出现收益21%(用户设定的止盈条件是大于20%时，回撤5%止盈)，则当天会继续持有，
+    到期也不卖出了。当该股收益最高点出现后，从次日起只要收益从最高点回撤大于5%时就会卖出止盈。
 
     特殊情况：当持有股票一字涨跌停时，会继续持有。
-    '''
+
     result=strategy.pickstock()
     log.info(u"即时选股: %s " % (result[0][1] if len(result)!=0 else "[]"))
     result= strategy.traceback()
-    log.info(u"[%s]选出:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
-    r=strategy.transaction()
-    if r is not False:
-        for i in xrange(len(r)):        
-            result=r[i]
-            print "%s %s %8s %s %s %s" % (result["stock_name"], \
-                  result["bought_at"], result["sold_at"], \
-                  result["buying_price"],result["selling_price"], \
-                  result["signal_return_rate"])   
-    while True:   
-        if trader.login_flag==True:
-            sys.stdout.write("\r[Time]: %10s \t [Thread-active]: %s" % (time.strftime("%Y-%m-%d %X",time.localtime()),trader.thread_1.isAlive()))
-            time.sleep(1)
+    log.info(u"[%s]回测选股:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
+    '''
+    
+    while calendar.trade_time():
+        quote=trader.getquote(code)
+        sys.stdout.write("\r%s %s: %s  %s" % \
+                         (time.strftime("%Y-%m-%d %X"),\
+                          quote['name'],\
+                          quote['realtimequote']['currentPrice'],\
+                          quote['realtimequote']['zdf']))
+        time.sleep(1)
 
 def trade_time():
     print '\n\n{0:-^72}'.format('\033[20;43mTRADE TIME\033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')
-    show_assets()  
-    if show_stocklist(): #如果不空仓， 需要监视价格变化是否达到止损止盈
+    show_assets()
+    stock_in_position=show_stocklist()
+    if stock_in_position: #如果不空仓， 需要监视价格变化是否达到止损止盈
         print 'Monitor Time\n'
-        sys.exit(0)
+        monitor(stock_in_position)
     else:
         result= strategy.traceback()
         if result==False:
