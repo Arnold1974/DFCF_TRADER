@@ -42,7 +42,9 @@ def show_stocklist():
         return False
     else:
         for i in xrange(len(stocklist)):
-            print '持仓:%(Zqmc)s<%(Zqdm)s>  可用数量:%(Kysl)s  盈亏比例:%(Ykbl)s  累计盈亏:%(Ljyk)s' % stocklist[i]
+            #转换盈亏比例为2位浮点百分小数
+            stocklist[i]['Ykbl']=str(float('%.2f' % (float(stocklist[i]['Ykbl'])*100)))+'%'
+            print '持仓:%(Zqmc)s  可用数量:%(Kysl)s  盈亏比例:%(Ykbl)s  累计盈亏:%(Ljyk)s' % stocklist[i]
         if len(trader.gethisdealdata())!=0:
             if trader.gethisdealdata()[-1]['Zqmc']==stocklist[i]['Zqmc'] and trader.gethisdealdata()[-1]['Mmlb_bs']=='B':
                 buy_date=trader.gethisdealdata()[-1]['Cjrq']
