@@ -58,7 +58,7 @@ def show_stocklist():
                         print show,
                 print '\n\n'    
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4)) 
-    return stocklist[i]['Zqdm']
+    return stocklist[i]
            
 def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
     r=strategy.transaction(start_day,end_day)
@@ -122,25 +122,34 @@ def monitor(code):
     result= strategy.traceback()
     log.info(u"[%s]回测选股:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
     '''
-    
+    stock_amount=show_stocklist()['Kysl']
+   
     while calendar.trade_time():
-        quote=trader.getquote(code)
-        sys.stdout.write("\r%s %s: %s  %s" % \
+       quote=trader.getquote(code)
+       sys.stdout.write("\r%s %s: %s  %s" % \
                          (time.strftime("%Y-%m-%d %X"),\
                           quote['name'],\
                           quote['realtimequote']['currentPrice'],\
                           quote['realtimequote']['zdf']))
-        time.sleep(1)
+       
+       #卖出条件触发，发卖出指令
+       if int(stock_amount)<>0 and float(quote['realtimequote']['currentPrice'])>22.80:
+            print '\n\nBegin Sell'
+            trader.deal(code,quote['name'],quote['bottomprice'],'S')
+            print 'Sell completed\n'
+            stock_amount=show_stocklist()['Kysl']
+       time.sleep(1)
 
 def trade_time():
     print '\n\n{0:-^72}'.format('\033[20;43mTRADE TIME\033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')
     show_assets()
-    stock_in_position=show_stocklist()
+    stock_in_position=show_stocklist()['Zqdm']
+
     if stock_in_position: #如果不空仓， 需要监视价格变化是否达到止损止盈
         print 'Monitor Time\n'
         monitor(stock_in_position)
-    else:  #position is 0, 需要开仓
+    else:  #position is empty, 需要开仓
         result= strategy.traceback()
         if result==False: #没有选出目标
             print 'Selected Stock: None! Keep Position 0\n'

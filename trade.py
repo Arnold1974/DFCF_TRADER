@@ -187,14 +187,14 @@ class DFCF_Trader(object):
         GetKyzjAndKml=self.s.post('https://jy.xzsec.com/Trade/GetKyzjAndKml'+self.url_suffix, \
                              {'stockCode':stockcode,'stockName':stockname,'price':price,'tradeType':tradetype});
         Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
-        print u"可买卖量 %s" % Kmml
+        print u"\n可买卖量 %s" % Kmml
 
         SubmitTrade=self.s.post('https://jy.xzsec.com/Trade/SubmitTrade'+self.url_suffix, \
                            {'stockCode':stockcode,'price':price, \
                            'amount':GetKyzjAndKml.json()["Data"]["Kmml"], \
                            'tradeType':tradetype} #,'stockName':stockname
                            )       
-        print "委托编号: [%s]" %  SubmitTrade.json()["Data"][0]["Wtbh"],
+        print "委托编号: [%s]\n" %  SubmitTrade.json()["Data"][0]["Wtbh"],
 
 #获取实时行情
     def getquote(self,stockcode):
