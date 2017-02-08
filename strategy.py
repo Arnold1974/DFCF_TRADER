@@ -95,12 +95,15 @@ class Strategy(object):
         
 if __name__=="__main__":
     test=Strategy("QUERY_2_DAYS",25,5,10) # 2天策略： 25|5|10
-   
+    from trade_calendar import TradeCalendar
+    calendar=TradeCalendar()
     result=test.pickstock()
     print u"即时选股: %s" % (result[0][1] if len(result)!=0 else "[]")
     result= test.traceback()
     if result!=False:
         print result["stockDate"] + " 选出: "+ result["data"][0]["codeName"] + " < "+result["data"][0]["code"]+" >"
+        print "%s选出:%s ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"], \
+             calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
     else:
         print "[]"
     
