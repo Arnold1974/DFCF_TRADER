@@ -53,7 +53,8 @@ def show_stocklist():
                         print show,
                 print '\n\n'    
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4)) 
-                
+    return True
+           
 def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
     r=strategy.transaction(start_day,end_day)
     print '\n{0:-^60}'.format('Portfolie Value ')
@@ -132,42 +133,45 @@ def trade_time():
     print '\n\n{0:-^72}'.format('\033[20;43mTRADE TIME\033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')
     show_assets()  
-    
-    result= strategy.traceback()
-    if result==False:
-        print 'Select None'
+    if show_stocklist(): #如果不空仓， 需要监视价格变化是否达到止损止盈
+        print 'Monitor Time\n'
+        sys.exit(0)
     else:
-        code=result["data"][0]["code"]
-        codename= result["data"][0]["codeName"]
-
-        show_stocklist()
-        
-        print "%s选出:%s ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"],calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
-        #log.info(u"[%s]选出:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
-        
-        quote=trader.getquote(code)       
-        print quote['name'],quote['code'],quote['topprice'],quote['bottomprice'],\
-              quote['realtimequote']['open'],quote['realtimequote']['time'],\
-              quote['realtimequote']['currentPrice'],\
-              quote['realtimequote']['zd'],\
-              quote['realtimequote']['zdf'],\
-              quote['fivequote']['buy1'],\
-              quote['fivequote']['sale1']
-          
-  
-    if result!=False:
-        print "Begin Buy: " + codename
-        winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
-        #trader.deal(code,codename,quote['fivequote']['sale5'],'B')
-        #trader.deal("000619","海螺型材","13.4","B")
-        while calendar.trade_time():
-            quote=trader.getquote(code)
-            sys.stdout.write("\r%s %s: %s  %s" % \
-                             (time.strftime("%Y-%m-%d %X"),\
-                              quote['name'],\
-                              quote['realtimequote']['currentPrice'],\
-                              quote['realtimequote']['zdf']))
-            time.sleep(1)        
+        result= strategy.traceback()
+        if result==False:
+            print 'Selected Stock: None! \n'
+            while calendar.trade_time():
+                if int(time.time()) % 2:
+                     sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"--> No Trade Target !"))           
+                else:
+                     sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"-->                  "))
+                time.sleep(1)                
+        else:
+            code=result["data"][0]["code"]
+            codename= result["data"][0]["codeName"]
+            print "%s选出:%s ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"],calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
+            #log.info(u"[%s]选出:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
+            quote=trader.getquote(code)       
+            print quote['name'],quote['code'],quote['topprice'],quote['bottomprice'],\
+                  quote['realtimequote']['open'],quote['realtimequote']['time'],\
+                  quote['realtimequote']['currentPrice'],\
+                  quote['realtimequote']['zd'],\
+                  quote['realtimequote']['zdf'],\
+                  quote['fivequote']['buy1'],\
+                  quote['fivequote']['sale1']
+ 
+            print "Begin Buy: " + codename
+            winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
+            #trader.deal(code,codename,quote['fivequote']['sale5'],'B')
+            #trader.deal("000619","海螺型材","13.4","B")
+            while calendar.trade_time():
+                quote=trader.getquote(code)
+                sys.stdout.write("\r%s %s: %s  %s" % \
+                                 (time.strftime("%Y-%m-%d %X"),\
+                                  quote['name'],\
+                                  quote['realtimequote']['currentPrice'],\
+                                  quote['realtimequote']['zdf']))
+                time.sleep(1)        
         
 #----------------------------------------------------------------------------------------------
 def run():
