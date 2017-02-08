@@ -15,6 +15,7 @@ time.sleep(.5)
 trader=DFCF_Trader()
 calendar=TradeCalendar()
 
+#%%
 def thread_login_keep_alive():
     if trader.thread_1.isAlive()==False:
         trader.__init__()
@@ -135,17 +136,17 @@ def trade_time():
     if stock_in_position: #如果不空仓， 需要监视价格变化是否达到止损止盈
         print 'Monitor Time\n'
         monitor(stock_in_position)
-    else:
+    else:  #position is 0, 需要开仓
         result= strategy.traceback()
-        if result==False:
-            print 'Selected Stock: None! \n'
+        if result==False: #没有选出目标
+            print 'Selected Stock: None! Keep Position 0\n'
             while calendar.trade_time():
                 if int(time.time()) % 2:
                      sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"--> No Trade Target !"))           
                 else:
                      sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"-->                  "))
                 time.sleep(1)                
-        else:
+        else: #选出目标， 开仓
             code=result["data"][0]["code"]
             codename= result["data"][0]["codeName"]
             print "%s选出:%s ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"],calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
@@ -178,7 +179,7 @@ def run():
         time.sleep(1)
 
     while True:
-        # 是否开市的日期
+        # 是否交易的日期
         if not calendar.trade_day():
             none_trade_day()
             continue
