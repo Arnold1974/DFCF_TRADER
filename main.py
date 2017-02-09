@@ -11,13 +11,7 @@ import time
 import pandas as pd
 import winsound
 
-strategy=Strategy("QUERY_4_DAYS")
-time.sleep(.5)
-trader=DFCF_Trader()
-calendar=TradeCalendar()
-pricemonitor=PriceMonitor()
 
-#%%
 def thread_login_keep_alive():
     if trader.thread_1.isAlive()==False:
         trader.__init__()
@@ -38,7 +32,7 @@ def show_assets():
 def show_stocklist():
     stocklist=trader.getstocklist()
     if len(stocklist)==0:
-        print "\033[1;35mStock Position:  0 \033[0m\n"
+        print u"\033[1;35m=== 空仓 ===\033[0m\n"
         return False
     else:
         for i in xrange(len(stocklist)):
@@ -48,7 +42,7 @@ def show_stocklist():
         st=time.strftime("%Y-%m-%d",time.localtime(time.time()-864000))
         et=time.strftime("%Y-%m-%d",time.localtime(time.time()))
         hisdealdate=trader.gethisdealdata(st=st,et=et)
-        if len(hisdealdate)!=[]:
+        if len(hisdealdate)!=0:
             if hisdealdate[-1]['Zqmc']==stocklist[i]['Zqmc'] and hisdealdate[-1]['Mmlb_bs']=='B':
                 buy_date=hisdealdate[-1]['Cjrq']
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
@@ -61,7 +55,7 @@ def show_stocklist():
                         print show,
                 print '\n\n'    
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
-                stocklist[i]['cell_day']=calendar.trade_calendar(buy_date,4)               
+                stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,4)               
     return stocklist[i]
            
 def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
@@ -79,9 +73,10 @@ def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
             portfolio *= 1+float(result["signal_return_rate"])/100    
 
 def none_trade_day():
-    print '\n\n{0:-^72}'.format('\033[20;43mNONE TRADE DAY\033[0m')    
+    print '\n\n{0:-^72}'.format('\033[20;43m NON TRADING DAY \033[0m')    
     show_assets()
     show_stocklist()
+    pricemonitor.kill=1
         #df=pd.DataFrame(trader.login_message['Data'])            
         #df=df.ix[:,[0,5,1,6]]
         #df.columns = ['Date', 'Time','Account','Name']       
@@ -99,18 +94,19 @@ def none_trade_day():
         time.sleep(1)           
 
 def none_trade_time():
-    print '\n\n{0:-^72}'.format('\033[20;46mNONE TRADE TIME\033[0m')    
+    print '\n\n{0:-^72}'.format('\033[20;46m NON TRADING TIME \033[0m')    
     show_assets()
     show_stocklist()
+    pricemonitor.kill=1
     while not calendar.trade_time():
         if int(time.time()) % 2:
-             sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"--> None Trade Time !"))           
+             sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"--> Non Trading Time !"))           
         else:
              sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"-->                  "))
         time.sleep(1)
     
 
-def monitor(code):
+def monitor(code,sell_day,stock_amount):
     '''
     如果选出的股票在下一个交易日出现停牌、开盘涨跌幅小于-9%、一字板涨跌停、 则取消买入这只股票
     上涨后回撤止盈: 持股期内当收益率触发止盈条件时(某交易日时点出现即触发，而不是收盘价），
@@ -126,33 +122,27 @@ def monitor(code):
     result= strategy.traceback()
     log.info(u"[%s]回测选股:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
     '''
-    stock_amount=show_stocklist()['Kysl']
-   
-    while calendar.trade_time():
-       quote=trader.getquote(code)
-       sys.stdout.write("\r%s  %s: %s   %s" % \
-                         (time.strftime("%Y-%m-%d %X"),\
-                          quote['name'],\
-                          quote['realtimequote']['currentPrice'],\
-                          quote['realtimequote']['zdf']))
-       
+    pricemonitor.stockcode=code
+    pricemonitor.show=1
+    while calendar.trade_time():       
        #卖出条件触发，发卖出指令
-       if int(stock_amount)<>0 and float(quote['realtimequote']['currentPrice'])>10.80:
+       if int(stock_amount)<>0 and float(pricemonitor.result['realtimequote']['currentPrice'])>30.80 \
+          or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) and time.localtime()[3:5]==(14,58):
             print '\n\nBegin Sell'
-            trader.deal(code,quote['name'],quote['bottomprice'],'S')
+            #trader.deal(code,quote['name'],quote['bottomprice'],'S')
             print 'Sell completed\n'
             stock_amount=show_stocklist()['Kysl']
        time.sleep(1)
 
 def trade_time():
-    print '\n\n{0:-^72}'.format('\033[20;43mTRADE TIME\033[0m')
+    print '\n\n{0:-^72}'.format('\033[20;43m TRADING TIME \033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')
     show_assets()
-    stock_in_position=show_stocklist()['Zqdm']
+    stock_in_position=show_stocklist()
 
-    if stock_in_position: #如果不空仓， 需要监视价格变化是否达到止损止盈
+    if stock_in_position: #如果不空仓，监视价格变化是否达到止损止盈
         print 'Monitor Time\n'
-        monitor(stock_in_position)
+        monitor(stock_in_position['Zqdm'],stock_in_position['sell_day'],stock_in_position['Kysl'])
     else:  #position is empty, 需要开仓
         result= strategy.traceback()
         if result==False: #没有选出目标
@@ -166,7 +156,7 @@ def trade_time():
         else: #选出目标， 开仓
             code=result["data"][0]["code"]
             codename= result["data"][0]["codeName"]
-            print "%s选出:%s ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"],calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
+            print "%s:[%s] ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"],calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
             #log.info(u"[%s]选出:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
             quote=trader.getquote(code)       
             print quote['name'],quote['code'],quote['topprice'],quote['bottomprice'],\
@@ -177,16 +167,18 @@ def trade_time():
                   quote['fivequote']['buy1'],\
                   quote['fivequote']['sale1']
  
-            print "Begin Buy: " + codename
-            winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
-            #trader.deal(code,codename,quote['fivequote']['sale5'],'B')
-            #trader.deal("000619","海螺型材","13.4","B")
-            
+            if float(pricemonitor.result['realtimequote']['currentPrice'])>30.80 \
+               and time.localtime()[3:5]==(9,26):
+                print "Begin Buy: " + codename
+                #trader.deal(code,codename,quote['fivequote']['sale5'],'B')
+                #trader.deal("000619","海螺型材","13.4","B")            
+                winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
+          
             pricemonitor.stockcode=code
             pricemonitor.show=True
             while calendar.trade_time():
                 time.sleep(1)        
-            pricemonitor.show=False        
+            pricemonitor.kill=1        
 #----------------------------------------------------------------------------------------------
 def run():
     while trader.login_flag<>True:
@@ -204,7 +196,12 @@ def run():
             trade_time()
             #time.sleep(.5)
               
-if __name__=="__main__":
+if __name__=="__main__":    
+    strategy=Strategy("QUERY_2_DAYS",25,5,10)
+    time.sleep(.5)
+    trader=DFCF_Trader()
+    calendar=TradeCalendar()
+    pricemonitor=PriceMonitor()
     try:
         run()
     except KeyboardInterrupt:

@@ -15,6 +15,7 @@ class DFCF_Trader(object):
         
         self.tradetime_flag=False
         self.login_flag=False
+        self.kill=0
         self.thread_1 = threading.Thread(target=self.login,name='Thread-login')
         self.thread_1.setDaemon(True)
         self.thread_1.start()
@@ -24,6 +25,8 @@ class DFCF_Trader(object):
 
         log.info('%s Active...' % threading.current_thread().name)
         while True:
+            if self.kill==1:
+                break
             if not self.login_flag:
                 #print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Logging...')
                 log.info('Logging...')
@@ -35,6 +38,7 @@ class DFCF_Trader(object):
                     #Beep(450,150)
                 except Exception:
                     winsound.PlaySound('./wav/connection lost.wav',winsound.SND_ASYNC)
+                    time.sleep(2)
                     #Beep(600,500)
                     log.info("Login connection lost !!!")
             time.sleep(.5)
@@ -50,7 +54,7 @@ class DFCF_Trader(object):
                    'Upgrade-Insecure-Requests':'1'         
                    } 
         self.s.headers.update(headers) 
-        res=self.s.post('https://jy.xzsec.com//Login/Authentication',json.load(file("./config/dfcf.json")))
+        res=self.s.post('https://jy.xzsec.com//Login/Authentication',json.load(file("./config/dfcf.json")),timeout=3)
         
         #获取 validatekey：
         get_validatekey=self.s.get('https://jy.xzsec.com/Trade/Buy')
