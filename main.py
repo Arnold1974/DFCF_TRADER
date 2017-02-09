@@ -45,9 +45,12 @@ def show_stocklist():
             #转换盈亏比例为2位浮点百分小数
             stocklist[i]['Ykbl']=str(float('%.2f' % (float(stocklist[i]['Ykbl'])*100)))+'%'
             print '持仓:%(Zqmc)s  可用数量:%(Kysl)s  盈亏比例:%(Ykbl)s  累计盈亏:%(Ljyk)s' % stocklist[i]
-        if len(trader.gethisdealdata())!=0:
-            if trader.gethisdealdata()[-1]['Zqmc']==stocklist[i]['Zqmc'] and trader.gethisdealdata()[-1]['Mmlb_bs']=='B':
-                buy_date=trader.gethisdealdata()[-1]['Cjrq']
+        st=time.strftime("%Y-%m-%d",time.localtime(time.time()-864000))
+        et=time.strftime("%Y-%m-%d",time.localtime(time.time()))
+        hisdealdate=trader.gethisdealdata(st=st,et=et)
+        if len(hisdealdate)!=[]:
+            if hisdealdate[-1]['Zqmc']==stocklist[i]['Zqmc'] and hisdealdate[-1]['Mmlb_bs']=='B':
+                buy_date=hisdealdate[-1]['Cjrq']
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
                 
                 for j in xrange(int(strategy.hold_days)):
@@ -57,7 +60,8 @@ def show_stocklist():
                     else:
                         print show,
                 print '\n\n'    
-                #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4)) 
+                #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
+                stocklist[i]['cell_day']=calendar.trade_calendar(buy_date,4)               
     return stocklist[i]
            
 def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
@@ -126,14 +130,14 @@ def monitor(code):
    
     while calendar.trade_time():
        quote=trader.getquote(code)
-       sys.stdout.write("\r%s %s: %s  %s" % \
+       sys.stdout.write("\r%s  %s: %s   %s" % \
                          (time.strftime("%Y-%m-%d %X"),\
                           quote['name'],\
                           quote['realtimequote']['currentPrice'],\
                           quote['realtimequote']['zdf']))
        
        #卖出条件触发，发卖出指令
-       if int(stock_amount)<>0 and float(quote['realtimequote']['currentPrice'])>22.80:
+       if int(stock_amount)<>0 and float(quote['realtimequote']['currentPrice'])>10.80:
             print '\n\nBegin Sell'
             trader.deal(code,quote['name'],quote['bottomprice'],'S')
             print 'Sell completed\n'

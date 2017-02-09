@@ -184,17 +184,35 @@ class DFCF_Trader(object):
 
 #下单
     def deal(self,stockcode,stockname,price,tradetype):
-        GetKyzjAndKml=self.s.post('https://jy.xzsec.com/Trade/GetKyzjAndKml'+self.url_suffix, \
-                             {'stockCode':stockcode,'stockName':stockname,'price':price,'tradeType':tradetype});
-        Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
-        print u"\n可买卖量 %s" % Kmml
+        while True:
+            try:
+                GetKyzjAndKml=self.s.post('https://jy.xzsec.com/Trade/GetKyzjAndKml'+self.url_suffix, \
+                                     {'stockCode':stockcode,'stockName':stockname,'price':price,'tradeType':tradetype});
+            except Exception:
+                print "\n<deal> Connection Lost, Re-Connecting..."
+                time.sleep(1)
 
-        SubmitTrade=self.s.post('https://jy.xzsec.com/Trade/SubmitTrade'+self.url_suffix, \
-                           {'stockCode':stockcode,'price':price, \
-                           'amount':GetKyzjAndKml.json()["Data"]["Kmml"], \
-                           'tradeType':tradetype} #,'stockName':stockname
-                           )       
-        print "委托编号: [%s]\n" %  SubmitTrade.json()["Data"][0]["Wtbh"],
+        
+            try:
+                SubmitTrade=self.s.post('https://jy.xzsec.com/Trade/SubmitTrade'+self.url_suffix, \
+                                   {'stockCode':stockcode,'price':price, \
+                                   'amount':GetKyzjAndKml.json()["Data"]["Kmml"], \
+                                   'tradeType':tradetype} #,'stockName':stockname
+                                   )       
+            except Exception:
+                print "\n<deal> Connection Lost, Re-Connecting..."
+                time.sleep(1)
+            else:
+                try:
+                    Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
+                    print u"\n可买卖量 %s" % Kmml
+                    Wtbh=SubmitTrade.json()["Data"][0]["Wtbh"]
+                    print "委托编号: [%s]\n" %  Wtbh,
+                    return Wtbh
+                except ValueError: 
+                    self.login_flag=False
+                    time.sleep(2)
+                    continue
 
 #获取实时行情
     def getquote(self,stockcode):
