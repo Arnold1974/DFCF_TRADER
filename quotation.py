@@ -7,6 +7,7 @@ import threading
 import winsound
 import log
 
+
 class PriceQuotation(object):
     def __init__(self,stockcode='600000'):
         self.kill=0

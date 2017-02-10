@@ -91,7 +91,7 @@ def none_trade_day():
     print '\n\n{0:-^72}'.format('\033[20;43m NON TRADING DAY \033[0m')    
     show_assets()
     show_stocklist()
-    quotation.kill=1
+    quotation.stockcode=False
         #df=pd.DataFrame(trader.login_message['Data'])            
         #df=df.ix[:,[0,5,1,6]]
         #df.columns = ['Date', 'Time','Account','Name']       
@@ -112,17 +112,29 @@ def none_trade_time():
     print '\n{0:-^72}'.format('\033[20;46m NON TRADING TIME \033[0m')    
     show_assets()
     show_stocklist()
-    quotation.kill=1
+    quotation.stockcode=False
     while not calendar.trade_time():
         if int(time.time()) % 2:
              sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"--> Non Trading Time !"))           
         else:
-             sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"-->                  "))
+             sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"-->                   "))
         time.sleep(1)
     
-def monitor_buy():
-    pass
-def monitor_close(code,sell_day,stock_amount):
+def monitor_buy(code,codename):
+    quotation.stockcode=code
+    quotation.show=True 
+    while calendar.trade_time():
+        if float(quotation.result['realtimequote']['currentPrice'])>10.80 \
+           and float(quotation.result['realtimequote']['zdf'].replace('%',''))>-9 \
+           and time.localtime()[3:5]>=(9,26):
+            print "Begin Buy: " + codename
+            trader.deal(code,codename,quotation.result['fivequote']['sale5'],'B')
+            #trader.deal("000619","海螺型材","13.4","B")            
+            winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
+            return
+                
+
+def monitor_sell(code,sell_day,stock_amount):
     '''
     如果选出的股票在下一个交易日出现停牌、开盘涨跌幅小于-9%、一字板涨跌停、 则取消买入这只股票
     上涨后回撤止盈: 持股期内当收益率触发止盈条件时(某交易日时点出现即触发，而不是收盘价），
@@ -158,7 +170,7 @@ def trade_time():
 
     if stock_in_position: #如果不空仓，监视价格变化是否达到止损止盈
         print 'Monitor Sell Condition:'
-        monitor_close(stock_in_position['Zqdm'],stock_in_position['sell_day'],stock_in_position['Kysl'])
+        monitor_sell(stock_in_position['Zqdm'],stock_in_position['sell_day'],stock_in_position['Kysl'])
     else:  #position is empty, 需要开仓
         result= strategy.traceback()
         if result==False: #没有选出目标
@@ -182,16 +194,9 @@ def trade_time():
                   quote['realtimequote']['zdf'],\
                   quote['fivequote']['buy1'],\
                   quote['fivequote']['sale1']
- 
-            if float(quotation.result['realtimequote']['currentPrice'])>10.80 \
-               and time.localtime()[3:5]>=(9,26):
-                print "Begin Buy: " + codename
-                trader.deal(code,codename,quote['fivequote']['sale5'],'B')
-                #trader.deal("000619","海螺型材","13.4","B")            
-                winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
-                
-            quotation.stockcode=code
-            quotation.show=True
+
+            monitor_buy(code,codename)
+            show_stocklist()
             while calendar.trade_time():
                 time.sleep(1)        
             quotation.kill=1        
