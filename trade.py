@@ -137,16 +137,21 @@ class DFCF_Trader(object):
                     self.ordersdata_message += key +":%s \n" % OrdersData.json()["Data"][i][key]
 
 #当日成交
-    def getdealdata(self):
-        self.dealdata_message=""
-        DealData=self.s.post('https://jy.xzsec.com/Search/GetDealData'+self.url_suffix,{'qqhs':'20','dwc':''});
-        if len(DealData.json()["Data"])==0:
-            print "Deals:  0"
-        else:
-            for i in xrange(len(DealData.json()["Data"])):
-                for key  in DealData.json()["Data"][i]:
-                    self.dealdata_message += key +":%s \n" % DealData.json()["Data"][i][key]
-       
+    def gettodaydealdata(self):
+        while True:
+            try:
+                TodayDealData=self.s.post('https://jy.xzsec.com/Search/GetDealData'+self.url_suffix,{'qqhs':'20','dwc':''});
+            except Exception:
+                print "\n <gettodaydealdata> connection lost!"
+                time.sleep(1)
+            else:
+                try:
+                    return TodayDealData.json()["Data"]                    
+                except ValueError:
+                    self.login_flag=False
+                    time.sleep(2)
+                    continue          
+         
 
 #历史成交
     def gethisdealdata(self,st='2017-02-01',et='2017-02-12'):

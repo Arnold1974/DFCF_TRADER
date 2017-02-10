@@ -7,15 +7,14 @@ import threading
 import winsound
 import log
 
-class PriceMonitor(object):
+class PriceQuotation(object):
     def __init__(self,stockcode='600000'):
         self.kill=0
         self.show=0
-        self.stockcode=stockcode
+        self.stockcode=False
         self.thread_2 = threading.Thread(target=self.getquote,name='Thread__Monitor__Price')
         self.thread_2.setDaemon(True)
         self.thread_2.start()
-
 
     #获取实时行情
     def getquote(self):
@@ -24,25 +23,26 @@ class PriceMonitor(object):
             if self.kill==True:
                 winsound.PlaySound('./wav/stop price monitor CN.wav',winsound.SND_ASYNC)
                 break
-            params={
-                    'id':self.stockcode,
-                    'callback':'',#'jQuery18302588442438663068_1484803703313',
-                    '_':'' # repr(time.time()).replace(".","")
-                   }
-            try:
-                quote=self.s.get('https://hsmarket.eastmoney.com/api/SHSZQuoteSnapshot',params = params)
-                
-            except Exception as e:
-                log.error('price quotation error!');time.sleep(1)
-                continue
-            self.result=eval(re.search(r'{.*}',quote.text).group())
-            self.show_price(self.result)
+            if self.stockcode <> False:
+                params={
+                        'id':self.stockcode,
+                        'callback':'',#'jQuery18302588442438663068_1484803703313',
+                        '_':'' # repr(time.time()).replace(".","")
+                       }
+                try:
+                    quote=self.s.get('https://hsmarket.eastmoney.com/api/SHSZQuoteSnapshot',params = params)
+                    
+                except Exception:
+                    log.error('price quotation error!');time.sleep(1)
+                    continue
+                self.result=eval(re.search(r'{.*}',quote.text).group())
+                self.show_price(self.result)
             time.sleep(1)
 
       
     def show_price(self, quote):
         if self.show==True:
-            sys.stdout.write("\r%s %s: %s  %s" % \
+            sys.stdout.write("\r    *%s %s: %s  %s" % \
                          (time.strftime("%Y-%m-%d %X"),\
                           quote['name'],\
                           quote['realtimequote']['currentPrice'],\
