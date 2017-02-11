@@ -17,7 +17,7 @@ class Strategy(object):
 
     返回数据为JSON类型.
     """
-    def __init__(self,arg_query,upperIncome="20",lowerIncome="8",fallIncome="5"):
+    def __init__(self,arg_query,upperIncome="20",fallIncome="5",lowerIncome="8"):
         self.s = requests.session()
         self.config=json.load(file("./config/strategy.json"))
         self.s.headers.update(self.config["headers"])
@@ -28,7 +28,7 @@ class Strategy(object):
         self.lowerIncome=str(lowerIncome)
         self.fallIncome=str(fallIncome)
         print '\n{0:-^60}'.format('')
-        print u"[策略]: %s days \t   [止损止盈]：%s|%s|%s \t [满仓]：%s 只" % (self.hold_days,self.upperIncome,self.lowerIncome,self.fallIncome,self.stockHoldCount)
+        print u"[策略]: %s days \t   [止损止盈]：%s|%s|%s \t [满仓]：%s 只" % (self.hold_days,self.upperIncome,self.fallIncome,self.lowerIncome,self.stockHoldCount)
         print '{0:-^60}\n'.format('')
         self.success= True
 
@@ -50,13 +50,14 @@ class Strategy(object):
                                 "fallIncome":self.fallIncome})        
         while True:
             try:
-                r=self.s.post(self.config["STRATEGY_URL"],data=traceback_params,timeout=5)
+                r=self.s.post(self.config["STRATEGY_URL"],data=traceback_params,timeout=10)
             except Exception as e:
                 print e;time.sleep(2)
             else:       
                 if r.json()['success']==False:
                     print r.json()['data']['crmMessage']
                     print u"抱歉，服务器繁忙，请稍后再试！"
+                    time.sleep(1)
                     continue
                 #print r.json()['data']['stockData']['list']['data'][0]['codeName']               
                 if r.json()['data']['stockData']['list']['stockNum']!=0:
@@ -82,19 +83,23 @@ class Strategy(object):
                                    "startDate":stime,
                                    "etime":etime}) 
                           
-        r=self.s.post(self.config["TRANSACTION_URL"],data=transaction_params)
+        while True:
+            try:
+                r=self.s.post(self.config["TRANSACTION_URL"],data=transaction_params)
+            except Exception as e:
+                print e;time.sleep(2)
+            else:       
+                if r.json()['success']==False:
+                    print r.json()['data']['crmMessage']
+                    print u"抱歉，服务器繁忙，请稍后再试！"
+                    time.sleep(1)
+                    continue
+                else:
+                    return r.json()['data']                
 
-        if r.json()['success']!=False:
-            return r.json()["data"]
-        else:
-            print r.json()['data']['crmMessage']  #请求超时
-            return False
-    
- 
- 
         
 if __name__=="__main__":
-    test=Strategy("QUERY_4_DAYS") # 2天策略： 25|5|10
+    test=Strategy("QUERY_2_DAYS",25,5,10) # 2天策略： 25|5|10
     from trade_calendar import TradeCalendar
     calendar=TradeCalendar()
     result=test.pickstock()
@@ -105,7 +110,7 @@ if __name__=="__main__":
         print "%s 选出: %s ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"], \
              calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
     else:
-        print "[]"
+        print "回测选股: []"
     
     r=test.transaction(stime='2017-01-01',etime='2018-01-01')
     print '\n{0:-^60}'.format('Portfolie Value ')
