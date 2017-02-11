@@ -11,6 +11,7 @@ import time
 import pandas as pd
 import winsound
 
+#%%
 
 def thread_login_keep_alive():
     if trader.thread_1.isAlive()==False:
@@ -61,7 +62,6 @@ def show_stocklist():
             if hisdealdata[-1]['Zqmc']==stocklist[i]['Zqmc'] and hisdealdata[-1]['Mmlb_bs']=='B':
                 buy_date=hisdealdata[-1]['Cjrq']
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
-                
                 for j in xrange(int(strategy.hold_days)):
                     show=calendar.trade_calendar(buy_date,j+1)
                     if show==time.strftime('%Y/%m/%d',time.localtime()):
@@ -122,11 +122,15 @@ def none_trade_time():
     
 def monitor_buy(code,codename):
     quotation.stockcode=code
-    quotation.show=True 
+    quotation.show=True
+    while quotation.result==False:
+        time.sleep(.5)
+
     while calendar.trade_time() and calendar.trade_day():
-        if float(quotation.result['realtimequote']['currentPrice'])>10.80 \
+        if quotation.result['code']==code \
+           and float(quotation.result['realtimequote']['currentPrice'])>10.80 \
            and float(quotation.result['realtimequote']['zdf'].replace('%',''))>-9 \
-           and time.localtime()[3:5]>=(9,26):
+           and time.localtime()[3:5]>=(9,29):
             print "Begin Buy: " + codename
             trader.deal(code,codename,quotation.result['fivequote']['sale5'],'B')
             #trader.deal("000619","海螺型材","13.4","B")            
@@ -152,10 +156,16 @@ def monitor_sell(code,sell_day,stock_amount):
     '''
     quotation.stockcode=code
     quotation.show=1
+    while quotation.result==False:
+        time.sleep(.5)
+
     while calendar.trade_time() and calendar.trade_day():       
        #卖出条件触发，发卖出指令
-       if int(stock_amount)<>0 and float(quotation.result['realtimequote']['currentPrice'])>30.80 \
-          or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) and time.localtime()[3:5]==(14,58):
+       if int(stock_amount)==0:
+           break
+       if quotation.result['code']==code and int(stock_amount)<>0 \
+          and float(quotation.result['realtimequote']['currentPrice'])>30.80 \
+          or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) and time.localtime()[3:5]>=(14,59):
             print '\n\nBegin Sell'
             #trader.deal(code,quote['name'],quote['bottomprice'],'S')
             print 'Sell completed\n'
@@ -205,7 +215,7 @@ def run():
     while trader.login_flag<>True:
         time.sleep(1)
 
-
+#%%
     while True:
         # 是否交易的日期
         if not calendar.trade_day():
@@ -217,8 +227,11 @@ def run():
         else: #进入交易时间  calendar.trade_day() & calendar.trade_time()
             trade_time()
             #time.sleep(.5)
+#%%
               
-if __name__=="__main__":    
+if __name__=="__main__":
+    winsound.PlaySound('./wav/good afternoon CN.wav',winsound.SND_ASYNC)
+    time.sleep(3)
     strategy=Strategy("QUERY_2_DAYS",25,5,10)
     time.sleep(.5)
     trader=DFCF_Trader()

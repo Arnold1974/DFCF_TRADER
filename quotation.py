@@ -13,6 +13,7 @@ class PriceQuotation(object):
         self.kill=0
         self.show=0
         self.stockcode=False
+        self.result=False
         self.thread_2 = threading.Thread(target=self.getquote,name='Thread__Monitor__Price')
         self.thread_2.setDaemon(True)
         self.thread_2.start()

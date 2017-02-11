@@ -1,3 +1,4 @@
+#!C:\ProgramData\Anaconda2\python.exe
 # -*- coding:utf-8 -*-
 #西藏同信证券股份有限公司
 
@@ -270,6 +271,8 @@ if __name__=="__main__":
             #print user.login_message['Data']
             #sys.stdout.write( "\r %(khmc)s <%(Syspm1)s> Logged at: %(Date)s-%(Time)s "  \
             #                  % user.login_message['Data'][0])
+            while 1:
+                time.sleep(1)
             break
         time.sleep(1)
     
