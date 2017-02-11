@@ -39,7 +39,7 @@ class DFCF_Trader(object):
                     #Beep(450,150)
                 except Exception:
                     winsound.PlaySound('./wav/connection lost.wav',winsound.SND_ASYNC)
-                    time.sleep(2)
+                    time.sleep(1)
                     #Beep(600,500)
                     log.info("Login connection lost !!!")
             time.sleep(.5)
@@ -55,7 +55,7 @@ class DFCF_Trader(object):
                    'Upgrade-Insecure-Requests':'1'         
                    } 
         self.s.headers.update(headers) 
-        res=self.s.post('https://jy.xzsec.com//Login/Authentication',json.load(file("./config/dfcf.json")),timeout=3)
+        res=self.s.post('https://jy.xzsec.com//Login/Authentication',json.load(file("./config/dfcf.json")),timeout=5)
         
         #获取 validatekey：
         get_validatekey=self.s.get('https://jy.xzsec.com/Trade/Buy')
@@ -217,7 +217,7 @@ class DFCF_Trader(object):
                     Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
                     print u"\n可买卖量 %s" % Kmml
                     Wtbh=SubmitTrade.json()["Data"][0]["Wtbh"]
-                    print "委托编号: [%s]\n" %  Wtbh,
+                    #print "委托编号: [%s]\n" %  Wtbh,
                     return Wtbh
                 except ValueError: 
                     self.login_flag=False
@@ -271,8 +271,7 @@ if __name__=="__main__":
             #print user.login_message['Data']
             #sys.stdout.write( "\r %(khmc)s <%(Syspm1)s> Logged at: %(Date)s-%(Time)s "  \
             #                  % user.login_message['Data'][0])
-            while 1:
-                time.sleep(1)
+
             break
         time.sleep(1)
     

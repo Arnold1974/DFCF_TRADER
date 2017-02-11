@@ -22,7 +22,7 @@ class PriceQuotation(object):
     def getquote(self):
         self.s = requests.session()
         while True:
-            if self.kill==True:
+            if self.kill==1:
                 winsound.PlaySound('./wav/stop price monitor CN.wav',winsound.SND_ASYNC)
                 break
             if self.stockcode <> False:
