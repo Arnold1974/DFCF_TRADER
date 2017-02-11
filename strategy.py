@@ -47,7 +47,9 @@ class Strategy(object):
                                 "daysForSaleStrategy":self.hold_days,
                                 "upperIncome":self.upperIncome,
                                 "lowerIncome":self.lowerIncome,
-                                "fallIncome":self.fallIncome})        
+                                "fallIncome":self.fallIncome,
+                                "startDate":" ",
+                                "endDate":" "})        
         while True:
             try:
                 r=self.s.post(self.config["STRATEGY_URL"],data=traceback_params,timeout=10)
@@ -59,7 +61,8 @@ class Strategy(object):
                     print u"抱歉，服务器繁忙，请稍后再试！"
                     time.sleep(1)
                     continue
-                #print r.json()['data']['stockData']['list']['data'][0]['codeName']               
+                #print r.json()['data']['stockData']['list']['data'][0]['codeName']   
+                #print  r.json()['data']['stockData'] #{u'errorCode': 100002, u'errorMsg': u'\u672a\u67e5\u8be2\u5230\u63a8\u8350\u80a1\u7968\u4ee3\u7801', u'list': []}
                 if r.json()['data']['stockData']['list']['stockNum']!=0:
                     return r.json()['data']['stockData']['list']
                 else:
@@ -99,7 +102,7 @@ class Strategy(object):
 
         
 if __name__=="__main__":
-    test=Strategy("QUERY_2_DAYS",25,5,10) # 2天策略： 25|5|10
+    test=Strategy("QUERY_4_DAYS") # 2天策略： 25|5|10
     from trade_calendar import TradeCalendar
     calendar=TradeCalendar()
     result=test.pickstock()
@@ -124,7 +127,16 @@ if __name__=="__main__":
                   result["signal_return_rate"], \
                   (1+float(result["signal_return_rate"])/100)*portfolio)                       
             portfolio *= 1+float(result["signal_return_rate"])/100
-
+            
+            if result['sold_at']=='持仓':
+                print'\n====>'
+                buy_date=result['bought_at'].replace('-','/')
+                for j in xrange(int(test.hold_days)):
+                    show=calendar.trade_calendar(buy_date,j+1)
+                    if show==time.strftime('%Y/%m/%d',time.localtime()):
+                        print '\033[2;43m %s \033[0m' % show,
+                    else:
+                        print show,
 
 
 
