@@ -37,7 +37,7 @@ class TradeCalendar(object):
      
     #获取交易时间段
     def trade_time(self):
-        if  time.localtime().tm_wday in range(0,7) and \
+        if  time.localtime().tm_wday in range(0,5) and \
             (time.localtime().tm_hour in range(10,15) or \
             time.localtime().tm_hour==9 and  time.localtime().tm_min in range(15,60)):
             return True

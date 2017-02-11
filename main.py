@@ -113,7 +113,7 @@ def none_trade_time():
     show_assets()
     show_stocklist()
     quotation.stockcode=False
-    while not calendar.trade_time():
+    while not calendar.trade_time() and calendar.trade_day():
         if int(time.time()) % 2:
              sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"--> Non Trading Time !"))           
         else:
@@ -123,7 +123,7 @@ def none_trade_time():
 def monitor_buy(code,codename):
     quotation.stockcode=code
     quotation.show=True 
-    while calendar.trade_time():
+    while calendar.trade_time() and calendar.trade_day():
         if float(quotation.result['realtimequote']['currentPrice'])>10.80 \
            and float(quotation.result['realtimequote']['zdf'].replace('%',''))>-9 \
            and time.localtime()[3:5]>=(9,26):
@@ -152,7 +152,7 @@ def monitor_sell(code,sell_day,stock_amount):
     '''
     quotation.stockcode=code
     quotation.show=1
-    while calendar.trade_time():       
+    while calendar.trade_time() and calendar.trade_day():       
        #卖出条件触发，发卖出指令
        if int(stock_amount)<>0 and float(quotation.result['realtimequote']['currentPrice'])>30.80 \
           or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) and time.localtime()[3:5]==(14,58):
@@ -175,7 +175,7 @@ def trade_time():
         result= strategy.traceback()
         if result==False: #没有选出目标
             print 'Selected Stock: None! Keep Position 0\n'
-            while calendar.trade_time():
+            while calendar.trade_time() and calendar.trade_day():
                 if int(time.time()) % 2:
                      sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"--> No Trade Target !"))           
                 else:
@@ -197,7 +197,7 @@ def trade_time():
 
             monitor_buy(code,codename)
             show_stocklist()
-            while calendar.trade_time():
+            while calendar.trade_time() and calendar.trade_day():
                 time.sleep(1)        
             quotation.kill=1        
 #----------------------------------------------------------------------------------------------
@@ -211,7 +211,7 @@ def run():
         if not calendar.trade_day():
             none_trade_day()
             continue
-        elif not calendar.trade_time():
+        elif not calendar.trade_time(): #交易日非交易时间段
             none_trade_time()
             continue
         else: #进入交易时间  calendar.trade_day() & calendar.trade_time()
@@ -227,4 +227,7 @@ if __name__=="__main__":
     try:
         run()
     except KeyboardInterrupt:
+        #关闭打开的线程
+        trader.kill=1
+        quotation.kill=1
         print '\n\nCtrl-C Entered'
