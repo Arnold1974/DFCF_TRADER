@@ -63,7 +63,12 @@ class Strategy(object):
                     continue
                 #print r.json()['data']['stockData']['list']['data'][0]['codeName']   
                 #print  r.json()['data']['stockData'] #{u'errorCode': 100002, u'errorMsg': u'\u672a\u67e5\u8be2\u5230\u63a8\u8350\u80a1\u7968\u4ee3\u7801', u'list': []}
-                if r.json()['data']['stockData']['list']['stockNum']!=0:
+                try:
+                    num=r.json()['data']['stockData']['list']['stockNum']
+                except TypeError as e:
+                    print e
+                    continue
+                if num!=0:
                     return r.json()['data']['stockData']['list']
                 else:
                     return False
@@ -102,7 +107,7 @@ class Strategy(object):
 
         
 if __name__=="__main__":
-    test=Strategy("QUERY_4_DAYS") # 2天策略： 25|5|10
+    test=Strategy("QUERY_2_DAYS",25,5,10) # 2天策略： 25|5|10
     from trade_calendar import TradeCalendar
     calendar=TradeCalendar()
     result=test.pickstock()

@@ -174,6 +174,9 @@ def monitor_sell(code,sell_day,stock_amount):
             stock_amount=show_stocklist()['Kysl']
        time.sleep(1)
 
+def record_price():
+    pass
+
 def trade_time():
     print '\n{0:-^72}'.format('\033[20;43m TRADING TIME \033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')

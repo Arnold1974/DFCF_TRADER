@@ -92,7 +92,10 @@ class DFCF_Trader(object):
                 except TypeError: #Status:-1; Message:'服务器异常'
                     print u"\n <getassets> 服务器异常!"
                     time.sleep(2)
-                    continue                   
+                    continue
+                except Exception as e:
+                    log.error(e)
+                    time.sleep(2)
                 '''                
                 if Assets.json()["Status"]!=0: #Status:-2 ; Message:"会话已超时，请重新登录!"
                     self.login_flag=False
