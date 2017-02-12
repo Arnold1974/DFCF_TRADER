@@ -49,3 +49,5 @@ if __name__=="__main__":
     test.trade_calendar("2017/02/07",4)   
     print "Today is Openday...........: %s" % test.trade_day()    
     print "Now is Trade Time..........: %s" % test.trade_time()
+    
+    
