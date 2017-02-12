@@ -16,6 +16,10 @@ class PriceQuotation(object):
         self.show=0
         self.stockcode=False
         self.result=False
+        
+        self.stop_loss_price=False
+        self.target_profit_price=False
+        
         self.thread_2 = threading.Thread(target=self.get_tushare_quote,name='Thread__Monitor__Price')
         self.thread_2.setDaemon(True)
         self.thread_2.start()
@@ -29,15 +33,15 @@ class PriceQuotation(object):
             if self.stockcode <> False:
                 self.result=tushare.get_realtime_quotes(self.stockcode)
                 self.show_tushare_price(self.result)
-            time.sleep(0.1)
+            time.sleep(.5)
     def show_tushare_price(self, quote):
         if self.show==1:
-            sys.stdout.write("\r    *%s %s: %.2f  %.2f%%" % \
-                         (time.strftime("%Y-%m-%d %X"),\
-                          quote['name'][0],\
-                          float(quote['price'][0]),\
-                          (float(quote['price'][0])-float(quote['pre_close'][0]))/float(quote['pre_close'][0])*100))    
- 
+                sys.stdout.write("\r%s %s: %.2f  %.2f%%" % \
+                             (time.strftime("%Y-%m-%d %X"),\
+                              quote['name'][0],\
+                              float(quote['price'][0]),\
+                              (float(quote['price'][0])-float(quote['pre_close'][0]))/float(quote['pre_close'][0])*100))    
+    
     
  #-------------------------------华丽的分割线-------------------  
     def get_quote(self):
@@ -95,11 +99,22 @@ class PriceQuotation(object):
 
 
     def get_hist_data(self,code='600898',s_date='2017-01-01',e_date=time.strftime('%Y-%m-%d',time.localtime())):
-        stockcode=code
-        start=s_date
-        end=e_date
-        return tushare.get_k_data(stockcode,start,end)
+        #stockcode=code
+        #start=s_date
+        #end=e_date
+        return tushare.get_k_data(code,s_date,e_date)
 
+    def get_stop_loss_price(self,code,buy_day):
+        df=self.get_hist_data(self.stockcode,buy_day)
+        index=df[df['date']==buy_day].index[0]
+        Open,High,Low=df.ix[index,'open'],df.ix[index,'high'],df.ix[index,'low']
+        show_list=[]
+        show_list.append(Open);show_list.append(High);show_list.append(Low)
+        print df
+        print show_list
+        print u'\n止损价格: {0:.2f}'.format(show_list[0]*0.9)
+        #print format(show_list[1], '.2f')        
+        return float(format(show_list[0], '.2f'))*0.9
 if __name__=="__main__":
     '''
     df=PriceQuotation().get_hist_price('600898','2017-02-01')
@@ -123,3 +138,4 @@ if __name__=="__main__":
     print format(show_list[1], '.2f')
     test.stockcode='600898'
     test.show=1
+    test.get_stop_loss_price('600300','2017-02-10')

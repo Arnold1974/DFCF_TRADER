@@ -29,7 +29,7 @@ def show_assets():
         print '{0:-^60}'.format('')
         print '\033[0m'
 
-def show_stocklist():
+def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显示，需从当日成交数据和历史成交数据中获取
     stocklist=trader.getstocklist()
     if len(stocklist)==0:
         print u"\033[1;35m=== 空仓 ===\033[0m\n"
@@ -47,20 +47,23 @@ def show_stocklist():
             if todaydealdata[-1]['Zqmc']==stocklist[i]['Zqmc'] and todaydealdata[-1]['Mmlb_bs']=='B':
                 buy_date=todaydealdata[-1]['Cjrq']
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
+                buy_date_for_return=buy_date.replace('/','-')
                 for j in xrange(int(strategy.hold_days)):
-                    show=calendar.trade_calendar(buy_date,j+1)
-                    if show==time.strftime('%Y/%m/%d',time.localtime()):
-                        print '\033[2;43m %s \033[0m' % show,
+                    next_day=calendar.trade_calendar(buy_date,j+1)
+                    if next_day==time.strftime('%Y/%m/%d',time.localtime()):
+                        print '\033[2;43m %s \033[0m' % next_day,
                     else:
-                        print show,
+                        print next_day,
                 print '\n\n'    
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
-                stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,4) 
+                stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,4)
+                stocklist[i]['buy_day']=buy_date_for_return
 
         elif len(hisdealdata)!=0:
             if hisdealdata[-1]['Zqmc']==stocklist[i]['Zqmc'] and hisdealdata[-1]['Mmlb_bs']=='B':
                 buy_date=hisdealdata[-1]['Cjrq']
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
+                buy_date_for_return=buy_date.replace('/','-')
                 for j in xrange(int(strategy.hold_days)):
                     show=calendar.trade_calendar(buy_date,j+1)
                     if show==time.strftime('%Y/%m/%d',time.localtime()):
@@ -69,7 +72,8 @@ def show_stocklist():
                         print show,
                 print '\n\n'    
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
-                stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,4)               
+                stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,4)
+                stocklist[i]['buy_day']=buy_date_for_return
     return stocklist[i]
            
 def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
@@ -87,7 +91,7 @@ def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
             portfolio *= 1+float(result["signal_return_rate"])/100    
 
 def none_trade_day():
-    print '\n{0:-^72}'.format('\033[20;43m NON TRADING DAY \033[0m')    
+    print '\n\n{0:-^72}'.format('\033[20;43m NON TRADING DAY \033[0m')    
     show_assets()
     show_stocklist()
     quotation.kill=1
@@ -110,7 +114,7 @@ def none_trade_day():
         time.sleep(1)           
 
 def none_trade_time():
-    print '\n{0:-^72}'.format('\033[20;46m NON TRADING TIME \033[0m')    
+    print '\n\n{0:-^72}'.format('\033[20;46m NON TRADING TIME \033[0m')    
     show_assets()
     show_stocklist()
     quotation.kill=1
@@ -135,13 +139,13 @@ def monitor_buy(code,codename):
            and float(quotation.result['realtimequote']['zdf'].replace('%',''))>-9 \
            and time.localtime()[3:5]>=(9,29) and time.localtime()[3:5]<=(9,31):
             print "Begin Buy: " + codename
-            Wtbh=trader.deal(code,codename,quotation.result['fivequote']['sale5'],'B') #['topprice']
+            #Wtbh=trader.deal(code,codename,quotation.result['fivequote']['sale5'],'B') #['topprice']
             #trader.deal("000619","海螺型材","13.4","B")            
             winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
             return Wtbh
         time.sleep(1)       
 
-def monitor_sell(code,sell_day,stock_amount):
+def monitor_sell(code,buy_day,sell_day,stock_amount):
     '''
     如果选出的股票在下一个交易日出现停牌、开盘涨跌幅小于-9%、一字板涨跌停、 则取消买入这只股票
     上涨后回撤止盈: 持股期内当收益率触发止盈条件时(某交易日时点出现即触发，而不是收盘价），
@@ -160,11 +164,25 @@ def monitor_sell(code,sell_day,stock_amount):
     print 'Monitor <%s> Price for Selling:' % code
     quotation.stockcode=code
     quotation.show=1
-    while quotation.result==False:
+
+    stop_loss_price=quotation.get_stop_loss_price(code,buy_day)
+
+    while quotation.result is False:
         time.sleep(.5)
 
     while calendar.trade_time() and calendar.trade_day() and int(stock_amount)<>0:       
        #卖出条件触发，发卖出指令
+
+       if quotation.result['code'][0]==code and int(stock_amount)<>0 \
+          and float(quotation.result['price'][0]) < stop_loss_price \
+          or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) and time.localtime()[3:5]>=(14,59):
+            print '\n\nBegin Sell'
+            #trader.deal(code,quote['name'],quote['bottomprice'],'S')
+            print 'Sell completed\n'
+            stock_amount=show_stocklist()['Kysl']
+
+                 
+       '''
        if quotation.result['code']==code and int(stock_amount)<>0 \
           and float(quotation.result['realtimequote']['currentPrice'])>30.80 \
           or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) and time.localtime()[3:5]>=(14,59):
@@ -172,21 +190,23 @@ def monitor_sell(code,sell_day,stock_amount):
             #trader.deal(code,quote['name'],quote['bottomprice'],'S')
             print 'Sell completed\n'
             stock_amount=show_stocklist()['Kysl']
+       '''
        time.sleep(1)
 
 def record_price():
     pass
 
 def trade_time():
-    print '\n{0:-^72}'.format('\033[20;43m TRADING TIME \033[0m')
+    print '\n\n{0:-^72}'.format('\033[20;43m TRADING TIME \033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')
     if quotation.kill==1:
         quotation.__init__()
     show_assets()
-    stock_in_position=show_stocklist()
+    stock_in_position=show_stocklist() #获取持仓的数据买卖日期
+    
     while calendar.trade_time() and calendar.trade_day():
         if stock_in_position and int(stock_in_position['Kysl'])<>0: #如果不空仓,且有股票可卖,监视价格变化是否达到止损止盈
-            monitor_sell(stock_in_position['Zqdm'],stock_in_position['sell_day'],stock_in_position['Kysl'])
+            monitor_sell(stock_in_position['Zqdm'],stock_in_position['buy_day'],stock_in_position['sell_day'],stock_in_position['Kysl'])
         elif stock_in_position==False:  #position is empty, 需要开仓
             result= strategy.traceback()
             if result==False: #没有选出目标
