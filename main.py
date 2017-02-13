@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 
+from __future__ import division
 import log
 #from log import logger as log
 from strategy import Strategy
@@ -135,6 +136,17 @@ def monitor_buy(code,codename):
 
     while calendar.trade_time() and calendar.trade_day():
         if quotation.result['code']==code \
+           and float(quotation.result['price'][0])>10.80 \
+           and (float(quotation.result['price'][0])-float(quotation.result['pre_close'][0]))*100/float(quotation.result['price'][0])>-9 \
+           and time.localtime()[3:5]>=(9,29) and time.localtime()[3:5]<=(9,31):
+            print "Begin Buy: " + codename
+            #Wtbh=trader.deal(code,codename,quotation.result['fivequote']['sale5'],'B') #['topprice']
+            #trader.deal("000619","海螺型材","13.4","B")            
+            winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
+            return Wtbh        
+        
+        '''
+        if quotation.result['code']==code \
            and float(quotation.result['realtimequote']['currentPrice'])>10.80 \
            and float(quotation.result['realtimequote']['zdf'].replace('%',''))>-9 \
            and time.localtime()[3:5]>=(9,29) and time.localtime()[3:5]<=(9,31):
@@ -143,6 +155,7 @@ def monitor_buy(code,codename):
             #trader.deal("000619","海螺型材","13.4","B")            
             winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
             return Wtbh
+        '''
         time.sleep(1)       
 
 def monitor_sell(code,buy_day,sell_day,stock_amount):
@@ -174,7 +187,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
        #卖出条件触发，发卖出指令
 
        if quotation.result['code'][0]==code and int(stock_amount)<>0 \
-          and float(quotation.result['price'][0]) < stop_loss_price \
+          and float(quotation.result['price'][0]) <= stop_loss_price \
           or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) and time.localtime()[3:5]>=(14,59):
             print '\n\nBegin Sell'
             #trader.deal(code,quote['name'],quote['bottomprice'],'S')

@@ -31,7 +31,11 @@ class PriceQuotation(object):
                 winsound.PlaySound('./wav/stop price monitor CN.wav',winsound.SND_ASYNC)
                 break
             if self.stockcode <> False:
-                self.result=tushare.get_realtime_quotes(self.stockcode)
+                try:
+                    self.result=tushare.get_realtime_quotes(self.stockcode)
+                except Exception as e:
+                    print e
+                    continue
                 self.show_tushare_price(self.result)
             time.sleep(.5)
     def show_tushare_price(self, quote):
