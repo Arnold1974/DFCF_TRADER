@@ -134,7 +134,7 @@ if __name__=="__main__":
             portfolio *= 1+float(result["signal_return_rate"])/100
             
             if result['sold_at']=='持仓':
-                print'\n====>'
+                print'\n      ===>'
                 buy_date=result['bought_at'].replace('-','/')
                 for j in xrange(int(test.hold_days)):
                     show=calendar.trade_calendar(buy_date,j+1)

@@ -66,11 +66,11 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
                 buy_date_for_return=buy_date.replace('/','-')
                 for j in xrange(int(strategy.hold_days)):
-                    show=calendar.trade_calendar(buy_date,j+1)
-                    if show==time.strftime('%Y/%m/%d',time.localtime()):
-                        print '\033[2;43m %s \033[0m' % show,
+                    next_day=calendar.trade_calendar(buy_date,j+1)
+                    if next_day==time.strftime('%Y/%m/%d',time.localtime()):
+                        print '\033[2;43m %s \033[0m' % next_day,
                     else:
-                        print show,
+                        print next_day,
                 print '\n\n'    
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
                 stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,4)
