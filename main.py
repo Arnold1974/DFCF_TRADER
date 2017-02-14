@@ -39,8 +39,9 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
         for i in xrange(len(stocklist)):
             #转换盈亏比例为2位浮点百分小数
             stocklist[i]['Ykbl']=str(float('%.2f' % (float(stocklist[i]['Ykbl'])*100)))+'%'
+            stocklist[i]['Cwbl']=str('%.0f' % (float(stocklist[i]['Cwbl'])*100))+'%'
             if int(stocklist[i]['Zqsl'])<>0:
-                 print '\033[1;42m证券:%(Zqmc)s   持仓:%(Zqsl)s   可用:%(Kysl)s   比例:%(Ykbl)s   盈亏:%(Ljyk)s\033[0m' % stocklist[i]
+                 print '\033[1;42m证券:%(Zqmc)s  持仓:%(Zqsl)s  可用:%(Kysl)s  仓位:%(Cwbl)s  涨跌:%(Ykbl)s  盈亏:%(Ljyk)s\033[0m' % stocklist[i]
         st=time.strftime("%Y-%m-%d",time.localtime(time.time()-864000))
         et=time.strftime("%Y-%m-%d",time.localtime(time.time()))
         hisdealdata=trader.gethisdealdata(st=st,et=et)
