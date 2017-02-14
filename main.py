@@ -57,7 +57,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                         print next_day,
                 print '\n\n'    
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
-                stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,4)
+                stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,int(strategy.hold_days))
                 stocklist[i]['buy_day']=buy_date_for_return
 
         elif len(hisdealdata)!=0:
@@ -73,7 +73,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                         print next_day,
                 print '\n\n'    
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
-                stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,4)
+                stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,int(strategy.hold_days))
                 stocklist[i]['buy_day']=buy_date_for_return
     return stocklist[i]
            
