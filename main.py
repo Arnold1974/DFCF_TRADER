@@ -183,9 +183,11 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
     print '=== Monitor <%s> Price for Selling: ===' % code
     quotation.stockcode=code
     quotation.show=1
-
-    stop_loss_price=quotation.get_stop_loss_price(code,buy_day)
-
+    
+    stock_holding_price=quotation.get_stop_loss_price(code,buy_day)
+    stop_loss_price=stock_holding_price['Stop_loss']
+    
+    dfcf_quote=trader.getquote(code) #获取东方财富的报价：涨跌停价格不需要即时报价
     while quotation.result is False:
         time.sleep(.5)
 
@@ -194,10 +196,11 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
 
        if quotation.result['code'][0]==code and int(stock_amount)<>0 \
           and float(quotation.result['price'][0]) <= stop_loss_price \
-          or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) and time.localtime()[3:5]>=(14,59):
-            print '\n\nBegin Sell'
-            #trader.deal(code,quote['name'],quote['bottomprice'],'S')
-            print 'Sell completed\n'
+          or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) \
+             and time.localtime()[3:5]>=(14,59):
+            log.info('Sell Begin...')
+            trader.deal(code,dfcf_quote['name'],dfcf_quote['bottomprice'],'S')
+            log.info('Sell End...\n')
             stock_amount=show_stocklist()['Kysl']
 
                  

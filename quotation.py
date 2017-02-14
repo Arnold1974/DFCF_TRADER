@@ -109,16 +109,25 @@ class PriceQuotation(object):
         return tushare.get_k_data(code,s_date,e_date)
 
     def get_stop_loss_price(self,code,buy_day):
-        df=self.get_hist_data(self.stockcode,buy_day)
-        index=df[df['date']==buy_day].index[0]
-        Open,High,Low=df.ix[index,'open'],df.ix[index,'high'],df.ix[index,'low']
-        show_list=[]
-        show_list.append(Open);show_list.append(High);show_list.append(Low)
+        df=self.get_hist_data(code,buy_day)
+        index=df[df['date']==buy_day].index[0] #获取购买日的行号
+        stock_holding_price={}
+        stock_holding_price['Stop_loss']=float(format(df.ix[index,'open'], '.2f'))*0.9
+        stock_holding_price['High']=df['high'].max()
+        stock_holding_price['Low']=df['low'].max()
+        '''
+        while index in df['date'].index:
+            if stoc_holding_period['High']<df.ix[index,'high']:
+                stoc_holding_period['High']=df.ix[index,'high']
+                print 'Highest Price Updated on:  %s' % df.ix[index,'date']
+            index+=1
+        print len(df['high']),      df['high'].max() 
+        '''
         print df
-        print show_list
-        print u'\n止损价格: {0:.2f}'.format(show_list[0]*0.9)
+        print stock_holding_price
+        print u'\n止损价格: {0:.2f}'.format(stock_holding_price['Stop_loss'])
         #print format(show_list[1], '.2f')        
-        return float(format(show_list[0], '.2f'))*0.9
+        return stock_holding_price
 if __name__=="__main__":
     '''
     df=PriceQuotation().get_hist_price('600898','2017-02-01')
@@ -140,6 +149,7 @@ if __name__=="__main__":
     print show_list
     print '{0:.2f}'.format(show_list[1])
     print format(show_list[1], '.2f')
-    test.stockcode='600898'
+    test.stockcode='600300'
     test.show=1
     test.get_stop_loss_price('600300','2017-02-10')
+    test.kill=1
