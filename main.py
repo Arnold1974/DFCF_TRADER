@@ -39,7 +39,8 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
         for i in xrange(len(stocklist)):
             #转换盈亏比例为2位浮点百分小数
             stocklist[i]['Ykbl']=str(float('%.2f' % (float(stocklist[i]['Ykbl'])*100)))+'%'
-            print '\033[1;42m持仓:%(Zqmc)s  可用数量:%(Kysl)s  盈亏比例:%(Ykbl)s  累计盈亏:%(Ljyk)s\033[0m' % stocklist[i]
+            if int(stocklist[i]['Zqsl'])<>0:
+                 print '\033[1;42m证券:%(Zqmc)s   持仓:%(Zqsl)s   可用:%(Kysl)s   比例:%(Ykbl)s   盈亏:%(Ljyk)s\033[0m' % stocklist[i]
         st=time.strftime("%Y-%m-%d",time.localtime(time.time()-864000))
         et=time.strftime("%Y-%m-%d",time.localtime(time.time()))
         hisdealdata=trader.gethisdealdata(st=st,et=et)
@@ -49,13 +50,15 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                 buy_date=todaydealdata[-1]['Cjrq']
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
                 buy_date_for_return=buy_date.replace('/','-')
+                
+                print'       +++++'
                 for j in xrange(int(strategy.hold_days)):
                     next_day=calendar.trade_calendar(buy_date,j+1)
                     if next_day==time.strftime('%Y/%m/%d',time.localtime()):
                         print '\033[2;43m %s \033[0m' % next_day,
                     else:
                         print next_day,
-                print '\n\n'    
+                print '\n'+' '*13*(j-1) +'       ---->'  
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
                 stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,int(strategy.hold_days))
                 stocklist[i]['buy_day']=buy_date_for_return
@@ -65,13 +68,15 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                 buy_date=hisdealdata[-1]['Cjrq']
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
                 buy_date_for_return=buy_date.replace('/','-')
+                
+                print'       +++++'
                 for j in xrange(int(strategy.hold_days)):
                     next_day=calendar.trade_calendar(buy_date,j+1)
                     if next_day==time.strftime('%Y/%m/%d',time.localtime()):
                         print '\033[2;43m %s \033[0m' % next_day,
                     else:
                         print next_day,
-                print '\n\n'    
+                print '\n'+' '*13*(j-1) +'       ---->'           
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
                 stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,int(strategy.hold_days))
                 stocklist[i]['buy_day']=buy_date_for_return
@@ -174,7 +179,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
     result= strategy.traceback()
     log.info(u"[%s]回测选股:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
     '''
-    print 'Monitor <%s> Price for Selling:' % code
+    print '=== Monitor <%s> Price for Selling: ===' % code
     quotation.stockcode=code
     quotation.show=1
 
@@ -250,6 +255,12 @@ def trade_time():
                 while calendar.trade_time() and calendar.trade_day():
                     time.sleep(1)        
                 quotation.kill=1
+        else:
+            print '=== No need to do operation, keep waiting! ==='
+            quotation.stockcode=stock_in_position['Zqdm']
+            quotation.show=1
+            while calendar.trade_time() and calendar.trade_day():
+                time.sleep(2)             
         time.sleep(1)
 #----------------------------------------------------------------------------------------------
 def run():
@@ -270,8 +281,8 @@ def run():
 
               
 if __name__=="__main__":
-    winsound.PlaySound('./wav/good afternoon CN.wav',winsound.SND_ASYNC)
-    time.sleep(3)
+    #winsound.PlaySound('./wav/good afternoon CN.wav',winsound.SND_ASYNC)
+    #time.sleep(3)
     strategy=Strategy("QUERY_2_DAYS",25,5,10)
     time.sleep(.5)
     trader=DFCF_Trader()
