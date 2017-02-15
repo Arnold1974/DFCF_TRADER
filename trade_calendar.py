@@ -18,6 +18,7 @@ class TradeCalendar(object):
         '''
                 交易日历
         isOpen=1是交易日，isOpen=0为休市
+        返回值: 持股N天后的日期
         '''
               
         #return pd.read_csv("http://218.244.146.57/static/calAll.csv")
@@ -46,7 +47,7 @@ class TradeCalendar(object):
          
 if __name__=="__main__":
     test=TradeCalendar()
-    test.trade_calendar("2017/02/07",4)   
+    print test.trade_calendar("2017/02/15",2)   
     print "Today is Openday...........: %s" % test.trade_day()    
     print "Now is Trade Time..........: %s" % test.trade_time()
     

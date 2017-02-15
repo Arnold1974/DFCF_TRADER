@@ -40,11 +40,11 @@ class PriceQuotation(object):
             time.sleep(.5)
     def show_tushare_price(self, quote):
         if self.show==1:
-                sys.stdout.write("\r%s %s: %.2f  %.2f%%" % \
+                sys.stdout.write("\r%s  %s: %.2f  %.2f%%  %s" % \
                              (time.strftime("%Y-%m-%d %X"),\
                               quote['name'][0],\
                               float(quote['price'][0]),\
-                              (float(quote['price'][0])-float(quote['pre_close'][0]))/float(quote['pre_close'][0])*100))    
+                              (float(quote['price'][0])-float(quote['pre_close'][0]))/float(quote['pre_close'][0])*100,quote['volume'][0]))
     
     
  #-------------------------------华丽的分割线-------------------  
@@ -123,9 +123,9 @@ class PriceQuotation(object):
             index+=1
         print len(df['high']),      df['high'].max() 
         '''
-        print df
-        print stock_holding_price
-        print u'\n止损价格: {0:.2f}'.format(stock_holding_price['Stop_loss'])
+        #print df
+        #print stock_holding_price
+        #print u'\n止损价格: {0:.2f}'.format(stock_holding_price['Stop_loss'])
         #print format(show_list[1], '.2f')        
         return stock_holding_price
 if __name__=="__main__":

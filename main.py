@@ -52,14 +52,15 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
                 buy_date_for_return=buy_date.replace('/','-')
                 
-                print'       +++++'
+                print'     +++++'
                 for j in xrange(int(strategy.hold_days)):
                     next_day=calendar.trade_calendar(buy_date,j+1)
                     if next_day==time.strftime('%Y/%m/%d',time.localtime()):
                         print '\033[2;43m %s \033[0m' % next_day,
+                        k=j
                     else:
                         print next_day,
-                print '\n'+' '*13*(j-1) +'       ---->'  
+                print '\n'+' '*13*(k) +'     ---->'  
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
                 stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,int(strategy.hold_days))
                 stocklist[i]['buy_day']=buy_date_for_return
@@ -70,14 +71,15 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
                 buy_date_for_return=buy_date.replace('/','-')
                 
-                print'       +++++'
+                print'     +++++'
                 for j in xrange(int(strategy.hold_days)):
                     next_day=calendar.trade_calendar(buy_date,j+1)
                     if next_day==time.strftime('%Y/%m/%d',time.localtime()):
                         print '\033[2;43m %s \033[0m' % next_day,
+                        k=j
                     else:
                         print next_day,
-                print '\n'+' '*13*(j-1) +'       ---->'           
+                print '\n'+' '*13*(k) +'     ---->'           
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
                 stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,int(strategy.hold_days))
                 stocklist[i]['buy_day']=buy_date_for_return
@@ -188,16 +190,20 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
     stop_loss_price=stock_holding_price['Stop_loss']
     
     dfcf_quote=trader.getquote(code) #获取东方财富的报价：涨跌停价格不需要即时报价
+    print u'\n止损价:{0:.2f} | 跌停价:{1:s} | 涨停价:{2:s}' \
+          .format(stock_holding_price['Stop_loss'],dfcf_quote['bottomprice'],dfcf_quote['topprice'])
+    #print '跌停价格: %s' % dfcf_quote['bottomprice']
+    
     while quotation.result is False:
         time.sleep(.5)
 
     while calendar.trade_time() and calendar.trade_day() and int(stock_amount)<>0:       
        #卖出条件触发，发卖出指令
-
+        
        if quotation.result['code'][0]==code and int(stock_amount)<>0 \
           and float(quotation.result['price'][0]) <= stop_loss_price \
           or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) \
-             and time.localtime()[3:5]>=(14,59):
+             and time.localtime()[3:5]>=(14,57):
             log.info('Sell Begin...')
             trader.deal(code,dfcf_quote['name'],dfcf_quote['bottomprice'],'S')
             log.info('Sell End...\n')

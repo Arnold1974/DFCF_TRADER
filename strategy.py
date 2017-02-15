@@ -116,7 +116,7 @@ if __name__=="__main__":
     if result!=False:
         print result["stockDate"] + " 选出: "+ result["data"][0]["codeName"] + " < "+result["data"][0]["code"]+" >"
         print "%s 选出: %s ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"], \
-             calendar.trade_calendar(result["stockDate"].replace("-","/"),int(test.hold_days))) if result!=False else (" ","[]"," "))
+             calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
     else:
         print "回测选股: []"
     
@@ -133,17 +133,7 @@ if __name__=="__main__":
                   (1+float(show["signal_return_rate"])/100)*portfolio)                       
             portfolio *= 1+float(show["signal_return_rate"])/100
 
-            if show['sold_at']=='持仓' or calendar.trade_calendar(result["stockDate"].replace("-","/"),int(test.hold_days))==time.strftime('%Y-%m-%d',time.localtime()):
-                print'\n     +++++'
-                buy_date=show['bought_at'].replace('-','/')
-                for j in xrange(int(test.hold_days)):
-                    show=calendar.trade_calendar(buy_date,j+1)
-                    if show==time.strftime('%Y/%m/%d',time.localtime()):
-                        print '\033[2;43m %s \033[0m' % show,
-                    else:
-                        print show,
-                print '\n'+' '*11*(j-1) +'=====>'
-
-
+               
+        print '\n卖出日: %s' % calendar.trade_calendar(show["bought_at"].replace("-","/"),int(test.hold_days))
 
 

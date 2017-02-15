@@ -23,7 +23,6 @@ class DFCF_Trader(object):
 
 #登陆
     def login(self):
-
         log.info('%s Active...' % threading.current_thread().name)
         while True:
             if self.kill==1:
@@ -34,8 +33,11 @@ class DFCF_Trader(object):
                 try:
                     self.__authorization()
                     #print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Login Success!')
-                    log.info('Login Success') if self.login_flag==True else log.info('Login Failed')
-                    winsound.PlaySound('./wav/login success.wav',winsound.SND_ASYNC)
+                    if self.login_flag==True:
+                        log.info('Login Success')
+                        winsound.PlaySound('./wav/login success.wav',winsound.SND_ASYNC)
+                    else:
+                        log.info('Login Failed')
                     #Beep(450,150)
                 except Exception:
                     winsound.PlaySound('./wav/connection lost.wav',winsound.SND_ASYNC)
@@ -64,7 +66,7 @@ class DFCF_Trader(object):
             print "\nvalidatekey: %s" % self.validatekey
             self.url_suffix='?validatekey='+self.validatekey
             
-            self.login_flag=True if res.json()["Status"]==0 else False         
+            self.login_flag=True if int(res.json()["Status"])==0 else False         
             self.login_message=res.json()
         '''
         self.login_message= "message(%s), Status(%s)" % (res.json()["Message"], res.json()["Status"])
@@ -201,8 +203,8 @@ class DFCF_Trader(object):
             try:
                 GetKyzjAndKml=self.s.post('https://jy.xzsec.com/Trade/GetKyzjAndKml'+self.url_suffix, \
                                      {'stockCode':stockcode,'stockName':stockname,'price':price,'tradeType':tradetype});
-            except Exception:
-                print "\n<deal> Connection Lost, Re-Connecting..."
+            except Exception as e:
+                print e,"\n<GetKyzjAndKml> Connection Lost, Re-Connecting..."
                 time.sleep(1)
 
         
@@ -212,21 +214,33 @@ class DFCF_Trader(object):
                                    'amount':GetKyzjAndKml.json()["Data"]["Kmml"], \
                                    'tradeType':tradetype} #,'stockName':stockname
                                    )       
-            except Exception:
-                print "\n<deal> Connection Lost, Re-Connecting..."
+            except Exception as e:
+                print e,"\n<SubmitTrade> Connection Lost, Re-Connecting..."
                 time.sleep(1)
             else:
                 try:
+                    print GetKyzjAndKml.json()
+                    print SubmitTrade.json()    
+                    
                     Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
                     print u"\n可买卖量 %s" % Kmml
+
                     Wtbh=SubmitTrade.json()["Data"][0]["Wtbh"]
+                    
                     #print "委托编号: [%s]\n" %  Wtbh,
                     return Wtbh
                 except ValueError: 
                     self.login_flag=False
                     time.sleep(2)
                     continue
-
+                except IndexError:
+                    log.error(SubmitTrade.json()["Message"]) #Status:-1
+                    break
+                
+                except Exception as e:
+                    print e
+                    time.sleep(2)
+                
 #获取实时行情
     def getquote(self,stockcode):
         params={
