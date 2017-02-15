@@ -40,8 +40,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
             #转换盈亏比例为2位浮点百分小数
             stocklist[i]['Ykbl']=str(float('%.2f' % (float(stocklist[i]['Ykbl'])*100)))+'%'
             stocklist[i]['Cwbl']=str('%.0f' % (float(stocklist[i]['Cwbl'])*100))+'%'
-            if int(stocklist[i]['Zqsl'])<>0:
-                 print '\033[1;42m证券:%(Zqmc)s  持仓:%(Zqsl)s  可用:%(Kysl)s  仓位:%(Cwbl)s  涨跌:%(Ykbl)s  盈亏:%(Ljyk)s\033[0m' % stocklist[i]
+            print '\033[1;42m证券:%(Zqmc)s  持仓:%(Zqsl)s  可用:%(Kysl)s  仓位:%(Cwbl)s  涨跌:%(Ykbl)s  盈亏:%(Ljyk)s\033[0m' % stocklist[i]
         st=time.strftime("%Y-%m-%d",time.localtime(time.time()-864000))
         et=time.strftime("%Y-%m-%d",time.localtime(time.time()))
         hisdealdata=trader.gethisdealdata(st=st,et=et)
@@ -100,7 +99,8 @@ def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
             portfolio *= 1+float(result["signal_return_rate"])/100    
 
 def none_trade_day():
-    print '\n\n{0:-^72}'.format('\033[20;43m NON TRADING DAY \033[0m')    
+    print '\n\n{0:-^72}'.format('\033[20;43m NON TRADING DAY \033[0m')
+    show_transaction(start_day='2017-01-01', end_day='2017-12-31')
     show_assets()
     show_stocklist()
     quotation.kill=1
@@ -124,6 +124,7 @@ def none_trade_day():
 
 def none_trade_time():
     print '\n\n{0:-^72}'.format('\033[20;46m NON TRADING TIME \033[0m')    
+    show_transaction(start_day='2017-01-01', end_day='2017-12-31')
     show_assets()
     show_stocklist()
     quotation.kill=1
@@ -198,18 +199,21 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
         time.sleep(.5)
 
     while calendar.trade_time() and calendar.trade_day() and int(stock_amount)<>0:       
-       #卖出条件触发，发卖出指令
-        
+      
+       #卖出条件触发，发卖出指令  
        if quotation.result['code'][0]==code and int(stock_amount)<>0 \
           and float(quotation.result['price'][0]) <= stop_loss_price \
           or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) \
              and time.localtime()[3:5]>=(14,57):
             log.info('Sell Begin...')
-            trader.deal(code,dfcf_quote['name'],dfcf_quote['bottomprice'],'S')
-            log.info('Sell End...\n')
-            stock_amount=show_stocklist()['Kysl']
-
-                 
+            Wtbh=trader.deal(code,dfcf_quote['name'],dfcf_quote['bottomprice'],'S')
+            if Wtbh is not None:
+                log.info('Sell End...\n')
+                print "委托编号: [%s]\n" %  Wtbh,
+                stock_amount=show_stocklist()['Kysl']
+                time.sleep(1)
+            else:
+                break
        '''
        if quotation.result['code']==code and int(stock_amount)<>0 \
           and float(quotation.result['realtimequote']['currentPrice'])>30.80 \

@@ -35,7 +35,8 @@ class DFCF_Trader(object):
                     #print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Login Success!')
                     if self.login_flag==True:
                         log.info('Login Success')
-                        winsound.PlaySound('./wav/login success.wav',winsound.SND_ASYNC)
+                        Beep(450,150)
+                        #winsound.PlaySound('./wav/login success.wav',winsound.SND_ASYNC)
                     else:
                         log.info('Login Failed')
                     #Beep(450,150)
@@ -80,24 +81,25 @@ class DFCF_Trader(object):
     def getassets(self):
         while True:
             try:
-                Assets=self.s.post('https://jy.xzsec.com/Com/GetAssets'+self.url_suffix,{'moneyType':'RMB'},timeout=3)
+                Assets=self.s.post('https://jy.xzsec.com/Com/GetAssets'+self.url_suffix,
+                                   {'moneyType':'RMB'},timeout=5)
             except Exception:
                 print "\n<getassets> Connection Lost, Re-Connecting..."
                 time.sleep(1)
             else:
                 try:
                     return Assets.json()["Data"][0]                    
-                except ValueError: 
+                except ValueError:
                     self.login_flag=False
-                    time.sleep(2)
-                    continue
+                    while self.login_flag is False:
+                        time.sleep(.5)
                 except TypeError: #Status:-1; Message:'服务器异常'
                     print u"\n <getassets> 服务器异常!"
                     time.sleep(2)
-                    continue
                 except Exception as e:
                     log.error(e)
                     time.sleep(2)
+                    
                 '''                
                 if Assets.json()["Status"]!=0: #Status:-2 ; Message:"会话已超时，请重新登录!"
                     self.login_flag=False
@@ -110,7 +112,8 @@ class DFCF_Trader(object):
     def getstocklist(self):
         while True:
             try:
-                StockList=self.s.post('https://jy.xzsec.com/Search/GetStockList'+self.url_suffix,{'qqhs':'1000','dwc':''});
+                StockList=self.s.post('https://jy.xzsec.com/Search/GetStockList'+self.url_suffix,
+                                      {'qqhs':'1000','dwc':''});
             except Exception:
                 print "\n <getstocklist> connection lost!"
                 time.sleep(1)
@@ -119,8 +122,12 @@ class DFCF_Trader(object):
                     return StockList.json()["Data"]                    
                 except ValueError:
                     self.login_flag=False
-                    time.sleep(2)
-                    continue  
+                    while self.login_flag is False:
+                        time.sleep(.5)
+                except Exception as e:
+                    log.error(e)
+                    time.sleep(2) 
+                     
             '''    
             self.stocklist_message=""
             StockList=self.s.post('https://jy.xzsec.com/Search/GetStockList',{'qqhs':'1000','dwc':''});
@@ -155,9 +162,11 @@ class DFCF_Trader(object):
                     return TodayDealData.json()["Data"]                    
                 except ValueError:
                     self.login_flag=False
-                    time.sleep(2)
-                    continue          
-         
+                    while self.login_flag is False:
+                        time.sleep(.5)         
+                except Exception as e:
+                    log.error(e)
+                    time.sleep(2)         
 
 #历史成交
     def gethisdealdata(self,st='2017-02-01',et='2017-02-12'):
@@ -173,9 +182,11 @@ class DFCF_Trader(object):
                     return HistDealList.json()["Data"]                    
                 except ValueError:
                     self.login_flag=False
-                    time.sleep(2)
-                    continue  
-
+                    while self.login_flag is False:
+                        time.sleep(.5)
+                except Exception as e:
+                    log.error(e)
+                    time.sleep(2) 
        
 #撤单列表
     def getrevokelist(self):
@@ -204,12 +215,15 @@ class DFCF_Trader(object):
                 GetKyzjAndKml=self.s.post('https://jy.xzsec.com/Trade/GetKyzjAndKml'+self.url_suffix, \
                                      {'stockCode':stockcode,'stockName':stockname,'price':price,'tradeType':tradetype});
                 Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
+            except ValueError: # ValueError: No JSON object could be decoded 超时返回登录前网页
+                self.login_flag=False
+                while self.login_flag is False:
+                    time.sleep(.5)
+                continue
             except Exception as e:
                 print e,"\n<GetKyzjAndKml> Connection Lost, Re-Connecting..."
                 time.sleep(1)
-            except ValueError: # ValueError: No JSON object could be decoded 超时返回登录前网页
-                self.login_flag=False
-                time.sleep(1) 
+                continue
         
             try:
                 SubmitTrade=self.s.post('https://jy.xzsec.com/Trade/SubmitTrade'+self.url_suffix, \
@@ -220,30 +234,20 @@ class DFCF_Trader(object):
             except Exception as e:
                 print e,"\n<SubmitTrade> Connection Lost, Re-Connecting..."
                 time.sleep(1)
-                
-            except ValueError: # ValueError: No JSON object could be decoded 超时返回登录前网页
-                self.login_flag=False
-                time.sleep(1)                
             else:
                 try:
-                    print GetKyzjAndKml.json()
-                    print SubmitTrade.json()    
-                    
-                    Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
-                    print u"\n可买卖量 %s" % Kmml
-
+                    #print GetKyzjAndKml.json()
+                    #print SubmitTrade.json()    
                     Wtbh=SubmitTrade.json()["Data"][0]["Wtbh"]
-                    
-                    #print "委托编号: [%s]\n" %  Wtbh,
                     return Wtbh
                 except ValueError: 
                     self.login_flag=False
-                    time.sleep(2)
+                    while self.login_flag is False:
+                        time.sleep(.5)
                     continue
                 except IndexError:
                     log.error(SubmitTrade.json()["Message"]) #Status:-1
-                    break
-                
+                    break               
                 except Exception as e:
                     print e
                     time.sleep(2)
