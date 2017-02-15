@@ -203,20 +203,27 @@ class DFCF_Trader(object):
             try:
                 GetKyzjAndKml=self.s.post('https://jy.xzsec.com/Trade/GetKyzjAndKml'+self.url_suffix, \
                                      {'stockCode':stockcode,'stockName':stockname,'price':price,'tradeType':tradetype});
+                Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
             except Exception as e:
                 print e,"\n<GetKyzjAndKml> Connection Lost, Re-Connecting..."
                 time.sleep(1)
-
+            except ValueError: # ValueError: No JSON object could be decoded 超时返回登录前网页
+                self.login_flag=False
+                time.sleep(1) 
         
             try:
                 SubmitTrade=self.s.post('https://jy.xzsec.com/Trade/SubmitTrade'+self.url_suffix, \
                                    {'stockCode':stockcode,'price':price, \
-                                   'amount':GetKyzjAndKml.json()["Data"]["Kmml"], \
+                                   'amount':Kmml, \
                                    'tradeType':tradetype} #,'stockName':stockname
                                    )       
             except Exception as e:
                 print e,"\n<SubmitTrade> Connection Lost, Re-Connecting..."
                 time.sleep(1)
+                
+            except ValueError: # ValueError: No JSON object could be decoded 超时返回登录前网页
+                self.login_flag=False
+                time.sleep(1)                
             else:
                 try:
                     print GetKyzjAndKml.json()
