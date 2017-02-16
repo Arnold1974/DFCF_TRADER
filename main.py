@@ -199,22 +199,31 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
     while quotation.result is False:
         time.sleep(.5)
 
-    stock_holding_price=quotation.get_stop_loss_price(code,buy_day)
-    stop_loss_price=stock_holding_price['Open']*(1-float(strategy.lowerIncome)/100) #止损价格
-    stop_sell_price=stock_holding_price['Open']*(1+float(strategy.upperIncome)/100) #止盈价格
-    stop_sell_price_updated=stop_sell_price #最新的止盈价格
+    stock_holding_price=quotation.get_holding_period_price(code,buy_day)
+    stop_loss_price=stock_holding_price['Open'] * (1-float(strategy.lowerIncome)/100) #止损价格
+    stop_sell_price=stock_holding_price['Open'] * (1+float(strategy.upperIncome)/100) #止盈价格
+    if stock_holding_price['High'] > stop_sell_price:
+         stop_sell_price=stock_holding_price['High'] #最新的止盈价格
+         stop_loss_price=stop_sell_price * (1-float(strategy.fallIncome)/100) #最新的止损价格
 
     
     dfcf_quote=trader.getquote(code) #获取东方财富的报价：涨跌停价格不需要即时报价
     print u'\n止损价:{0:.2f} |止盈价:{1:.2f}| 跌停价:{2:s} | 涨停价:{3:s}' \
-          .format(stop_loss_price,stop_sell_price_updated,dfcf_quote['bottomprice'],dfcf_quote['topprice'])
+          .format(stop_loss_price,stop_sell_price,dfcf_quote['bottomprice'],dfcf_quote['topprice'])
     #print '跌停价格: %s' % dfcf_quote['bottomprice']
     
 
     while calendar.trade_time() and calendar.trade_day() and int(stock_amount)<>0:       
-       if float(quotation.result['price'][0])>stop_sell_price_updated:  #最新止盈价格出现，更新止盈价格，当日停止卖出
-           stop_sell_price_updated=float(quotation.result['price'][0])
-           
+       if float(quotation.result['high'][0])>stop_sell_price:  #最新止盈价格出现，更新止盈价格，当日停止卖出
+           new_price_occur_time= time.strftime('%X' , time.localtime())
+           quotation.show=0
+           if int(time.time()) % 2:
+               sys.stdout.write("\r[%s] %s" % (new_price_occur_time,"--> The new highest price occurred !"))           
+           else:
+               sys.stdout.write("\r[%s] %s" % (new_price_occur_time,"-->                                 "))
+               time.sleep(1) 
+           time.sleep(1)
+           continue
        #卖出条件触发，发卖出指令  
        if quotation.result['code'][0]==code and int(stock_amount)<>0 \
           and float(quotation.result['price'][0]) <= stop_loss_price \
