@@ -44,7 +44,8 @@ class PriceQuotation(object):
                              (time.strftime("%Y-%m-%d %X"),\
                               quote['name'][0],\
                               float(quote['price'][0]),\
-                              (float(quote['price'][0])-float(quote['pre_close'][0]))/float(quote['pre_close'][0])*100,quote['volume'][0]))
+                              (float(quote['price'][0])-float(quote['pre_close'][0]))/float(quote['pre_close'][0])*100,
+                              quote['volume'][0]))
     
     
  #-------------------------------华丽的分割线-------------------  
@@ -112,7 +113,7 @@ class PriceQuotation(object):
         df=self.get_hist_data(code,buy_day)
         index=df[df['date']==buy_day].index[0] #获取购买日的行号
         stock_holding_price={}
-        stock_holding_price['Stop_loss']=float(format(df.ix[index,'open'], '.2f'))*0.9
+        stock_holding_price['Open']=float(format(df.ix[index,'open'], '.2f'))#*(1-float(strategy.lowerIncome)/100)
         stock_holding_price['High']=df['high'].max()
         stock_holding_price['Low']=df['low'].max()
         '''
