@@ -12,6 +12,7 @@ import time
 import pandas as pd
 import winsound
 
+#%%
 
 def thread_login_keep_alive():
     if trader.thread_1.isAlive()==False:
@@ -51,7 +52,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
                 buy_date_for_return=buy_date.replace('/','-')
                 
-                print'     +++++'
+                print'       +++++'
                 for j in xrange(int(strategy.hold_days)):
                     next_day=calendar.trade_calendar(buy_date,j+1)
                     if next_day==time.strftime('%Y/%m/%d',time.localtime()):
@@ -59,7 +60,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                         k=j
                     else:
                         print next_day,
-                print '\n'+' '*13*(k) +'     ---->'  
+                print '\n'+' '*13*(k) +'       ---->'  
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
                 stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,int(strategy.hold_days))
                 stocklist[i]['buy_day']=buy_date_for_return
@@ -70,7 +71,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
                 buy_date_for_return=buy_date.replace('/','-')
                 
-                print'     +++++'
+                print'       +++++'
                 for j in xrange(int(strategy.hold_days)):
                     next_day=calendar.trade_calendar(buy_date,j+1)
                     if next_day==time.strftime('%Y/%m/%d',time.localtime()):
@@ -78,7 +79,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                         k=j
                     else:
                         print next_day,
-                print '\n'+' '*13*(k) +'     ---->'           
+                print '\n'+' '*13*(k) +'       ---->'           
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
                 stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,int(strategy.hold_days))
                 stocklist[i]['buy_day']=buy_date_for_return
