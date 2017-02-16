@@ -154,7 +154,7 @@ def monitor_buy(code,codename):
            and time.localtime()[3:6]>=(9,29,45) and time.localtime()[3:5]<=(9,30):
             quotation.show=0
             log.info("\nBegin Buy: " + codename)
-            Wtbh=trader.deal(code,codename,dfcf_quote['topprice'],'B') #['topprice']
+            Wtbh=trader.deal(code,codename,str(float(dfcf_quote['topprice'])-0.01),'B') #['topprice']
 
             if Wtbh is not None:
                 log.info('\nBuy End...\n')
@@ -232,7 +232,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
               and time.localtime()[3:5]>=(14,57):
             quotation.show=0
             log.info('Sell Begin...')
-            Wtbh=trader.deal(code,dfcf_quote['name'],dfcf_quote['bottomprice'],'S')
+            Wtbh=trader.deal(code,dfcf_quote['name'],str(float(dfcf_quote['bottomprice'])-0.01),'S')
             if Wtbh is not None:
                 log.info('Sell End...\n')
                 print "委托编号: [%s]\n" %  Wtbh,
