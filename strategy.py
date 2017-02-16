@@ -67,6 +67,7 @@ class Strategy(object):
                     num=r.json()['data']['stockData']['list']['stockNum']
                 except TypeError as e:
                     print e
+                    time.sleep(1)
                     continue
                 if num!=0:
                     return r.json()['data']['stockData']['list']
@@ -107,7 +108,7 @@ class Strategy(object):
 
         
 if __name__=="__main__":
-    test=Strategy("QUERY_4_DAYS",25,5,10) # 2天策略： 25|5|10
+    test=Strategy("QUERY_2_DAYS",25,5,10) # 2天策略： 25|5|10
     from trade_calendar import TradeCalendar
     calendar=TradeCalendar()
     result=test.pickstock()

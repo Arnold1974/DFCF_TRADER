@@ -215,6 +215,10 @@ class DFCF_Trader(object):
                 GetKyzjAndKml=self.s.post('https://jy.xzsec.com/Trade/GetKyzjAndKml'+self.url_suffix, \
                                      {'stockCode':stockcode,'stockName':stockname,'price':price,'tradeType':tradetype});
                 Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
+                if Kmml=='0':
+                    print '可交易数量为0'
+                    time.sleep(5)
+                    break
             except ValueError: # ValueError: No JSON object could be decoded 超时返回登录前网页
                 self.login_flag=False
                 while self.login_flag is False:
@@ -245,11 +249,11 @@ class DFCF_Trader(object):
                     while self.login_flag is False:
                         time.sleep(.5)
                     continue
-                except IndexError:
+                except (IndexError,TypeError):
                     log.error(SubmitTrade.json()["Message"]) #Status:-1
                     break               
                 except Exception as e:
-                    print e
+                    print e,'unknow error!'
                     time.sleep(2)
                 
 #获取实时行情

@@ -138,21 +138,30 @@ def none_trade_time():
         time.sleep(1)
     
 def monitor_buy(code,codename):
+    print '=== Monitor <%s> Price for Buy: ===' % code
     quotation.stockcode=code
     quotation.show=1
-    while quotation.result==False:
+
+    while quotation.result is False:
         time.sleep(.5)
 
+    dfcf_quote=trader.getquote(code)
+
     while calendar.trade_time() and calendar.trade_day():
-        if quotation.result['code']==code \
-           and float(quotation.result['price'][0])>10.80 \
-           and (float(quotation.result['price'][0])-float(quotation.result['pre_close'][0]))*100/float(quotation.result['price'][0])>-9 \
-           and time.localtime()[3:5]>=(9,29) and time.localtime()[3:5]<=(9,31):
-            print "Begin Buy: " + codename
-            #Wtbh=trader.deal(code,codename,quotation.result['fivequote']['sale5'],'B') #['topprice']
-            #trader.deal("000619","海螺型材","13.4","B")            
-            winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
-            return Wtbh        
+        if quotation.result['code'][0]==code \
+           and (float(quotation.result['price'][0])-float(quotation.result['pre_close'][0]))*100/float(quotation.result['pre_close'][0])>-9 \
+           and time.localtime()[3:6]>=(9,29,45) and time.localtime()[3:5]<=(9,30):
+            quotation.show=0
+            log.info("\nBegin Buy: " + codename)
+            Wtbh=trader.deal(code,codename,dfcf_quote['topprice'],'B') #['topprice']
+
+            if Wtbh is not None:
+                log.info('Buy End...\n')
+                #trader.deal("000619","海螺型材","13.4","B")            
+                winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
+                while time.localtime()[3:5]<=(9,30):
+                    time.sleep(1)
+                return Wtbh        
         
         '''
         if quotation.result['code']==code \
@@ -205,6 +214,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
           and float(quotation.result['price'][0]) <= stop_loss_price \
           or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) \
              and time.localtime()[3:5]>=(14,57):
+            quotation.show=0
             log.info('Sell Begin...')
             Wtbh=trader.deal(code,dfcf_quote['name'],dfcf_quote['bottomprice'],'S')
             if Wtbh is not None:
@@ -235,7 +245,7 @@ def trade_time():
         quotation.__init__()
     show_assets()
     stock_in_position=show_stocklist() #获取持仓的数据买卖日期
-    
+                                 
     while calendar.trade_time() and calendar.trade_day():
         if stock_in_position and int(stock_in_position['Kysl'])<>0: #如果不空仓,且有股票可卖,监视价格变化是否达到止损止盈
             monitor_sell(stock_in_position['Zqdm'],stock_in_position['buy_day'],stock_in_position['sell_day'],stock_in_position['Kysl'])
@@ -254,21 +264,11 @@ def trade_time():
                 codename= result["data"][0]["codeName"]
                 print "%s:[%s] ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"],calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
                 #log.info(u"[%s]选出:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
-                quote=trader.getquote(code)       
-                print quote['name'],quote['code'],quote['topprice'],quote['bottomprice'],\
-                      quote['realtimequote']['open'],quote['realtimequote']['time'],\
-                      quote['realtimequote']['currentPrice'],\
-                      quote['realtimequote']['zd'],\
-                      quote['realtimequote']['zdf'],\
-                      quote['fivequote']['buy1'],\
-                      quote['fivequote']['sale1']
     
                 Wtbh=monitor_buy(code,codename)
                 print "委托编号: [%s]\n" %  Wtbh,
-                show_stocklist()
-                while calendar.trade_time() and calendar.trade_day():
-                    time.sleep(1)        
-                quotation.kill=1
+                stock_in_position=show_stocklist()
+
         else:
             print '=== No need to do operation, keep waiting! ==='
             quotation.stockcode=stock_in_position['Zqdm']
