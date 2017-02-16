@@ -12,7 +12,7 @@ import time
 import pandas as pd
 import winsound
 
-#%%
+
 
 def thread_login_keep_alive():
     if trader.thread_1.isAlive()==False:

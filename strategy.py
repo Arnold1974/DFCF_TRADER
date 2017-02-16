@@ -106,6 +106,7 @@ class Strategy(object):
                 else:
                     return r.json()['data']                
 
+#%%
         
 if __name__=="__main__":
     test=Strategy("QUERY_2_DAYS",25,5,10) # 2天策略： 25|5|10
@@ -135,6 +136,6 @@ if __name__=="__main__":
             portfolio *= 1+float(show["signal_return_rate"])/100
 
                
-        print '\n卖出日: %s' % calendar.trade_calendar(show["bought_at"].replace("-","/"),int(test.hold_days))
+        print '\n%s 卖出日: %s' % (show["stock_name"], calendar.trade_calendar(show["bought_at"].replace("-","/"),int(test.hold_days)))
 
 
