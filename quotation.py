@@ -40,8 +40,9 @@ class PriceQuotation(object):
             time.sleep(.5)
     def show_tushare_price(self, quote):
         if self.show==1:
-                sys.stdout.write("\r%s  %s: %.2f  %.2f%%  %s" % \
-                             (time.strftime("%Y-%m-%d %X"),\
+                sys.stdout.write("\r\033[1;45m%s %s  %s:  %.2f   %.2f%%   %s\033[0m" % \
+                             (quote['date'][0],\
+                              quote['time'][0],
                               quote['name'][0],\
                               float(quote['price'][0]),\
                               (float(quote['price'][0])-float(quote['pre_close'][0]))/float(quote['pre_close'][0])*100,

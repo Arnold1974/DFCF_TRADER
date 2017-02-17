@@ -193,9 +193,9 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
     result= strategy.traceback()
     log.info(u"[%s]回测选股:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
     '''
-    print '=== Monitor <%s> Price for Selling: ===' % code
+    print '\033[3;33m=== Monitor <%s> Price for Selling: ===\033[0m' % code
     quotation.stockcode=code
-    quotation.show=1
+
 
     while quotation.result is False:
         time.sleep(.5)
@@ -209,11 +209,11 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
 
 
     dfcf_quote=trader.getquote(code) #获取东方财富的报价：涨跌停价格不需要即时报价
-    print u'\n止损价:{0:.2f} |止盈价:{1:.2f}| 跌停价:{2:s} | 涨停价:{3:s}' \
+    print u'止损价:{0:.2f} | 止盈价:{1:.2f} | 跌停价:{2:s} | 涨停价:{3:s}' \
           .format(stop_loss_price,stop_sell_price,dfcf_quote['bottomprice'],dfcf_quote['topprice'])
     #print '跌停价格: %s' % dfcf_quote['bottomprice']
 
-
+    quotation.show=1
     while calendar.trade_time() and calendar.trade_day() and int(stock_amount)<>0:
         if float(quotation.result['high'][0])>stop_sell_price:  #最新止盈价格出现，更新止盈价格，当日停止卖出
             new_price_occur_time= time.strftime('%X' , time.localtime())
@@ -232,7 +232,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
               and time.localtime()[3:5]>=(14,57):
             quotation.show=0
             log.info('Sell Begin...')
-            Wtbh=trader.deal(code,dfcf_quote['name'],str(float(dfcf_quote['bottomprice'])-0.01),'S')
+            Wtbh=trader.deal(code,dfcf_quote['name'],str(float(dfcf_quote['bottomprice'])+0.01),'S')
             if Wtbh is not None:
                 log.info('Sell End...\n')
                 print "委托编号: [%s]\n" %  Wtbh,
