@@ -23,7 +23,7 @@ def show_assets():
     assets=trader.getassets()
     if assets:
         assets.update(trader.login_message['Data'][0])
-        print '\033[1;36m'
+        print '\033[2;36m'
         print "%(khmc)s [%(Syspm1)s]\t    Logged at: [%(Date)s-%(Time)s]" % assets
         print '{0:-^60}'.format('')
         print "总资产: %(Zzc)10s\t可用资金: %(Kyzj)9s\t 可取资金: %(Kqzj)9s" % assets
@@ -184,7 +184,9 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
     当日便不卖出，而是等下个交易日出现止盈回撤条件触发。
     例如：本来持有4天卖出的股票，
     但是到了第3天，某时点出现收益21%(用户设定的止盈条件是大于20%时，回撤5%止盈)，则当天会继续持有，
-    到期也不卖出了。当该股收益最高点出现后，从次日起只要收益从最高点回撤大于5%时就会卖出止盈。
+    到期也不卖出了。当该股收益最高点出现后，从次日起(当日不管是否出现回撤止盈)开始重新监测，
+    只要收益从最高点回撤大于5%时就会卖出止盈。
+    {目前建议采用的止盈策略，盘中出现持股期间股价新高后，更新止损价， 随时止损}
 
     特殊情况：当持有股票一字涨跌停时，会继续持有。
 
@@ -203,10 +205,11 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
     stock_holding_price=quotation.get_holding_period_price(code,buy_day)
     stop_loss_price=stock_holding_price['Open'] * (1-float(strategy.lowerIncome)/100) #止损价格
     stop_sell_price=stock_holding_price['Open'] * (1+float(strategy.upperIncome)/100) #止盈价格
+    price_updated=False # 判断是否出现新的价格高点， 用来处理到期卖出还是看回撤卖出
     if stock_holding_price['High'] > stop_sell_price:
         stop_sell_price=stock_holding_price['High'] #最新的止盈价格
         stop_loss_price=stop_sell_price * (1-float(strategy.fallIncome)/100) #最新的止损价格
-
+        price_updated=True
 
     dfcf_quote=trader.getquote(code) #获取东方财富的报价：涨跌停价格不需要即时报价
     print u'止损价:{0:.2f} | 止盈价:{1:.2f} | 跌停价:{2:s} | 涨停价:{3:s}' \
@@ -216,20 +219,17 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
     quotation.show=1
     while calendar.trade_time() and calendar.trade_day() and int(stock_amount)<>0:
         if float(quotation.result['high'][0])>stop_sell_price:  #最新止盈价格出现，更新止盈价格，当日停止卖出
-            new_price_occur_time= time.strftime('%X' , time.localtime())
+            price_updated=True
             quotation.show=0
-            if int(time.time()) % 2:
-                sys.stdout.write("\r[%s] %s" % (new_price_occur_time,"--> The new highest price occurred !"))
-            else:
-                sys.stdout.write("\r[%s] %s" % (new_price_occur_time,"-->                                 "))
-                time.sleep(1)
-            time.sleep(1)
-            continue
+            stop_sell_price=float(quotation.result['high'][0])
+            stop_loss_price=stop_sell_price * (1-float(strategy.fallIncome)/100) #最新的止损价格    
+            print 'The new highest price: %s occurred at: %s' % (stop_sell_price,time.strftime('%X' , time.localtime()))
+            quotation.show=1
        #卖出条件触发，发卖出指令
         if quotation.result['code'][0]==code and int(stock_amount)<>0 \
            and float(quotation.result['price'][0]) <= stop_loss_price \
            or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) \
-              and time.localtime()[3:5]>=(14,57):
+              and time.localtime()[3:6]>=(14,59,45) and price_updated <> True:
             quotation.show=0
             log.info('Sell Begin...')
             Wtbh=trader.deal(code,dfcf_quote['name'],str(float(dfcf_quote['bottomprice'])+0.01),'S')
