@@ -151,7 +151,7 @@ def monitor_buy(code,codename):
     while calendar.trade_time() and calendar.trade_day():
         if quotation.result['code'][0]==code \
            and (float(quotation.result['price'][0])-float(quotation.result['pre_close'][0]))*100/float(quotation.result['pre_close'][0])>-9 \
-           and time.localtime()[3:6]>=(9,29,45) and time.localtime()[3:5]<=(9,30):
+           and time.localtime()[3:6]>=(9,25,5) and time.localtime()[3:5]<=(9,30):
             quotation.show=0
             log.info("\nBegin Buy: " + codename)
             Wtbh=trader.deal(code,codename,str(float(dfcf_quote['topprice'])-0.01),'B') #['topprice']
@@ -162,6 +162,9 @@ def monitor_buy(code,codename):
                 winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
                 while time.localtime()[3:5]<=(9,30):
                     time.sleep(1)
+                #查询当日委托状态， 如果未成则等待
+                    
+                    
                 return Wtbh
 
         '''
