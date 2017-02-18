@@ -228,11 +228,14 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
             stop_loss_price=stop_sell_price * (1-float(strategy.fallIncome)/100) #最新的止损价格    
             print 'The new highest price: %s occurred at: %s' % (stop_sell_price,time.strftime('%X' , time.localtime()))
             quotation.show=1
-       #卖出条件触发，发卖出指令
+            
+       #-----------卖出条件触发，发卖出指令-----------
         if quotation.result['code'][0]==code and int(stock_amount)<>0 \
            and float(quotation.result['price'][0]) <= stop_loss_price \
            or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) \
-              and time.localtime()[3:6]>=(14,59,45) and price_updated <> True:
+              and time.localtime()[3:6]>=(14,59,45) and price_updated <> True \
+              and float(quotation.result['price'][0]) <> float(dfcf_quote['topprice']):
+            
             quotation.show=0
             log.info('Sell Begin...')
             Wtbh=trader.deal(code,dfcf_quote['name'],str(float(dfcf_quote['bottomprice'])+0.01),'S')
