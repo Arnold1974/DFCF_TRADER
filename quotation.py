@@ -51,6 +51,9 @@ class PriceQuotation(object):
     
  #-------------------------------华丽的分割线-------------------  
     def get_quote(self):
+        '''
+        获取东方财富的实时行情数据
+        '''
         self.s = requests.session()
         while True:
             if self.kill==1:
@@ -83,6 +86,7 @@ class PriceQuotation(object):
 
     def get_hist_price(self,stockcode='000001.ss',s_date='2017-01-01',e_date=time.strftime('%Y-%m-%d',time.localtime())):
         '''
+        yahoo 的历史数据
         深市数据链接：http://table.finance.yahoo.com/table.csv?s=000001.sz
         上市数据链接：http://table.finance.yahoo.com/table.csv?s=600000.ss
         上证综指代码：000001.ss
@@ -111,6 +115,9 @@ class PriceQuotation(object):
         return tushare.get_k_data(code,s_date,e_date)
 
     def get_holding_period_price(self,code,buy_day):
+        '''
+        tushare 的历史行情数据
+        '''
         df=self.get_hist_data(code,buy_day)
         index=df[df['date']==buy_day].index[0] #获取购买日的行号
         stock_holding_price={}

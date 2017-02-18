@@ -160,11 +160,13 @@ def monitor_buy(code,codename):
                 log.info('\nBuy End...\n')
                 #trader.deal("000619","海螺型材","13.4","B")
                 winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
-                while time.localtime()[3:5]<=(9,30):
-                    time.sleep(1)
+                #while time.localtime()[3:5]<=(9,30):
+                #    time.sleep(1)
                 #查询当日委托状态， 如果未成则等待
-                    
-                    
+                while trader.getordersdata()[-1]['Wtzt'] <> '已成':
+                    sys.stdout.write("委托还未成交!")
+                    time.sleep(1)
+
                 return Wtbh
 
         '''
@@ -229,13 +231,26 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
             print 'The new highest price: %s occurred at: %s' % (stop_sell_price,time.strftime('%X' , time.localtime()))
             quotation.show=1
             
-       #-----------卖出条件触发，发卖出指令-----------
-        if quotation.result['code'][0]==code and int(stock_amount)<>0 \
-           and float(quotation.result['price'][0]) <= stop_loss_price \
-           or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) \
-              and time.localtime()[3:6]>=(14,59,45) and price_updated <> True \
-              and float(quotation.result['price'][0]) <> float(dfcf_quote['topprice']):
-            
+        #-----------卖出条件触发，发卖出指令-----------
+        # .1. 触发止损
+        sell_condition_1=quotation.result['code'][0]==code and int(stock_amount)<>0 \
+                         and float(quotation.result['price'][0]) <= stop_loss_price 
+        
+        # .2. 卖出日，没触及止盈点，并且不是一字涨停 (最低价不等于涨停价),收盘价卖出               
+        sell_condition_2=quotation.result['code'][0]==code and int(stock_amount)<>0 \
+                         and sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) \
+                         and time.localtime()[3:6]>=(14,59,45) and price_updated <> True \
+                         and float(quotation.result['low'][0]) <> float(dfcf_quote['topprice'])  
+        
+        # .3. 卖出日，非一字涨停，如果涨停价也不能触及止盈价，则涨到7%就卖出，不用等收盘
+        sell_condition_3=quotation.result['code'][0]==code and int(stock_amount)<>0 \
+                         and sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) \
+                         and price_updated <> True \
+                         and float(dfcf_quote['topprice']) < stop_sell_price \
+                         and float(quotation.result['low'][0]) <> float(dfcf_quote['topprice']) \
+                         and float(quotation.result['price'][0]) >= float(dfcf_quote['topprice']) * 0.7
+ 
+        if sell_condition_1 or sell_condition_2 or sell_condition_3:                
             quotation.show=0
             log.info('Sell Begin...')
             Wtbh=trader.deal(code,dfcf_quote['name'],str(float(dfcf_quote['bottomprice'])+0.01),'S')
