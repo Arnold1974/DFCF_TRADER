@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#encoding=utf-8
+#-*- coding:utf-8 -*-
 
 try:
     import pytesseract
@@ -55,14 +55,17 @@ class VerifyCode(object):
 if __name__=="__main__":
     test=VerifyCode()
     i=0;vcode=""
-    while len(vcode)<>4 and i<1000:
-        vcode,im=test.get_verify_code()
+    while len(vcode)<>10 and i<1000:
+        vcode,im=test.get_verify_code()     
         if len(vcode)==4:
-            plt.figure("verify code")
-            plt.imshow(im)
-            plt.show()
-            #im.save('d:/dog.jpg')
-
-        sys.stdout.write( "\r字符:[%8s]  :    长度:%2d" % (vcode, len(vcode)))
+            for k in xrange(4):
+                if vcode[k] not in [str(x) for x in xrange(10)]:
+                    break
+            else:
+                plt.figure("verify code")
+                plt.imshow(im)
+                plt.show()
+                print  "\rCode:[%4s]    Length:%2d" % (vcode, len(vcode))
+        sys.stdout.write( "\rCode:[%8s]    Length:%2d   Count: %d" % (vcode, len(vcode),i))
         i+=1
     print '\nDone'
