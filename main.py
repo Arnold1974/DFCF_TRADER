@@ -87,7 +87,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
 
 def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
     r=strategy.transaction(start_day,end_day)
-    print '\n{0:-^60}'.format('Portfolie Value ')
+    print '\n{0:-^60}'.format(' Portfolie Value')
     if r is not False:
         portfolio=1
         for i in xrange(len(r)-1,-1,-1):
@@ -100,7 +100,7 @@ def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
             portfolio *= 1+float(result["signal_return_rate"])/100
 
 def none_trade_day():
-    print '\n\n{0:-^72}'.format('\033[20;43m NON TRADING DAY \033[0m')
+    print '\n\n{0:-^72}'.format('\033[20;44m NON TRADING DAY \033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')
     show_assets()
     show_stocklist()
@@ -118,7 +118,7 @@ def none_trade_day():
 
     while not calendar.trade_day():
         if int(time.time()) % 2:
-            sys.stdout.write("\r\033[1;43m[%s]  Login-Thread Alive: %s\033[0m" % (time.strftime("%X",time.localtime()),trader.thread_1.isAlive()))
+            sys.stdout.write("\r\033[1;44m[%s]  Login-Thread Alive: %s\033[0m" % (time.strftime("%X",time.localtime()),trader.thread_1.isAlive()))
         else:
             sys.stdout.write("\r[%s]  Login-Thread Alive: %s" % (time.strftime("%X",time.localtime()),trader.thread_1.isAlive()))
         time.sleep(1)
@@ -166,7 +166,6 @@ def monitor_buy(code,codename):
                 while trader.getordersdata()[-1]['Wtzt'] <> '已成':
                     sys.stdout.write("委托还未成交!")
                     time.sleep(1)
-
                 return Wtbh
 
         '''

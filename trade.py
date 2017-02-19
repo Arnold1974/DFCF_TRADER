@@ -64,7 +64,7 @@ class DFCF_Trader(object):
         get_validatekey=self.s.get('https://jy.xzsec.com/Trade/Buy')
         if re.search(r'em_validatekey.*?>',get_validatekey.text).group():
             self.validatekey= re.search(r'em_validatekey.*?>',get_validatekey.text).group()[37:73]
-            print "\nvalidatekey: %s" % self.validatekey
+            #print "\nvalidatekey: %s" % self.validatekey
             self.url_suffix='?validatekey='+self.validatekey
             
             self.login_flag=True if int(res.json()["Status"])==0 else False         
