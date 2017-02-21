@@ -40,9 +40,7 @@ class VerifyCode(object):
         #im.show()
         '''
         vcode = pytesseract.image_to_string(image=im, lang="eng", config="-psm 7")
-        pytesseract.image_to_string
-        plt.imshow(im)
-        plt.show()        
+      
         #对于识别成字母的 采用该表进行修正  
         rep={'O':'0',  
             'I':'1','L':'1',  

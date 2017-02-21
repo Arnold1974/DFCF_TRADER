@@ -23,6 +23,14 @@ def show_assets():
     assets=trader.getassets()
     if assets:
         assets.update(trader.login_message['Data'][0])
+        show= '\033[2;36m'+\
+               "%(khmc)s [%(Syspm1)s]\t    Logged at: [%(Date)s-%(Time)s]\n" +\
+              '{0:-^60}'.format('') +'\n'+\
+              "总资产: %(Zzc)10s\t可用资金: %(Kyzj)9s\t 可取资金: %(Kqzj)9s\n" +\
+              "总市值: %(Zxsz)10s\t冻结资金: %(Djzj)9s\t 资金余额: %(Zjye)9s\n" +\
+              '{0:-^60}'.format('')+ '\033[0m'
+        print show % assets
+        ''' 
         print '\033[2;36m'
         print "%(khmc)s [%(Syspm1)s]\t    Logged at: [%(Date)s-%(Time)s]" % assets
         print '{0:-^60}'.format('')
@@ -30,7 +38,7 @@ def show_assets():
         print "总市值: %(Zxsz)10s\t冻结资金: %(Djzj)9s\t 资金余额: %(Zjye)9s" % assets
         print '{0:-^60}'.format('')
         print '\033[0m'
-
+        '''
 def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显示，需从当日成交数据和历史成交数据中获取
     stocklist=trader.getstocklist()
     if len(stocklist)==0:
@@ -41,7 +49,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
             #转换盈亏比例为2位浮点百分小数
             stocklist[i]['Ykbl']=str(float('%.2f' % (float(stocklist[i]['Ykbl'])*100)))+'%'
             stocklist[i]['Cwbl']=str('%.0f' % (float(stocklist[i]['Cwbl'])*100))+'%'
-            print '\033[1;42m证券:%(Zqmc)s  持仓:%(Zqsl)s  可用:%(Kysl)s  仓位:%(Cwbl)s  涨跌:%(Ykbl)s  盈亏:%(Ljyk)s\033[0m' % stocklist[i]
+            print '\033[1;42m%(Zqmc)s  持仓:%(Zqsl)5s 可用:%(Kysl)5s 仓位:%(Cwbl)3s 涨跌:%(Ykbl)5s 盈亏:%(Ljyk)8s\033[0m' % stocklist[i]
         st=time.strftime("%Y-%m-%d",time.localtime(time.time()-864000))
         et=time.strftime("%Y-%m-%d",time.localtime(time.time()))
         hisdealdata=trader.gethisdealdata(st=st,et=et)
@@ -92,6 +100,8 @@ def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
         portfolio=1
         for i in xrange(len(r)-1,-1,-1):
             result=r[i]
+            if len(result["stock_name"])==3:
+                result["stock_name"]=result["stock_name"]+'  '
             print "%s  %s %8s  %6s %6s %6s   %1.3f" % (result["stock_name"], \
                   result["bought_at"], result["sold_at"], \
                   result["buying_price"],result["selling_price"], \
@@ -100,13 +110,14 @@ def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
             portfolio *= 1+float(result["signal_return_rate"])/100
 
 def none_trade_day():
+    quotation.kill=1
+    quotation.stockcode=False
+    quotation.resulult=False
     print '\n\n{0:-^72}'.format('\033[20;44m NON TRADING DAY \033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')
     show_assets()
     show_stocklist()
-    quotation.kill=1
-    quotation.stockcode=False
-    quotation.resulult=False
+
         #df=pd.DataFrame(trader.login_message['Data'])
         #df=df.ix[:,[0,5,1,6]]
         #df.columns = ['Date', 'Time','Account','Name']
@@ -124,13 +135,14 @@ def none_trade_day():
         time.sleep(1)
 
 def none_trade_time():
+    quotation.kill=1
+    quotation.stockcode=False
+    quotation.resulult=False
     print '\n\n{0:-^72}'.format('\033[20;46m NON TRADING TIME \033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')
     show_assets()
     show_stocklist()
-    quotation.kill=1
-    quotation.stockcode=False
-    quotation.resulult=False
+
     while not calendar.trade_time() and calendar.trade_day():
         if int(time.time()) % 2:
             sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"--> Non Trading Time !"))
@@ -271,9 +283,6 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
         '''
         time.sleep(1)
 
-def record_price():
-    pass
-
 def trade_time():
     print '\n\n{0:-^72}'.format('\033[20;43m TRADING TIME \033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')
@@ -306,7 +315,7 @@ def trade_time():
                 stock_in_position=show_stocklist()
 
         else:
-            print '   === No need to do operation, keep idle! ==='
+            print '\n             === No need operation, keep idle! ==='
             quotation.stockcode=stock_in_position['Zqdm']
             quotation.show=1
             while calendar.trade_time() and calendar.trade_day():
