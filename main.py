@@ -197,7 +197,7 @@ def monitor_buy(code,codename):
                 #查询当日委托状态， 如果未成则等待
                 while trader.getordersdata()[-1]['Wtzt'] <> '已成':
                     sys.stdout.write("委托还未成交!")
-                    time.sleep(1)
+                    time.sleep(5)
                 return Wtbh
 
         '''
