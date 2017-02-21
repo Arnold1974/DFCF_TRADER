@@ -113,6 +113,7 @@ if __name__=="__main__":
     from trade_calendar import TradeCalendar
     calendar=TradeCalendar()
     result=test.pickstock()
+
     print u"即时选股:  @%s  %s [%s]" % (time.strftime('%X',time.localtime()),result[0][1],result[0][0][:6])if len(result)!=0 else (" ","[]"," ")
     result= test.traceback()
     if result!=False:
@@ -120,7 +121,7 @@ if __name__=="__main__":
              result["data"][0]["code"], calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "," "))
     else:
         print "回测选股: []"
-    
+
     r=test.transaction(stime='2017-01-01',etime='2018-01-01')
     print '\n{0:-^60}'.format('Portfolie Value ')
     if r is not False:
