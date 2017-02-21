@@ -243,25 +243,27 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
             quotation.show=1
             
         #-----------卖出条件触发，发卖出指令-----------
-        # .1. 触发止损
-        sell_condition_1=quotation.result['code'][0]==code and int(stock_amount)<>0 \
-                         and float(quotation.result['price'][0]) <= stop_loss_price 
+        # .0. 确认是当前股票的报价，并且有仓位可用
+        sell_condition_0 = quotation.result['code'][0]==code and int(stock_amount)<>0
+        
+        # .1. 触发止损 (用实时行情胡最低价与止损价格比较)
+        sell_condition_1 = float(quotation.result['low'][0]) <= stop_loss_price 
         
         # .2. 卖出日，没触及止盈点，并且不是一字涨停 (最低价不等于涨停价),收盘价卖出               
-        sell_condition_2=quotation.result['code'][0]==code and int(stock_amount)<>0 \
-                         and sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) \
+        #     sell_day 为策略理论卖出日，如果因其他原因该卖没卖， 则以后会出现sell_day < 当前日期
+        #     而且止盈点也没有出现， 应该自行卖出或由程序隔日卖出。所以条件设置 sell_day <= 当前日
+        sell_condition_2 = sell_day <= time.strftime("%Y/%m/%d",time.localtime(time.time())) \
                          and time.localtime()[3:6]>=(14,59,45) and price_updated <> True \
                          and float(quotation.result['low'][0]) <> float(dfcf_quote['topprice'])  
         
         # .3. 卖出日，非一字涨停，如果涨停价也不能触及止盈价，则涨到 5% 就卖出，不用等收盘
-        sell_condition_3=quotation.result['code'][0]==code and int(stock_amount)<>0 \
-                         and sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) \
+        sell_condition_3 = sell_day == time.strftime("%Y/%m/%d",time.localtime(time.time())) \
                          and price_updated <> True \
                          and float(dfcf_quote['topprice']) < stop_sell_price \
                          and float(quotation.result['low'][0]) <> float(dfcf_quote['topprice']) \
                          and float(quotation.result['price'][0]) >= float(quotation.result['open'][0]) * 1.05
  
-        if sell_condition_1 or sell_condition_2 or sell_condition_3:                
+        if sell_condition_0 and (sell_condition_1 or sell_condition_2 or sell_condition_3):
             quotation.show=0
             log.info('Sell Begin...')
             Wtbh=trader.deal(code,dfcf_quote['name'],str(float(dfcf_quote['bottomprice'])+0.01),'S')

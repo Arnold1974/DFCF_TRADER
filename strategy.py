@@ -106,7 +106,7 @@ class Strategy(object):
                 else:
                     return r.json()['data']                
 
-#%%
+
         
 if __name__=="__main__":
     test=Strategy("QUERY_2_DAYS",25,5,10) # 2天策略： 25|5|10
