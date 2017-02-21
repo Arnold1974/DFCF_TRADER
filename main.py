@@ -49,7 +49,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
             #转换盈亏比例为2位浮点百分小数
             stocklist[i]['Ykbl']=str(float('%.2f' % (float(stocklist[i]['Ykbl'])*100)))+'%'
             stocklist[i]['Cwbl']=str('%.0f' % (float(stocklist[i]['Cwbl'])*100))+'%'
-            print '\033[1;42m%(Zqmc)s  持仓:%(Zqsl)5s 可用:%(Kysl)5s 仓位:%(Cwbl)3s 涨跌:%(Ykbl)5s 盈亏:%(Ljyk)8s\033[0m' % stocklist[i]
+            print '\033[1;42m%(Zqmc)s  持仓:%(Zqsl)5s 可用:%(Kysl)5s 仓位:%(Cwbl)3s 涨跌:%(Ykbl)6s 盈亏:%(Ljyk)8s\033[0m' % stocklist[i]
         st=time.strftime("%Y-%m-%d",time.localtime(time.time()-864000))
         et=time.strftime("%Y-%m-%d",time.localtime(time.time()))
         hisdealdata=trader.gethisdealdata(st=st,et=et)
@@ -77,7 +77,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                         print show[L].replace('/','-'),
                     else: 
                         print show[L].replace('/','-') 
-                print '{0:-^60}'.format('')
+                print '\n{0:-^60}'.format('')
                         
                 #print '\n'+' '*13*(k) +'       ---->'
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
@@ -90,15 +90,24 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
                 buy_date_for_return=buy_date.replace('/','-')
 
-                print'       +++++'
+                print'     +++++'
                 for j in xrange(int(strategy.hold_days)):
                     next_day=calendar.trade_calendar(buy_date,j+1)
-                    if next_day==time.strftime('%Y/%m/%d',time.localtime()):
-                        print '\033[2;43m %s \033[0m' % next_day,
-                        k=j
-                    else:
-                        print next_day,
-                print '\n'+' '*13*(k) +'       ---->'
+                    show.append(next_day)
+                while show[-1]<time.strftime('%Y/%m/%d',time.localtime()):
+                    show.append(calendar.trade_calendar(buy_date,2))
+
+                for L in xrange(len(show)):
+                    if show[L]==calendar.trade_calendar(buy_date,int(strategy.hold_days)):
+                       show[L]='\033[2;43m%s\033[0m' % show[L]                   
+                    if show[L]==time.strftime('%Y/%m/%d',time.localtime()):
+                        show[L]='\033[2;46m%s\033[0m' % show[L]
+                    if ((L+1) % 5 <> 0):
+                        print show[L].replace('/','-'),
+                    else: 
+                        print show[L].replace('/','-') 
+                print '\n{0:-^60}'.format('')
+                #print '\n'+' '*13*(k) +'       ---->'
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
                 stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,int(strategy.hold_days))
                 stocklist[i]['buy_day']=buy_date_for_return
@@ -149,7 +158,7 @@ def none_trade_time():
     quotation.kill=1
     quotation.stockcode=False
     quotation.resulult=False
-    print '\n\n{0:-^72}'.format('\033[20;46m NON TRADING TIME \033[0m')
+    print '\n\n{0:-^72}'.format('\033[20;43m NON TRADING TIME \033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')
     show_assets()
     show_stocklist()
@@ -297,7 +306,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
         time.sleep(1)
 
 def trade_time():
-    print '\n\n{0:-^72}'.format('\033[20;43m TRADING TIME \033[0m')
+    print '\n\n{0:-^72}'.format('\033[20;46m TRADING TIME \033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')
     if quotation.kill==1:
         quotation.__init__()
