@@ -315,7 +315,7 @@ def trade_time():
                 stock_in_position=show_stocklist()
 
         else:
-            print '\n             === No need operation, keep idle! ==='
+            print '\n          === No need operation, keep idle! ==='
             quotation.stockcode=stock_in_position['Zqdm']
             quotation.show=1
             while calendar.trade_time() and calendar.trade_day():
