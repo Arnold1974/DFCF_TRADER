@@ -24,10 +24,10 @@ def show_assets():
     if assets:
         assets.update(trader.login_message['Data'][0])
         show= '\033[2;36m'+\
-               "%(khmc)s [%(Syspm1)s]\t    Logged at: [%(Date)s-%(Time)s]\n" +\
+              "\n%(khmc)s [%(Syspm1)s]\t     Logged at: [%(Date)s-%(Time)s]\n" +\
               '{0:-^60}'.format('') +'\n'+\
-              "总资产: %(Zzc)10s\t可用资金: %(Kyzj)9s\t 可取资金: %(Kqzj)9s\n" +\
-              "总市值: %(Zxsz)10s\t冻结资金: %(Djzj)9s\t 资金余额: %(Zjye)9s\n" +\
+              "总资产: %(Zzc)10s  可用资金: %(Kyzj)9s  可取资金: %(Kqzj)9s\n" +\
+              "总市值: %(Zxsz)10s  冻结资金: %(Djzj)9s  资金余额: %(Zjye)9s\n" +\
               '{0:-^60}'.format('')+ '\033[0m'
         print show % assets
         ''' 
@@ -95,7 +95,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
 
 def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
     r=strategy.transaction(start_day,end_day)
-    print '\n{0:-^60}'.format(' Portfolie Value')
+    print '\n{0:-^60}'.format(' Portfolie Value ')
     if r is not False:
         portfolio=1
         for i in xrange(len(r)-1,-1,-1):
