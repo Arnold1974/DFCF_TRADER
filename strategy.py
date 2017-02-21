@@ -113,12 +113,11 @@ if __name__=="__main__":
     from trade_calendar import TradeCalendar
     calendar=TradeCalendar()
     result=test.pickstock()
-    print u"即时选股: %s" % (result[0][1] if len(result)!=0 else "[]")
+    print u"即时选股:  @%s  %s [%s]" % (time.strftime('%X',time.localtime()),result[0][1],result[0][0][:6])if len(result)!=0 else (" ","[]"," ")
     result= test.traceback()
     if result!=False:
-        print result["stockDate"] + " 选出: "+ result["data"][0]["codeName"] + " < "+result["data"][0]["code"]+" >"
-        print "%s 选出: %s ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"], \
-             calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
+        print "策略选股: %s  %s [%s] ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"], \
+             result["data"][0]["code"], calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "," "))
     else:
         print "回测选股: []"
     
@@ -128,6 +127,8 @@ if __name__=="__main__":
         portfolio=1
         for i in xrange(len(r)-1,-1,-1):
             show=r[i]
+            if len(show["stock_name"])==3:
+                show["stock_name"]=show["stock_name"]+'  '
             print "%s  %s %8s  %6s %6s %6s   %1.3f" % (show["stock_name"], \
                   show["bought_at"], show["sold_at"], \
                   show["buying_price"],show["selling_price"], \
