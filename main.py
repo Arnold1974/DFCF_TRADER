@@ -183,11 +183,11 @@ def monitor_buy(code,codename):
     while calendar.trade_time() and calendar.trade_day():
         buy_condition_0 = quotation.result['code'][0]==code
         buy_condition_1 = (float(quotation.result['price'][0])-float(quotation.result['pre_close'][0]))*100/float(quotation.result['pre_close'][0])>-9
-        buy_condition_2 = time.localtime()[3:6]>=(9,25,5) and time.localtime()[3:5]<=(9,30)
+        buy_condition_2 = time.localtime()[3:6]>=(9,25,5) and time.localtime()[3:6]<=(9,30,6)
 
         
         if buy_condition_0 and buy_condition_1 and buy_condition_2:
-            if float(quotation.result['high'][0]) == 0:
+            if float(quotation.result['open'][0]) == float(quotation.result['amount'][0]) ==0:
                 print "\n%s %s: Suspension\n" % (quotation.result['date'][0],codename)
                 while calendar.trade_time() and calendar.trade_day():
                     time.sleep(2)
@@ -289,9 +289,16 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                          and price_updated <> True \
                          and float(dfcf_quote['topprice']) < stop_sell_price \
                          and float(quotation.result['low'][0]) <> float(dfcf_quote['topprice']) \
-                         and float(quotation.result['price'][0]) >= float(quotation.result['open'][0]) * 1.05
- 
+                         and float(quotation.result['price'][0]) >= float(quotation.result['open'][0]) * 1.05 \
+                         and time.localtime()[3:6]>=(9,30,5)
+                                         
+        #符合条件则下单卖出
         if sell_condition_0 and (sell_condition_1 or sell_condition_2 or sell_condition_3):
+            #如果停牌
+            if time.localtime()[3:6]>=(9,25,5) and float(quotation.result['open'][0]) == float(quotation.result['amount'][0]) ==0:
+                print "\n%s %s: Suspension\n" % (quotation.result['date'][0],quotation.result['name'][0])
+                while calendar.trade_time() and calendar.trade_day():
+                    time.sleep(2)
             quotation.show=0
             log.info('Sell Begin...')
             Wtbh=trader.deal(code,dfcf_quote['name'],str(float(dfcf_quote['bottomprice'])+0.01),'S')
