@@ -171,7 +171,7 @@ def none_trade_time():
         time.sleep(1)
 
 def monitor_buy(code,codename):
-    print '=== Monitor <%s> Price for Buy: ===' % code
+    print '=== Monitor Price for Buy: %s===' % code
     quotation.stockcode=code
     quotation.show=1
 
@@ -181,9 +181,16 @@ def monitor_buy(code,codename):
     dfcf_quote=trader.getquote(code)
 
     while calendar.trade_time() and calendar.trade_day():
-        if quotation.result['code'][0]==code \
-           and (float(quotation.result['price'][0])-float(quotation.result['pre_close'][0]))*100/float(quotation.result['pre_close'][0])>-9 \
-           and time.localtime()[3:6]>=(9,25,5) and time.localtime()[3:5]<=(9,30):
+        buy_condition_0 = quotation.result['code'][0]==code
+        buy_condition_1 = (float(quotation.result['price'][0])-float(quotation.result['pre_close'][0]))*100/float(quotation.result['pre_close'][0])>-9
+        buy_condition_2 = time.localtime()[3:6]>=(9,25,5) and time.localtime()[3:5]<=(9,30)
+
+        
+        if buy_condition_0 and buy_condition_1 and buy_condition_2:
+            if float(quotation.result['high'][0]) == 0:
+                print "\n%s %s: Suspension\n" % (quotation.result['date'][0],codename)
+                while calendar.trade_time() and calendar.trade_day():
+                    time.sleep(2)
             quotation.show=0
             log.info("\nBegin Buy: " + codename)
             Wtbh=trader.deal(code,codename,str(float(dfcf_quote['topprice'])-0.01),'B') #['topprice']
@@ -330,7 +337,7 @@ def trade_time():
             else: #选出目标， 开仓
                 code=result["data"][0]["code"]
                 codename= result["data"][0]["codeName"]
-                print "%s:[%s] ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"],calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
+                print "%s:[%s] ---> 购买日:%s\n" %((result["stockDate"], codename,calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
                 #log.info(u"[%s]选出:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
 
                 Wtbh=monitor_buy(code,codename)
@@ -360,7 +367,6 @@ def run():
         else: #进入交易时间  calendar.trade_day() & calendar.trade_time()
             trade_time()
             #time.sleep(.5)
-
 
 if __name__=="__main__":
     #winsound.PlaySound('./wav/good afternoon CN.wav',winsound.SND_ASYNC)
