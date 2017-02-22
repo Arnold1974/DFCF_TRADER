@@ -231,7 +231,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
     result= strategy.traceback()
     log.info(u"[%s]回测选股:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
     '''
-    print '\033[3;33m=== Monitor <%s> Price for Selling: ===\033[0m' % code
+    print '\n\033[3;33m     === Monitor Price for Selling [%s]: ===\033[0m' % code
     quotation.stockcode=code
 
 
@@ -267,8 +267,9 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
         sell_condition_0 = quotation.result['code'][0]==code and int(stock_amount)<>0
         
         # .1. 触发止损 (用实时行情胡最低价与止损价格比较)
-        sell_condition_1 = float(quotation.result['low'][0]) <= stop_loss_price 
-        
+        sell_condition_1 = float(quotation.result['low'][0]) <= stop_loss_price  \
+                         and time.localtime()[3:6]>=(9,30,5)
+
         # .2. 卖出日，没触及止盈点，并且不是一字涨停 (最低价不等于涨停价),收盘价卖出               
         #     sell_day 为策略理论卖出日，如果因其他原因该卖没卖， 则以后会出现sell_day < 当前日期
         #     而且止盈点也没有出现， 应该自行卖出或由程序隔日卖出。所以条件设置 sell_day <= 当前日
@@ -314,7 +315,7 @@ def trade_time():
     stock_in_position=show_stocklist() #获取持仓的数据买卖日期
 
     while calendar.trade_time() and calendar.trade_day():
-        if stock_in_position and int(stock_in_position['Kysl'])<>0: #如果不空仓,且有股票可卖,监视价格变化是否达到止损止盈
+        if stock_in_position and int(stock_in_position['Kysl'])<>0: #如果不空仓,且有股票可卖,监视价格变化是否达到止损止盈           
             monitor_sell(stock_in_position['Zqdm'],stock_in_position['buy_day'],stock_in_position['sell_day'],stock_in_position['Kysl'])
         elif stock_in_position==False:  #position is empty, 需要开仓
             result= strategy.traceback()
