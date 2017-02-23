@@ -192,21 +192,21 @@ def monitor_buy(code,codename):
                 while calendar.trade_time() and calendar.trade_day():
                     time.sleep(2)
             quotation.show=0
-            log.info("\nBegin Buy: " + codename)
+            print '\n'
+            log.info("Begin Buy: %s" % codename)
             Wtbh=trader.deal(code,codename,str(float(dfcf_quote['topprice'])-0.01),'B') #['topprice']
 
             if Wtbh is not None:
-                log.info('\nBuy End...\n')
-                #trader.deal("000619","海螺型材","13.4","B")
+                log.info('Buy Order Accomplished!')
                 winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
-                #while time.localtime()[3:5]<=(9,30):
-                #    time.sleep(1)
+
                 #查询当日委托状态， 如果未成则等待
                 while trader.getordersdata()[-1]['Wtzt'] <> '已成':
-                    sys.stdout.write("委托还未成交!")
+                    sys.stdout.write("\r委托编号:[%s] 还未成交!" % Wtbh)
                     time.sleep(5)
+                log.info('Deal Done!')
                 return Wtbh
-
+                 
         '''
         if quotation.result['code']==code \
            and float(quotation.result['realtimequote']['currentPrice'])>10.80 \
