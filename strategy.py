@@ -109,12 +109,14 @@ class Strategy(object):
 
         
 if __name__=="__main__":
-    test=Strategy("QUERY_2_DAYS",25,5,10) # 2天策略： 25|5|10
+    test=Strategy("QUERY_2_DAYS_HARD",25,5,10) # 2天策略： 25|5|10
     from trade_calendar import TradeCalendar
     calendar=TradeCalendar()
-    result=test.pickstock()
 
-    print u"即时选股:  @%s  %s [%s]" % (time.strftime('%X',time.localtime()),result[0][1],result[0][0][:6])if len(result)!=0 else (" ","[]"," ")
+#-----------------------
+    result=test.pickstock()
+    print u"即时选股:  @%s  %s [%s]" % ((time.strftime('%X',time.localtime()),result[0][1],result[0][0][:6])if len(result)!=0 else (" ","[]"," "))
+#------------------------
     result= test.traceback()
     if result!=False:
         print "策略选股: %s  %s [%s] ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"], \
@@ -122,10 +124,12 @@ if __name__=="__main__":
     else:
         print "回测选股: []"
     
+    
+##--------------------------------
     stime='2017-01-01'
     etime='2018-01-01'
     r=test.transaction(stime=stime,etime=etime)
-    print '\n{0:-^60}'.format('Portfolie Value ')
+    print '{0:-^60}'.format('Portfolie Value ')
     if r is not False:
         portfolio=1
         for i in xrange(len(r)-1,-1,-1):
@@ -139,7 +143,7 @@ if __name__=="__main__":
                   (1+float(show["signal_return_rate"])/100)*portfolio)                       
             portfolio *= 1+float(show["signal_return_rate"])/100
 
-               
-        print '\n%s 卖出日: %s' % (show["stock_name"], calendar.trade_calendar(show["bought_at"].replace("-","/"),int(test.hold_days)))
+        print '%s 卖出日: %s' % (show["stock_name"], calendar.trade_calendar(show["bought_at"].replace("-","/"),int(test.hold_days)))
+    print '{0:-^60}\n'.format('End')
 
 

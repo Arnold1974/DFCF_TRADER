@@ -50,7 +50,7 @@ class PriceQuotation(object):
     
     
  #-------------------------------华丽的分割线-------------------  
-    def get_quote(self):
+    def get_dfcf_quote(self):
         '''
         获取东方财富的实时行情数据
         '''
@@ -75,7 +75,7 @@ class PriceQuotation(object):
                 self.result=eval(re.search(r'{.*}',quote.text).group())
                 self.show_price(self.result)
             time.sleep(1)      
-    def show_price(self, quote):
+    def show_dfcf_price(self, quote):
         if self.show==1:
             sys.stdout.write("\r    *%s %s: %s  %s" % \
                          (time.strftime("%Y-%m-%d %X"),\
@@ -84,7 +84,7 @@ class PriceQuotation(object):
                           quote['realtimequote']['zdf']))
             
 
-    def get_hist_price(self,stockcode='000001.ss',s_date='2017-01-01',e_date=time.strftime('%Y-%m-%d',time.localtime())):
+    def get_yahoo_hist_price(self,stockcode='000001.ss',s_date='2017-01-01',e_date=time.strftime('%Y-%m-%d',time.localtime())):
         '''
         yahoo 的历史数据
         深市数据链接：http://table.finance.yahoo.com/table.csv?s=000001.sz

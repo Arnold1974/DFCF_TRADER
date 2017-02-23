@@ -232,16 +232,10 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
     {目前建议采用的止盈策略，盘中出现持股期间股价新高后，更新止损价， 随时止损}
 
     特殊情况：当持有股票一字涨跌停时，会继续持有。
-
-    result=strategy.pickstock()
-    log.info(u"即时选股: %s " % (result[0][1] if len(result)!=0 else "[]"))
-    result= strategy.traceback()
-    log.info(u"[%s]回测选股:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
     '''
     print '\n\033[3;33m     === Monitor Price for Selling [%s]: ===\033[0m' % code
     quotation.stockcode=code
-
-
+    
     while quotation.result is False:
         time.sleep(.5)
 
