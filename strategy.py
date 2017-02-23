@@ -121,8 +121,10 @@ if __name__=="__main__":
              result["data"][0]["code"], calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "," "))
     else:
         print "回测选股: []"
-
-    r=test.transaction(stime='2017-01-01',etime='2018-01-01')
+    
+    stime='2017-01-01'
+    etime='2018-01-01'
+    r=test.transaction(stime=stime,etime=etime)
     print '\n{0:-^60}'.format('Portfolie Value ')
     if r is not False:
         portfolio=1

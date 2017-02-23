@@ -6,12 +6,12 @@ class TradeCalendar(object):
     
     def __init__(self):
         test_day=time.strftime("%Y/%m/%d",time.localtime(time.time()+2550000))
-        self.df= pd.read_csv(".\calendar\calendar.csv")
+        self.df= pd.read_csv("./calendar/calendar.csv")
         #如果本地文件已过期，查不到数据，则网络更新
         if not test_day in list(self.df['calendarDate']):
             self.config=json.load(file("./config/strategy.json"))
             self.df= pd.read_csv(self.config["TRADE_CALENDAR_URL"])
-            self.df.to_csv('.\calendar\calendar.csv')
+            self.df.to_csv('./calendar/calendar.csv')
             print '### calendar.csv updated ###'       
 
     def trade_calendar(self,buy_date,hold_days):
