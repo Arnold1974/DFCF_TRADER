@@ -356,7 +356,7 @@ def trade_time():
             quotation.stockcode=stock_in_position['Zqdm']
             quotation.show=1
             while calendar.trade_time() and calendar.trade_day():
-                time.sleep(2)
+                time.sleep(5)
         time.sleep(1)
 #----------------------------------------------------------------------------------------------
 def run():
