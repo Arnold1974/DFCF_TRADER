@@ -24,10 +24,10 @@ def show_assets():
     if assets:
         assets.update(trader.login_message['Data'][0])
         show= '\n\033[2;36m'+\
-              "%(khmc)s [%(Syspm1)s]\t         Logged at: [%(Date)s - %(Time)s]\n" +\
+              "%(khmc)s [%(Syspm1)s]\t             Logged at: [%(Date)s - %(Time)s]\n" +\
               '{0:-^70}'.format('') +'\n'+\
-              "总资产: %(Zzc)11s   可用资金: %(Kyzj)10s   可取资金: %(Kqzj)11s\n" +\
-              "总市值: %(Zxsz)11s   冻结资金: %(Djzj)10s   资金余额: %(Zjye)11s\n" +\
+              "总资产: %(Zzc)11s   可用资金: %(Kyzj)11s   可取资金: %(Kqzj)11s\n" +\
+              "总市值: %(Zxsz)11s   冻结资金: %(Djzj)11s   资金余额: %(Zjye)11s\n" +\
               '{0:-^70}'.format('')+ '\033[0m'
         print show % assets
         ''' 
@@ -49,7 +49,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
             #转换盈亏比例为2位浮点百分小数
             stocklist[i]['Ykbl']=str(float('%.2f' % (float(stocklist[i]['Ykbl'])*100)))+'%'
             stocklist[i]['Cwbl']=str('%.0f' % (float(stocklist[i]['Cwbl'])*100))+'%'
-            print '\033[1;42m%(Zqmc)s ==> 持仓:%(Zqsl)5s 可用:%(Kysl)5s  仓位:%(Cwbl)3s   涨跌:%(Ykbl)5s   盈亏:%(Ljyk)8s\033[0m' % stocklist[i]
+            print '\033[1;42m%(Zqmc)s ==> 持仓:%(Zqsl)4s 可用:%(Kysl)4s  仓位:%(Cwbl)3s  涨跌:%(Ykbl)5s  盈亏:%(Ljyk)8s\033[0m' % stocklist[i]
         st=time.strftime("%Y-%m-%d",time.localtime(time.time()-864000))
         et=time.strftime("%Y-%m-%d",time.localtime(time.time()))
         hisdealdata=trader.gethisdealdata(st=st,et=et)
