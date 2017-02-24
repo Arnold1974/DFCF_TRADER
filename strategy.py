@@ -27,9 +27,9 @@ class Strategy(object):
         self.upperIncome=str(upperIncome)
         self.lowerIncome=str(lowerIncome)
         self.fallIncome=str(fallIncome)
-        print '\n{0:-^60}'.format('')
+        print '\n{0:-^70}'.format('')
         print u"[策略]: %s days \t   [止盈回撤止损]: %s|%s|%s \t  [满仓]: %s 只" % (self.hold_days,self.upperIncome,self.fallIncome,self.lowerIncome,self.stockHoldCount)
-        print '{0:-^60}\n'.format('')
+        print '{0:-^70}\n'.format('')
         self.success= True
 
     #即时选股
@@ -123,20 +123,19 @@ if __name__=="__main__":
              result["data"][0]["code"], calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "," "))
     else:
         print "回测选股: []"
-    
-    
+   
 ##--------------------------------
     stime='2017-01-01'
     etime='2018-01-01'
     r=test.transaction(stime=stime,etime=etime)
-    print '{0:-^60}'.format('Portfolie Value ')
+    print '{0:-^70}'.format('Portfolie Value ')
     if r is not False:
         portfolio=1
         for i in xrange(len(r)-1,-1,-1):
             show=r[i]
             if len(show["stock_name"])==3:
                 show["stock_name"]=show["stock_name"]+'  '
-            print "%s %s  %8s  %6s %6s %6s   %1.3f" % \
+            print "%s  %s  %8s  %6s %6s %6s   %1.3f" % \
                  (show["stock_name"], 
                   show["bought_at"], show["sold_at"], 
                   show["buying_price"],show["selling_price"], 
@@ -144,7 +143,7 @@ if __name__=="__main__":
                   (1+float(show["signal_return_rate"])/100)*portfolio)                       
             portfolio *= 1+float(show["signal_return_rate"])/100
 
-        print '%s       --->  %s' % (show["stock_name"], calendar.trade_calendar(show["bought_at"].replace("-","/"),int(test.hold_days)))
-    print '{0:-^60}\n'.format('End')
+        print '%s        --->  %s' % (show["stock_name"], calendar.trade_calendar(show["bought_at"].replace("-","/"),int(test.hold_days)))
+    print '{0:-^70}\n'.format('End')
 
 

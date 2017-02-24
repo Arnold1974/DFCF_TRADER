@@ -24,11 +24,11 @@ def show_assets():
     if assets:
         assets.update(trader.login_message['Data'][0])
         show= '\033[2;36m'+\
-              "\n%(khmc)s [%(Syspm1)s]\t     Logged at: [%(Date)s-%(Time)s]\n" +\
-              '{0:-^60}'.format('') +'\n'+\
-              "总资产: %(Zzc)10s  可用资金: %(Kyzj)9s  可取资金: %(Kqzj)9s\n" +\
-              "总市值: %(Zxsz)10s  冻结资金: %(Djzj)9s  资金余额: %(Zjye)9s\n" +\
-              '{0:-^60}'.format('')+ '\033[0m'
+              "\n%(khmc)s [%(Syspm1)s]\t         Logged at: [%(Date)s - %(Time)s]\n" +\
+              '{0:-^70}'.format('') +'\n'+\
+              "总资产: %(Zzc)11s   可用资金: %(Kyzj)10s   可取资金: %(Kqzj)11s\n" +\
+              "总市值: %(Zxsz)11s   冻结资金: %(Djzj)10s   资金余额: %(Zjye)11s\n" +\
+              '{0:-^70}'.format('')+ '\033[0m'
         print show % assets
         ''' 
         print '\033[2;36m'
@@ -49,7 +49,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
             #转换盈亏比例为2位浮点百分小数
             stocklist[i]['Ykbl']=str(float('%.2f' % (float(stocklist[i]['Ykbl'])*100)))+'%'
             stocklist[i]['Cwbl']=str('%.0f' % (float(stocklist[i]['Cwbl'])*100))+'%'
-            print '\033[1;42m%(Zqmc)s  持仓:%(Zqsl)5s 可用:%(Kysl)5s 仓位:%(Cwbl)3s 涨跌:%(Ykbl)6s 盈亏:%(Ljyk)8s\033[0m' % stocklist[i]
+            print '\033[1;42m%(Zqmc)s ==> 持仓:%(Zqsl)5s 可用:%(Kysl)5s  仓位:%(Cwbl)3s   涨跌:%(Ykbl)5s   盈亏:%(Ljyk)8s\033[0m' % stocklist[i]
         st=time.strftime("%Y-%m-%d",time.localtime(time.time()-864000))
         et=time.strftime("%Y-%m-%d",time.localtime(time.time()))
         hisdealdata=trader.gethisdealdata(st=st,et=et)
@@ -113,27 +113,28 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                 stocklist[i]['buy_day']=buy_date_for_return
     return stocklist[i]
 
-def show_transaction(start_day='2015-01-01', end_day='2017-12-31'):
+def show_transaction(start_day='2014-01-01', end_day='2017-12-31'):
     r=strategy.transaction(start_day,end_day)
-    print '\n{0:-^60}'.format(' Portfolie Value ')
+    print '\n{0:*^70}'.format(' Portfolie Value ')
     if r is not False:
         portfolio=1
         for i in xrange(len(r)-1,-1,-1):
             result=r[i]
             if len(result["stock_name"])==3:
                 result["stock_name"]=result["stock_name"]+'  '
-            print "%s  %s %8s  %6s %6s %6s   %1.3f" % (result["stock_name"], \
+            print "%s   %s   %8s  %6s  %6s  %6s    %1.3f" % (result["stock_name"], \
                   result["bought_at"], result["sold_at"], \
                   result["buying_price"],result["selling_price"], \
                   result["signal_return_rate"], \
                   (1+float(result["signal_return_rate"])/100)*portfolio)
             portfolio *= 1+float(result["signal_return_rate"])/100
-
+        print '%s         --->  %s' % (result["stock_name"], calendar.trade_calendar(result["bought_at"].replace("-","/"),int(strategy.hold_days)))
+    print '{0:*^70}\n'.format(' End ')
 def none_trade_day():
     quotation.kill=1
     quotation.stockcode=False
     quotation.resulult=False
-    print '\n\n{0:-^72}'.format('\033[20;44m NON TRADING DAY \033[0m')
+    print '\n\n{0:=^82}'.format('\033[20;44m NON TRADING DAY \033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')
     show_assets()
     show_stocklist()
@@ -159,7 +160,7 @@ def none_trade_time():
     quotation.kill=1
     quotation.stockcode=False
     quotation.resulult=False
-    print '\n\n{0:-^72}'.format('\033[20;43m NON TRADING TIME \033[0m')
+    print '\n\n{0:=^82}'.format('\033[20;43m NON TRADING TIME \033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')
     show_assets()
     show_stocklist()
@@ -335,7 +336,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
         time.sleep(1)
 
 def trade_time():
-    print '\n\n{0:-^72}'.format('\033[20;46m TRADING TIME \033[0m')
+    print '\n\n{0:=^82}'.format('\033[20;46m TRADING TIME \033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')
     if quotation.kill==1:
         quotation.__init__()
@@ -393,7 +394,11 @@ def run():
 if __name__=="__main__":
     #winsound.PlaySound('./wav/good afternoon CN.wav',winsound.SND_ASYNC)
     #time.sleep(3)
-    strategy=Strategy("QUERY_2_DAYS",25,5,10)
+    args=sys.argv
+    if len(args)==5:
+        strategy=Strategy(args[1],args[2],args[3],args[4])    
+    else:
+        strategy=Strategy("QUERY_2_DAYS",25,5,10)
     time.sleep(.5)
     trader=DFCF_Trader()
     calendar=TradeCalendar()
