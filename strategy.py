@@ -104,8 +104,14 @@ class Strategy(object):
                     time.sleep(1)
                     continue
                 else:
-                    return r.json()['data']                
-
+                    try:
+                        return r.json()['data'] 
+                    except TypeError as e:
+                        print e
+                        time.sleep(1)
+                        continue
+                    else:
+                        return False
 
         
 if __name__=="__main__":
