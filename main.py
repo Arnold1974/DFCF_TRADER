@@ -23,8 +23,8 @@ def show_assets():
     assets=trader.getassets()
     if assets:
         assets.update(trader.login_message['Data'][0])
-        show= '\033[2;36m'+\
-              "\n%(khmc)s [%(Syspm1)s]\t         Logged at: [%(Date)s - %(Time)s]\n" +\
+        show= '\n\033[2;36m'+\
+              "%(khmc)s [%(Syspm1)s]\t         Logged at: [%(Date)s - %(Time)s]\n" +\
               '{0:-^70}'.format('') +'\n'+\
               "总资产: %(Zzc)11s   可用资金: %(Kyzj)10s   可取资金: %(Kqzj)11s\n" +\
               "总市值: %(Zxsz)11s   冻结资金: %(Djzj)10s   资金余额: %(Zjye)11s\n" +\
@@ -134,9 +134,10 @@ def none_trade_day():
     quotation.kill=1
     quotation.stockcode=False
     quotation.resulult=False
+    show_assets()
     print '\n\n{0:=^82}'.format('\033[20;44m NON TRADING DAY \033[0m')
     show_transaction(start_day='2017-01-01', end_day='2017-12-31')
-    show_assets()
+
     show_stocklist()
 
         #df=pd.DataFrame(trader.login_message['Data'])
@@ -160,9 +161,10 @@ def none_trade_time():
     quotation.kill=1
     quotation.stockcode=False
     quotation.resulult=False
-    print '\n\n{0:=^82}'.format('\033[20;43m NON TRADING TIME \033[0m')
-    show_transaction(start_day='2017-01-01', end_day='2017-12-31')
     show_assets()
+    print '\n{0:=^82}'.format('\033[20;43m NON TRADING TIME \033[0m')
+    show_transaction(start_day='2017-01-01', end_day='2017-12-31')
+
     show_stocklist()
 
     while not calendar.trade_time() and calendar.trade_day():
