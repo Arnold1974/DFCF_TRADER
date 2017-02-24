@@ -130,7 +130,7 @@ def show_transaction():
                   result["signal_return_rate"], \
                   (1+float(result["signal_return_rate"])/100)*portfolio)
             portfolio *= 1+float(result["signal_return_rate"])/100
-        print '%s         --->  %s' % (result["stock_name"], calendar.trade_calendar(result["bought_at"].replace("-","/"),int(strategy.hold_days)))
+        print '%s         --->   %s' % (result["stock_name"], calendar.trade_calendar(result["bought_at"].replace("-","/"),int(strategy.hold_days)))
     print '{0:*^70}\n'.format(' End ')
 def none_trade_day():
     quotation.kill=1
