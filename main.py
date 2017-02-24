@@ -113,7 +113,9 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                 stocklist[i]['buy_day']=buy_date_for_return
     return stocklist[i]
 
-def show_transaction(start_day='2014-01-01', end_day='2017-12-31'):
+def show_transaction():
+    start_day=time.strftime("%Y",time.localtime())+'-01-01'
+    end_day=time.strftime("%Y-%m-%d",time.localtime())
     r=strategy.transaction(start_day,end_day)
     print '\n{0:*^70}'.format(' Portfolie Value ')
     if r is not False:
@@ -136,7 +138,7 @@ def none_trade_day():
     quotation.resulult=False
     show_assets()
     print '\n\n{0:=^82}'.format('\033[20;44m NON TRADING DAY \033[0m')
-    show_transaction(start_day='2017-01-01', end_day='2017-12-31')
+    show_transaction()
 
     show_stocklist()
 
@@ -162,14 +164,14 @@ def none_trade_time():
     quotation.stockcode=False
     quotation.resulult=False
     show_assets()
-    print '\n{0:=^82}'.format('\033[20;43m NON TRADING TIME \033[0m')
-    show_transaction(start_day='2017-01-01', end_day='2017-12-31')
+    print '\n{0:=^82}'.format('\033[2;43m NON TRADING TIME \033[0m')
+    show_transaction()
 
     show_stocklist()
 
     while not calendar.trade_time() and calendar.trade_day():
         if int(time.time()) % 2:
-            sys.stdout.write("\r\033[1;43m[%s] %s\033[0m" % (time.strftime("%X",time.localtime()),"--> Non Trading Time !"))
+            sys.stdout.write("\r\033[2;43m[%s] %s\033[0m" % (time.strftime("%X",time.localtime()),"--> Non Trading Time !"))
         else:
             sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"-->                   "))
         sys.stdout.flush()
@@ -226,6 +228,7 @@ def monitor_buy(code,codename):
         '''
         time.sleep(1)
 
+             
 def monitor_sell(code,buy_day,sell_day,stock_amount):
     '''
     如果选出的股票在下一个交易日出现停牌、开盘涨跌幅小于-9%、一字板涨跌停、 则取消买入这只股票
@@ -326,20 +329,18 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                 stock_amount=trader.getstocklist()[-1]['Kysl'] 
             else:
                 break
-        '''
-        if quotation.result['code']==code and int(stock_amount)<>0 \
-          and float(quotation.result['realtimequote']['currentPrice'])>30.80 \
-          or sell_day==time.strftime("%Y/%m/%d",time.localtime(time.time())) and time.localtime()[3:5]>=(14,59):
-            print '\n\nBegin Sell'
-            #trader.deal(code,quote['name'],quote['bottomprice'],'S')
-            print 'Sell completed\n'
-            stock_amount=show_stocklist()['Kysl']
-        '''
+        #每天中午12：30刷新持仓， 同时也可让Login 的 180分钟 有效期重新开始计算
+        if time.localtime()[3]==12 and \
+           time.localtime()[4]==30 and \
+           time.localtime()[5]>10 and \
+           time.localtime()[5]<12:
+            show_assets()
+
         time.sleep(1)
 
 def trade_time():
     print '\n\n{0:=^82}'.format('\033[20;46m TRADING TIME \033[0m')
-    show_transaction(start_day='2017-01-01', end_day='2017-12-31')
+    show_transaction()
     if quotation.kill==1:
         quotation.__init__()
     show_assets()
