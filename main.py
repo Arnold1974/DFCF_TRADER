@@ -185,14 +185,15 @@ def monitor_buy(code,codename):
     while quotation.result is False:
         time.sleep(.5)
 
-    dfcf_quote=trader.getquote(code)
+    dfcf_quote=trader.getquote(code) #获取东方财富的报价：涨跌停价格不需要即时报价
+    print u'跌停价:{0:s} | 涨停价:{1:s}'.format(dfcf_quote['bottomprice'],dfcf_quote['topprice'])
+
 
     while calendar.trade_time() and calendar.trade_day():
         buy_condition_0 = quotation.result['code'][0]==code
         buy_condition_1 = (float(quotation.result['price'][0])-float(quotation.result['pre_close'][0]))*100/float(quotation.result['pre_close'][0])>-9
         buy_condition_2 = time.localtime()[3:6]>=(9,25,5) and time.localtime()[3:6]<=(9,30,6)
-
-        
+     
         if buy_condition_0 and buy_condition_1 and buy_condition_2:
             if float(quotation.result['open'][0]) == float(quotation.result['amount'][0]) ==0:
                 print "\n%s %s: Suspension\n" % (quotation.result['date'][0],codename)
@@ -215,6 +216,12 @@ def monitor_buy(code,codename):
                 log.info('Deal Done!')
                 return Wtbh
                  
+        #按照涨停价-0.01挂单，如果成交价格为开盘价， 则还有10%的资金未利用
+        elif time.localtime()[3:6]>(9,30,6):
+            if float(quotation.result['open'])*0.98>=float(dfcf_quote['bottomprice']):
+                log.info("Begin Buy: %s" % codename)
+                Wtbh=trader.deal(code,codename,str(float(quotation.result['open'])*0.98),'B')                
+            pass
         '''
         if quotation.result['code']==code \
            and float(quotation.result['realtimequote']['currentPrice'])>10.80 \
@@ -298,8 +305,8 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                          and price_updated <> True \
                          and float(dfcf_quote['topprice']) < stop_sell_price \
                          and float(quotation.result['low'][0]) <> float(dfcf_quote['topprice']) \
-                         and float(quotation.result['price'][0]) >= float(quotation.result['open'][0]) * 1.05 \
-                         and time.localtime()[3:6]>=(9,30,1)
+                         and float(quotation.result['high'][0]) >= float(quotation.result['open'][0]) * 1.05 \
+                         and time.localtime()[3:6]>=(9,30,0)
                                          
         #符合条件则下单卖出
         if sell_condition_0 and (sell_condition_1 or sell_condition_2 or sell_condition_3):
