@@ -152,6 +152,7 @@ def none_trade_day():
             sys.stdout.write("\r\033[1;44m[%s]  Login-Thread Alive: %s\033[0m" % (time.strftime("%X",time.localtime()),trader.thread_1.isAlive()))
         else:
             sys.stdout.write("\r[%s]  Login-Thread Alive: %s" % (time.strftime("%X",time.localtime()),trader.thread_1.isAlive()))
+        sys.stdout.flush()
         time.sleep(1)
 
 def none_trade_time():
@@ -168,6 +169,7 @@ def none_trade_time():
             sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"--> Non Trading Time !"))
         else:
             sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"-->                   "))
+        sys.stdout.flush()
         time.sleep(1)
 
 def monitor_buy(code,codename):
@@ -203,6 +205,7 @@ def monitor_buy(code,codename):
                 #查询当日委托状态， 如果未成则等待
                 while trader.getordersdata()[-1]['Wtzt'] <> '已成':
                     sys.stdout.write("\r委托编号:[%s] 还未成交!" % Wtbh)
+                    sys.stdout.flush()
                     time.sleep(5)
                 log.info('Deal Done!')
                 return Wtbh
@@ -252,6 +255,12 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
     print u'止损价:{0:.2f} | 止盈价:{1:.2f} | 跌停价:{2:s} | 涨停价:{3:s}' \
           .format(stop_loss_price,stop_sell_price,dfcf_quote['bottomprice'],dfcf_quote['topprice'])
     #print '跌停价格: %s' % dfcf_quote['bottomprice']
+    
+    #卖出日，非一字涨停，如果涨停价也不能触及止盈价，则涨到 5% 就卖出，不用等收盘
+    if sell_day == time.strftime("%Y/%m/%d",time.localtime(time.time())) \
+                   and price_updated <> True \
+                   and float(dfcf_quote['topprice']) < stop_sell_price:
+       print u'今日涨停也不可能达到止盈价止损价,盘中能碰到5%就卖出!' 
 
     quotation.show=1
     while calendar.trade_time() and calendar.trade_day() and int(stock_amount)<>0:
@@ -269,7 +278,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
         
         # .1. 触发止损 (用实时行情胡最低价与止损价格比较)
         sell_condition_1 = float(quotation.result['low'][0]) <= stop_loss_price  \
-                         and time.localtime()[3:6]>=(9,30,5)
+                         and time.localtime()[3:6]>=(9,30,1)
 
         # .2. 卖出日，没触及止盈点，并且不是一字涨停 (最低价不等于涨停价),收盘价卖出               
         #     sell_day 为策略理论卖出日，如果因其他原因该卖没卖， 则以后会出现sell_day < 当前日期
@@ -284,12 +293,12 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                          and float(dfcf_quote['topprice']) < stop_sell_price \
                          and float(quotation.result['low'][0]) <> float(dfcf_quote['topprice']) \
                          and float(quotation.result['price'][0]) >= float(quotation.result['open'][0]) * 1.05 \
-                         and time.localtime()[3:6]>=(9,30,5)
+                         and time.localtime()[3:6]>=(9,30,1)
                                          
         #符合条件则下单卖出
         if sell_condition_0 and (sell_condition_1 or sell_condition_2 or sell_condition_3):
             #如果停牌
-            if time.localtime()[3:6]>=(9,25,5) and float(quotation.result['open'][0]) == float(quotation.result['amount'][0]) ==0:
+            if  float(quotation.result['open'][0]) == float(quotation.result['amount'][0]) ==0:
                 print "\n%s %s: Suspension\n" % (quotation.result['date'][0],quotation.result['name'][0])
                 while calendar.trade_time() and calendar.trade_day():
                     time.sleep(2)
@@ -305,6 +314,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                 #查询当日委托状态， 如果未成则等待
                 while trader.getordersdata()[-1]['Wtzt'] <> '已成':
                     sys.stdout.write("\r委托编号:[%s] 还未成交!" % Wtbh)
+                    sys.stdout.flush()
                     time.sleep(5)
                 log.info('Deal Done!')
             else:
@@ -340,6 +350,7 @@ def trade_time():
                         sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"--> No Trade Target !"))
                     else:
                         sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"-->                  "))
+                    sys.stdout.flush()
                     time.sleep(1)
             else: #选出目标， 开仓
                 code=result["data"][0]["code"]

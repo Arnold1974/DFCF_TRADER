@@ -84,7 +84,7 @@ class PriceQuotation(object):
                           quote['realtimequote']['currentPrice'],\
                           quote['realtimequote']['zdf']))
             
-
+            sys.stdout.flush()
     def get_yahoo_hist_price(self,stockcode='000001.ss',s_date='2017-01-01',e_date=time.strftime('%Y-%m-%d',time.localtime())):
         '''
         yahoo 的历史数据

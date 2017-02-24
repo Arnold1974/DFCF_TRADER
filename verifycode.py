@@ -67,5 +67,6 @@ if __name__=="__main__":
                 plt.show()
                 print  "\rCode:[%4s]    Length:%2d" % (vcode, len(vcode))
         sys.stdout.write( "\rCode:[%8s]    Length:%2d   Count: %d" % (vcode, len(vcode),i))
+        sys.stdout.flush()
         i+=1
     print '\nDone'
