@@ -109,7 +109,7 @@ class Strategy(object):
 
         
 if __name__=="__main__":
-    test=Strategy("QUERY_2_DAYS_HARD",25,5,10) # 2天策略： 25|5|10
+    test=Strategy("QUERY_2_DAYS",25,5,10) # 2天策略： 25|5|10
     from trade_calendar import TradeCalendar
     calendar=TradeCalendar()
 
@@ -136,14 +136,15 @@ if __name__=="__main__":
             show=r[i]
             if len(show["stock_name"])==3:
                 show["stock_name"]=show["stock_name"]+'  '
-            print "%s  %s %8s  %6s %6s %6s   %1.3f" % (show["stock_name"], \
-                  show["bought_at"], show["sold_at"], \
-                  show["buying_price"],show["selling_price"], \
-                  show["signal_return_rate"], \
+            print "%s %s  %8s  %6s %6s %6s   %1.3f" % \
+                 (show["stock_name"], 
+                  show["bought_at"], show["sold_at"], 
+                  show["buying_price"],show["selling_price"], 
+                  show["signal_return_rate"], 
                   (1+float(show["signal_return_rate"])/100)*portfolio)                       
             portfolio *= 1+float(show["signal_return_rate"])/100
 
-        print '%s 卖出日: %s' % (show["stock_name"], calendar.trade_calendar(show["bought_at"].replace("-","/"),int(test.hold_days)))
+        print '%s       --->  %s' % (show["stock_name"], calendar.trade_calendar(show["bought_at"].replace("-","/"),int(test.hold_days)))
     print '{0:-^60}\n'.format('End')
 
 

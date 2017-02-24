@@ -74,7 +74,7 @@ class PriceQuotation(object):
                     print 'price quotation error!';time.sleep(1)
                     continue
                 self.result=eval(re.search(r'{.*}',quote.text).group())
-                self.show_price(self.result)
+                self.show_dfcf_price(self.result)
             time.sleep(1)      
     def show_dfcf_price(self, quote):
         if self.show==1:

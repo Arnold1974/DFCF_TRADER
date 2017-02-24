@@ -58,7 +58,7 @@ class DFCF_Trader(object):
                    'Upgrade-Insecure-Requests':'1'         
                    } 
         self.s.headers.update(headers) 
-        res=self.s.post('https://jy.xzsec.com//Login/Authentication',json.load(file("./config/dfcf.json")),timeout=5)
+        res=self.s.post('https://jy.xzsec.com//Login/Authentication',json.load(file("./config/dfcf.json")))
         
         #获取 validatekey：
         get_validatekey=self.s.get('https://jy.xzsec.com/Trade/Buy')

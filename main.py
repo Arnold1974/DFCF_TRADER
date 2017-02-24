@@ -260,7 +260,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
     if sell_day == time.strftime("%Y/%m/%d",time.localtime(time.time())) \
                    and price_updated <> True \
                    and float(dfcf_quote['topprice']) < stop_sell_price:
-       print u'今日涨停也不可能达到止盈价止损价,盘中能碰到5%就卖出!' 
+       print u'今日涨停价达不到止盈价, 因此盘中价格达到 5% 就卖出!' 
 
     quotation.show=1
     while calendar.trade_time() and calendar.trade_day() and int(stock_amount)<>0:
