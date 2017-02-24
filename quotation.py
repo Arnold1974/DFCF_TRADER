@@ -8,7 +8,7 @@ import threading
 import winsound
 import pandas as pd
 import tushare
-
+import log
 
 class PriceQuotation(object):
     def __init__(self,stockcode='600000'):
@@ -34,7 +34,8 @@ class PriceQuotation(object):
                 try:
                     self.result=tushare.get_realtime_quotes(self.stockcode)
                 except Exception as e:
-                    print e
+                    log.error(e)
+                    time.sleep(.5)
                     continue
                 self.show_tushare_price(self.result)
             time.sleep(.5)
@@ -47,7 +48,7 @@ class PriceQuotation(object):
                               float(quote['price'][0]),
                               (float(quote['price'][0])-float(quote['pre_close'][0]))/float(quote['pre_close'][0])*100,
                               quote['volume'][0]))
-    
+                sys.stdout.flush()
     
  #-------------------------------华丽的分割线-------------------  
     def get_dfcf_quote(self):

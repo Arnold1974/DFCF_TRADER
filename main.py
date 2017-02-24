@@ -297,10 +297,16 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
             log.info('Sell Begin...')
             Wtbh=trader.deal(code,dfcf_quote['name'],str(float(dfcf_quote['bottomprice'])+0.01),'S')
             if Wtbh is not None:
-                log.info('Sell End...\n')
+                log.info('Sell Order Accomplished!\n')
+                winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
                 print "委托编号: [%s]\n" %  Wtbh,
                 stock_amount=show_stocklist()['Kysl']
-                time.sleep(1)
+
+                #查询当日委托状态， 如果未成则等待
+                while trader.getordersdata()[-1]['Wtzt'] <> '已成':
+                    sys.stdout.write("\r委托编号:[%s] 还未成交!" % Wtbh)
+                    time.sleep(5)
+                log.info('Deal Done!')
             else:
                 break
         '''
