@@ -32,15 +32,19 @@ class Strategy(object):
         print '{0:-^70}\n'.format('')
         self.success= True
 
-    #即时选股
+    #即时选股-----------------------------------------
     def pickstock(self):
         pickstock_params=self.config["pickstock_params"]
         pickstock_params.update({"w":self.query})
-        r=self.s.get(self.config["PICKSTOCK_URL"],params=pickstock_params)
-        #print r.json()["data"]["result"]["result"][0][1]
-        return r.json()["data"]["result"]["result"]
+        while True:
+            try:
+                r=self.s.get(self.config["PICKSTOCK_URL"],params=pickstock_params)
+            except Exception as e:
+                print e;time.sleep(1)
+            else:
+                return r.json()["data"]["result"]["result"]
 
-    #回测选股
+    #回测选股--------------------------------------------
     def traceback(self):
         traceback_params=self.config["traceback_params"]
         traceback_params.update({"query":self.query,
@@ -74,7 +78,7 @@ class Strategy(object):
                 else:
                     return False
     
-    #策略回测   
+    #策略回测----------------------------------------------
     def transaction(self,stime='2015-01-01',etime='2027-01-01'):
         '''
         return: (JSON)
