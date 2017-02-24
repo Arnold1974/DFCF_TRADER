@@ -166,7 +166,7 @@ def none_trade_time():
 
     while not calendar.trade_time() and calendar.trade_day():
         if int(time.time()) % 2:
-            sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"--> Non Trading Time !"))
+            sys.stdout.write("\r\033[1;43m[%s] %s\033[0m" % (time.strftime("%X",time.localtime()),"--> Non Trading Time !"))
         else:
             sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"-->                   "))
         sys.stdout.flush()
@@ -303,20 +303,24 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                 while calendar.trade_time() and calendar.trade_day():
                     time.sleep(2)
             quotation.show=0
+            sys.stdout.write("\r")
+            sys.stdout.flush()
             log.info('Sell Begin...')
             Wtbh=trader.deal(code,dfcf_quote['name'],str(float(dfcf_quote['bottomprice'])+0.01),'S')
             if Wtbh is not None:
-                log.info('Sell Order Accomplished!\n')
+                log.info('Sell End...')
                 winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
                 print "委托编号: [%s]\n" %  Wtbh,
-                stock_amount=show_stocklist()['Kysl']
 
                 #查询当日委托状态， 如果未成则等待
                 while trader.getordersdata()[-1]['Wtzt'] <> '已成':
-                    sys.stdout.write("\r委托编号:[%s] 还未成交!" % Wtbh)
+                    sys.stdout.write("\r委托编号: [%s] 还未成交!" % Wtbh)
                     sys.stdout.flush()
                     time.sleep(5)
+                sys.stdout.write("\r")
+                sys.stdout.flush()
                 log.info('Deal Done!')
+                stock_amount=trader.getstocklist()[-1]['Kysl'] 
             else:
                 break
         '''
