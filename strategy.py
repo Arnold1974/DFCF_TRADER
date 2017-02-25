@@ -28,7 +28,7 @@ class Strategy(object):
         self.lowerIncome=str(lowerIncome)
         self.fallIncome=str(fallIncome)
         print '\n{0:-^70}'.format('')
-        print u"[策略]:  %s  \t  [止盈回撤止损]: %s|%s|%s \t  [满仓]: %s 只" % (arg_query,self.upperIncome,self.fallIncome,self.lowerIncome,self.stockHoldCount)
+        print u"[策略]:  %s   [止盈回撤止损]: %s|%s|%s   [满仓]: %s 只" % (arg_query,self.upperIncome,self.fallIncome,self.lowerIncome,self.stockHoldCount)
         print '{0:-^70}\n'.format('')
         self.success= True
 

@@ -35,7 +35,7 @@ class DFCF_Trader(object):
                     #print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Login Success!')
                     if self.login_flag==True:
                         log.info('Login Success')
-                        Beep(450,150)
+                        #Beep(450,150)
                         #winsound.PlaySound('./wav/login success.wav',winsound.SND_ASYNC)
                     else:
                         log.info('Login Failed')
