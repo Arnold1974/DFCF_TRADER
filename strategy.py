@@ -101,25 +101,29 @@ class Strategy(object):
                 r=self.s.post(self.config["TRANSACTION_URL"],data=transaction_params)
             except Exception as e:
                 print e;time.sleep(2)
-            else:       
-                if r.json()['success']==False:
-                    print r.json()['data']['crmMessage']
-                    print u"抱歉，服务器繁忙，请稍后再试！"
-                    time.sleep(1)
-                    continue
-                else:
-                    try:
-                        return r.json()['data'] 
-                    except TypeError as e:
-                        print e
+            else:    
+                try:
+                    if r.json()['success']==False:
+                        print r.json()['data']['crmMessage']
+                        print u"抱歉，服务器繁忙，请稍后再试！"
                         time.sleep(1)
                         continue
                     else:
-                        return False
+                        try:
+                            return r.json()['data'] 
+                        except TypeError as e:
+                            print e
+                            time.sleep(1)
+                            continue
+                        else:
+                            return False
+                except ValueError as e: # NO JSON object could be decoded
+                    print e;time.sleep(2)
+                        
 
         
 if __name__=="__main__":
-    test=Strategy("QUERY_2_DAYS",25,5,10) # 2天策略： 25|5|10
+    test=Strategy("QUERY_2_DAYS_HARD",25,5,10) # 2天策略： 25|5|10
     from trade_calendar import TradeCalendar
     calendar=TradeCalendar()
 

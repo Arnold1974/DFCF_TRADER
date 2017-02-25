@@ -5,7 +5,7 @@ import re
 import time,sys
 import requests
 import threading
-import winsound
+#import winsound
 import pandas as pd
 import tushare
 import log
@@ -28,7 +28,7 @@ class PriceQuotation(object):
     def get_tushare_quote(self):
         while True:
             if self.kill==1:
-                winsound.PlaySound('./wav/stop price monitor CN.wav',winsound.SND_ASYNC)
+                #winsound.PlaySound('./wav/stop price monitor CN.wav',winsound.SND_ASYNC)
                 break
             if self.stockcode <> False:
                 try:
@@ -58,7 +58,7 @@ class PriceQuotation(object):
         self.s = requests.session()
         while True:
             if self.kill==1:
-                winsound.PlaySound('./wav/stop price monitor CN.wav',winsound.SND_ASYNC)
+                #winsound.PlaySound('./wav/stop price monitor CN.wav',winsound.SND_ASYNC)
                 break
             if self.stockcode <> False:
                 params={

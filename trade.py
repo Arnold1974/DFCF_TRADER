@@ -7,8 +7,8 @@ import requests
 import json,re
 import threading
 import time,log
-from winsound import Beep
-import winsound
+#from winsound import Beep
+#import winsound
 
 class DFCF_Trader(object):
     def __init__(self):
@@ -41,7 +41,7 @@ class DFCF_Trader(object):
                         log.info('Login Failed')
                     #Beep(450,150)
                 except Exception:
-                    winsound.PlaySound('./wav/connection lost.wav',winsound.SND_ASYNC)
+                    #winsound.PlaySound('./wav/connection lost.wav',winsound.SND_ASYNC)
                     time.sleep(1)
                     #Beep(600,500)
                     log.info("Login connection lost !!!")
