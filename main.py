@@ -8,7 +8,7 @@ from strategy import Strategy
 from trade import DFCF_Trader
 from trade_calendar import TradeCalendar
 from quotation import PriceQuotation
-import sys
+import sys,os
 import time
 import pandas as pd
 #import winsound
@@ -182,6 +182,7 @@ def monitor_buy(code,codename):
 
             if Wtbh is not None:
                 log.info('Buy Order Accomplished!')
+                #os.system("say order completed")
                 #winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
 
                 #查询当日委托状态， 如果未成则等待
@@ -302,7 +303,8 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
             Wtbh=trader.deal(code,dfcf_quote['name'],str(float(dfcf_quote['bottomprice'])+0.01),'S')
             if Wtbh is not None:
                 log.info('Sell End...')
-               # winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
+                #os.system("say order completed")
+                #winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
                 print "委托编号: [%s]\n" %  Wtbh,
 
                 #查询当日委托状态， 如果未成则等待

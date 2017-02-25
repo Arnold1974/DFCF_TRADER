@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 #西藏同信证券股份有限公司
 
-import sys
+import sys,os
 import requests
 import json,re
 import threading
@@ -35,6 +35,7 @@ class DFCF_Trader(object):
                     #print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Login Success!')
                     if self.login_flag==True:
                         log.info('Login Success')
+                        #os.system("say login success")
                         #Beep(450,150)
                         #winsound.PlaySound('./wav/login success.wav',winsound.SND_ASYNC)
                     else:
@@ -43,6 +44,7 @@ class DFCF_Trader(object):
                 except Exception:
                     #winsound.PlaySound('./wav/connection lost.wav',winsound.SND_ASYNC)
                     time.sleep(1)
+                    #os.system("say connection lost")
                     #Beep(600,500)
                     log.info("Login connection lost !!!")
             time.sleep(.5)
