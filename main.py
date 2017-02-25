@@ -221,7 +221,7 @@ def monitor_buy(code,codename):
                     log.info("%f Buy: %s" % (float(quotation.result['open'])*0.98,codename))
                     Wtbh_02=trader.deal(code,codename,str(float(quotation.result['open'])*0.98),'B')                
                     log.info('Deal Done!')
-                    return Wtbh + " | " + Wtbh_02 if Wtbh_02 is not None else Wtbh
+                return Wtbh + " | " + Wtbh_02 if Wtbh_02 is not None else Wtbh
             else:
                 return 'buy order failed!'
             
