@@ -216,11 +216,13 @@ def monitor_buy(code,codename):
                     time.sleep(5)
                 log.info('Deal Done!')
                 #return Wtbh             
-                #按照涨停价-0.01挂单，如果成交价格为开盘价， 则还有10%的资金未利用            
+                #按照涨停价-0.01挂单，如果成交价格为开盘价， 则还有10%的资金未利用        
+                Wtbh_02 = None
                 if float(quotation.result['open'])*0.98>=float(dfcf_quote['bottomprice']):
                     log.info("%f Buy: %s" % (float(quotation.result['open'])*0.98,codename))
                     Wtbh_02=trader.deal(code,codename,str(float(quotation.result['open'])*0.98),'B')                
                     log.info('Deal Done!')
+                #--------------------------------------------------------------------------    
                 return Wtbh + " | " + Wtbh_02 if Wtbh_02 is not None else Wtbh
             else:
                 return 'buy order failed!'
