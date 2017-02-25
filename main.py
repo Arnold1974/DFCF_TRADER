@@ -214,14 +214,16 @@ def monitor_buy(code,codename):
                     sys.stdout.flush()
                     time.sleep(5)
                 log.info('Deal Done!')
-                return Wtbh
-                 
-        #按照涨停价-0.01挂单，如果成交价格为开盘价， 则还有10%的资金未利用
-        elif time.localtime()[3:6]>(9,30,6):
-            if float(quotation.result['open'])*0.98>=float(dfcf_quote['bottomprice']):
-                log.info("Begin Buy: %s" % codename)
-                Wtbh=trader.deal(code,codename,str(float(quotation.result['open'])*0.98),'B')                
-            pass
+                #return Wtbh             
+                #按照涨停价-0.01挂单，如果成交价格为开盘价， 则还有10%的资金未利用            
+                if float(quotation.result['open'])*0.98>=float(dfcf_quote['bottomprice']):
+                    log.info("%f Buy: %s" % (float(quotation.result['open'])*0.98,codename))
+                    Wtbh_02=trader.deal(code,codename,str(float(quotation.result['open'])*0.98),'B')                
+                    log.info('Deal Done!')
+                    return Wtbh + " | " + Wtbh_02 if Wtbh_02 is not None else Wtbh
+            else:
+                return 'buy order failed!'
+            
         '''
         if quotation.result['code']==code \
            and float(quotation.result['realtimequote']['currentPrice'])>10.80 \
@@ -356,7 +358,7 @@ def trade_time():
     while calendar.trade_time() and calendar.trade_day():
         if stock_in_position and int(stock_in_position['Kysl'])<>0: #如果不空仓,且有股票可卖,监视价格变化是否达到止损止盈           
             monitor_sell(stock_in_position['Zqdm'],stock_in_position['buy_day'],stock_in_position['sell_day'],stock_in_position['Kysl'])
-        elif stock_in_position==False:  #position is empty, 需要开仓
+        elif stock_in_position == False:  #position is empty, 需要开仓
             result= strategy.traceback()
             if result==False: #没有选出目标
                 print 'Selected Stock: None! Keep Position 0\n'
@@ -367,6 +369,7 @@ def trade_time():
                         sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"-->                  "))
                     sys.stdout.flush()
                     time.sleep(1)
+                    
             else: #选出目标， 开仓
                 code=result["data"][0]["code"]
                 codename= result["data"][0]["codeName"]
