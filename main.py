@@ -63,14 +63,20 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
                 buy_date_for_return=buy_date.replace('/','-')
 
-                print'     +++++'
+                print'     + + +'
                 for j in xrange(int(strategy.hold_days)):
                     next_day=calendar.trade_calendar(buy_date,j+1)
                     show.append(next_day)
                 
+                #如果持股日期炒股策略最后期限，则显示到目前的状态
                 while show[-1]<time.strftime('%Y/%m/%d',time.localtime()):
-                    show.append(calendar.trade_calendar(next_day,2))
-
+                    next_day=calendar.trade_calendar(next_day,2)
+                    if next_day > time.strftime('%Y/%m/%d',time.localtime()):
+                        #show.append('- - -')
+                        show.append('\033[1;36m' + next_day + '\033[0m')
+                        break
+                    show.append(next_day)
+               
                 for L in xrange(len(show)):
                     if show[L]==calendar.trade_calendar(buy_date,int(strategy.hold_days)):
                        show[L]='\033[2;43m%s\033[0m' % show[L]                   
@@ -107,7 +113,7 @@ def show_transaction():
                   (1+float(result["signal_return_rate"])/100)*portfolio)
             portfolio *= 1+float(result["signal_return_rate"])/100
         print '%s         --->   %s' % (result["stock_name"], calendar.trade_calendar(result["bought_at"].replace("-","/"),int(strategy.hold_days)))
-    print '{0:*^70}\n'.format(' End ')
+    print '{0:*^70}\n'.format(' End of Show ')
 def none_trade_day():
     quotation.kill=1
     quotation.stockcode=False
@@ -115,9 +121,15 @@ def none_trade_day():
     show_assets()
     print '\n\n{0:=^82}'.format('\033[20;44m NON TRADING DAY \033[0m')
     show_transaction()
-
-    show_stocklist()
-
+    stock_in_position = show_stocklist()
+    if stock_in_position == False:
+        result = strategy.traceback()
+        if result != False:
+            show = "\r%s 策略选股: %s [%s] ---> 购买日:%s" %((result["stockDate"], result["data"][0]["codeName"], \
+                 result["data"][0]["code"], calendar.trade_calendar(result["stockDate"].replace("-","/"),2)))
+        else:
+            show = "策略选股: None"
+    else: show = "\r[%s]  Login-Thread Alive: %s" % (time.strftime("%X",time.localtime()),trader.thread_1.isAlive())
         #df=pd.DataFrame(trader.login_message['Data'])
         #df=df.ix[:,[0,5,1,6]]
         #df.columns = ['Date', 'Time','Account','Name']
@@ -129,9 +141,9 @@ def none_trade_day():
 
     while not calendar.trade_day():
         if int(time.time()) % 2:
-            sys.stdout.write("\r\033[1;44m[%s]  Login-Thread Alive: %s\033[0m" % (time.strftime("%X",time.localtime()),trader.thread_1.isAlive()))
+            sys.stdout.write(show)
         else:
-            sys.stdout.write("\r[%s]  Login-Thread Alive: %s" % (time.strftime("%X",time.localtime()),trader.thread_1.isAlive()))
+            sys.stdout.write('\033[1;44m'+ show + '\033[0m')
         sys.stdout.flush()
         time.sleep(1)
 
@@ -278,7 +290,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
         #     sell_day 为策略理论卖出日，如果因其他原因该卖没卖， 则以后会出现sell_day < 当前日期
         #     而且止盈点也没有出现， 应该自行卖出或由程序隔日卖出。所以条件设置 sell_day <= 当前日
         sell_condition_2 = sell_day <= time.strftime("%Y/%m/%d",time.localtime(time.time())) \
-                         and time.localtime()[3:6]>=(14,59,45) and price_updated <> True \
+                         and time.localtime()[3:6]>=(14,59,0) and price_updated <> True \
                          and float(quotation.result['low'][0]) <> float(dfcf_quote['topprice'])  
         
         # .3. 卖出日，非一字涨停，如果涨停价也不能触及止盈价，则涨到 5% 就卖出，不用等收盘
@@ -340,7 +352,7 @@ def trade_time():
             monitor_sell(stock_in_position['Zqdm'],stock_in_position['buy_day'],stock_in_position['sell_day'],stock_in_position['Kysl'])
         elif stock_in_position == False:  #position is empty, 需要开仓
             result= strategy.traceback()
-            if result==False: #没有选出目标
+            if result == False: #没有选出目标
                 print 'Selected Stock: None! Keep Position 0\n'
                 while calendar.trade_time() and calendar.trade_day():
                     if int(time.time()) % 2:
