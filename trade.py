@@ -44,7 +44,7 @@ class DFCF_Trader(object):
                     else:
                         log.info('Login Failed')
                         #Beep(450,150)
-                        playsound(mac_say='login failed',win_sound='./wav/login failed.wav',frequency=600, duration=500)
+                        playsound(mac_say='login failed',win_sound='./wav/login failed.wav',frequency=450, duration=150)
                         time.sleep(3)                    
                 except Exception:
                     #winsound.PlaySound('./wav/connection lost.wav',winsound.SND_ASYNC)

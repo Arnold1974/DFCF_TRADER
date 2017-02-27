@@ -195,7 +195,7 @@ def monitor_buy(code,codename):
                 log.info('Buy Order Accomplished!')
                 #os.system("say order completed")
                 #winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
-                playsound(mac_say='transaction completed',win_sound='./wav/transaction completed.wav',frequency=600, duration=500)
+                playsound(mac_say='transaction completed',win_sound='./wav/transaction completed.wav',frequency=450, duration=150)
                 #查询当日委托状态， 如果未成则等待
                 while trader.getordersdata()[-1]['Wtzt'] <> '已成':
                     sys.stdout.write("\r委托编号:[%s] 还未成交!" % Wtbh)
@@ -316,7 +316,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                 log.info('Sell End...')
                 #os.system("say order completed")
                 #winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
-                playsound(mac_say='transaction completed',win_sound='./wav/transaction completed.wav',frequency=600, duration=500)
+                playsound(mac_say='transaction completed',win_sound='./wav/transaction completed.wav',frequency=450, duration=150)
                 print "委托编号: [%s]\n" %  Wtbh,
 
                 #查询当日委托状态， 如果未成则等待
