@@ -168,7 +168,6 @@ def none_trade_time():
 def monitor_buy(code,codename):
     print '=== Monitor Price for Buy: %s===' % code
     quotation.stockcode=code
-    quotation.show=1
 
     while quotation.result is False:
         time.sleep(.5)
@@ -176,11 +175,11 @@ def monitor_buy(code,codename):
     dfcf_quote=trader.getquote(code) #获取东方财富的报价：涨跌停价格不需要即时报价
     print u'跌停价:{0:s} | 涨停价:{1:s}'.format(dfcf_quote['bottomprice'],dfcf_quote['topprice'])
 
-
+    quotation.show=1
     while calendar.trade_time() and calendar.trade_day():
         buy_condition_0 = quotation.result['code'][0]==code
         buy_condition_1 = (float(quotation.result['price'][0])-float(quotation.result['pre_close'][0]))*100/float(quotation.result['pre_close'][0])>-9
-        buy_condition_2 = time.localtime()[3:6]>=(9,25,5) and time.localtime()[3:6]<=(9,30,6)
+        buy_condition_2 = time.localtime()[3:6]>=(9,25,10) and time.localtime()[3:6]<=(9,30,6)
      
         if buy_condition_0 and buy_condition_1 and buy_condition_2:
             if float(quotation.result['open'][0]) == float(quotation.result['amount'][0]) ==0:
@@ -189,7 +188,7 @@ def monitor_buy(code,codename):
                     time.sleep(2)
             quotation.show=0
             print '\n'
-            log.info("Begin Buy: %s" % codename)
+            log.info("Begin Buy -->  %s" % codename)
             Wtbh=trader.deal(code,codename,str(float(dfcf_quote['topprice'])-0.01),'B') #['topprice']
 
             if Wtbh is not None:
@@ -207,8 +206,8 @@ def monitor_buy(code,codename):
                 #按照涨停价-0.01挂单，如果成交价格为开盘价， 则还有10%的资金未利用        
                 Wtbh_02 = None
                 if float(quotation.result['open'])*0.98>=float(dfcf_quote['bottomprice']):
-                    log.info("%f Buy: %s" % (float(quotation.result['open'])*0.98,codename))
-                    Wtbh_02=trader.deal(code,codename,str(float(quotation.result['open'])*0.98),'B')                
+                    log.info("Begin Buy -->  %s %s" % (codename,format(float(quotation.result['open'])*0.98, '.2f')))
+                    Wtbh_02=trader.deal(code,codename,format(float(quotation.result['open'])*0.98, '.2f'),'B')                
                     log.info('Deal Done!')
                 #--------------------------------------------------------------------------    
                 return Wtbh + " | " + Wtbh_02 if Wtbh_02 is not None else Wtbh

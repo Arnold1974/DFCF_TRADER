@@ -60,7 +60,7 @@ class DFCF_Trader(object):
                    'Upgrade-Insecure-Requests':'1'         
                    } 
         self.s.headers.update(headers) 
-        res=self.s.post('https://jy.xzsec.com//Login/Authentication',json.load(file("./config/dfcf.json")))
+        res=self.s.post('https://jy.xzsec.com/Login/Authentication',json.load(file("./config/dfcf.json")))
         
         #获取 validatekey：
         get_validatekey=self.s.get('https://jy.xzsec.com/Trade/Buy')
@@ -234,6 +234,7 @@ class DFCF_Trader(object):
                 GetKyzjAndKml=self.s.post('https://jy.xzsec.com/Trade/GetKyzjAndKml'+self.url_suffix, \
                                      {'stockCode':stockcode,'stockName':stockname,'price':price,'tradeType':tradetype});
                 Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
+                print GetKyzjAndKml.json()
                 if Kmml=='0':
                     print '可交易数量为0'
                     time.sleep(5)
