@@ -106,7 +106,7 @@ def show_transaction():
             result=r[i]
             if len(result["stock_name"])==3:
                 result["stock_name"]=result["stock_name"]+'  '
-            print "%s   %s   %8s  %6s  %6s  %6s    %1.3f" % (result["stock_name"], \
+            print "%s   %s   %8s    %6s  %6s  %6s    %1.3f" % (result["stock_name"], \
                   result["bought_at"], result["sold_at"], \
                   result["buying_price"],result["selling_price"], \
                   result["signal_return_rate"], \
@@ -152,7 +152,7 @@ def none_trade_time():
     quotation.stockcode=False
     quotation.resulult=False
     show_assets()
-    print '\n{0:=^82}'.format('\033[2;41m NON TRADING TIME \033[0m')
+    print '\n{0:=^81}'.format('\033[2;41m NON TRADING TIME \033[0m')
     show_transaction()
     show_stocklist()
 
