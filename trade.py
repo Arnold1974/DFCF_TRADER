@@ -23,7 +23,7 @@ class DFCF_Trader(object):
 
 #登陆
     def login(self):
-        log.info('%s Active...' % threading.current_thread().name)
+        #log.info('%s Active...' % threading.current_thread().name)
         while True:
             if self.kill==1:
                 break
