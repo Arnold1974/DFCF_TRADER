@@ -1,14 +1,16 @@
-#!C:\ProgramData\Anaconda2\python.exe
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 #西藏同信证券股份有限公司
 
-import sys,os
+import sys
 import requests
 import json,re
 import threading
 import time,log
+from voice import playsound
 #from winsound import Beep
 #import winsound
+
 
 class DFCF_Trader(object):
     def __init__(self):
@@ -38,14 +40,19 @@ class DFCF_Trader(object):
                         #os.system("say login success")
                         #Beep(450,150)
                         #winsound.PlaySound('./wav/login success.wav',winsound.SND_ASYNC)
+                        playsound(mac_say='login success',win_sound='./wav/login success.wav',frequency=450, duration=150)
                     else:
                         log.info('Login Failed')
-                    #Beep(450,150)
+                        #Beep(450,150)
+                        playsound(mac_say='login failed',win_sound='./wav/login failed.wav',frequency=600, duration=500)
+                        time.sleep(3)                    
                 except Exception:
                     #winsound.PlaySound('./wav/connection lost.wav',winsound.SND_ASYNC)
-                    time.sleep(1)
                     #os.system("say connection lost")
                     #Beep(600,500)
+                    playsound(mac_say='connection lost',win_sound='./wav/connection lost.wav',frequency=600, duration=500)
+                    time.sleep(1)
+                    
                     log.info("Login connection lost !!!")
             time.sleep(.5)
             

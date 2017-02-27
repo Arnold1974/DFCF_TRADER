@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from __future__ import division
@@ -6,6 +7,7 @@ import time,sys
 import requests
 import threading
 #import winsound
+from voice import playsound
 import pandas as pd
 import tushare
 import log
@@ -29,6 +31,7 @@ class PriceQuotation(object):
         while True:
             if self.kill==1:
                 #winsound.PlaySound('./wav/stop price monitor CN.wav',winsound.SND_ASYNC)
+                playsound(mac_say='price monitor stopped',win_sound='./wav/stop price monitor CN.wav',frequency=600, duration=500)
                 break
             if self.stockcode <> False:
                 try:

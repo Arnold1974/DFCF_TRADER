@@ -8,11 +8,11 @@ from strategy import Strategy
 from trade import DFCF_Trader
 from trade_calendar import TradeCalendar
 from quotation import PriceQuotation
-import sys,os
+import sys
 import time
 import pandas as pd
 #import winsound
-
+from voice import playsound
 
 
 def thread_login_keep_alive():
@@ -195,7 +195,7 @@ def monitor_buy(code,codename):
                 log.info('Buy Order Accomplished!')
                 #os.system("say order completed")
                 #winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
-
+                playsound(mac_say='transaction completed',win_sound='./wav/transaction completed.wav',frequency=600, duration=500)
                 #查询当日委托状态， 如果未成则等待
                 while trader.getordersdata()[-1]['Wtzt'] <> '已成':
                     sys.stdout.write("\r委托编号:[%s] 还未成交!" % Wtbh)
@@ -316,6 +316,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                 log.info('Sell End...')
                 #os.system("say order completed")
                 #winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
+                playsound(mac_say='transaction completed',win_sound='./wav/transaction completed.wav',frequency=600, duration=500)
                 print "委托编号: [%s]\n" %  Wtbh,
 
                 #查询当日委托状态， 如果未成则等待
