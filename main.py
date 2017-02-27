@@ -79,7 +79,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                
                 for L in xrange(len(show)):
                     if show[L]==calendar.trade_calendar(buy_date,int(strategy.hold_days)):
-                       show[L]='\033[2;43m%s\033[0m' % show[L]                   
+                       show[L]='\033[2;41m%s\033[0m' % show[L]                   
                     if show[L]==time.strftime('%Y/%m/%d',time.localtime()):
                         show[L]='\033[2;46m%s\033[0m' % show[L]
                     if ((L+1) % 6 <> 0):
@@ -152,14 +152,14 @@ def none_trade_time():
     quotation.stockcode=False
     quotation.resulult=False
     show_assets()
-    print '\n{0:=^82}'.format('\033[2;43m NON TRADING TIME \033[0m')
+    print '\n{0:=^82}'.format('\033[2;41m NON TRADING TIME \033[0m')
     show_transaction()
 
     show_stocklist()
 
     while not calendar.trade_time() and calendar.trade_day():
         if int(time.time()) % 2:
-            sys.stdout.write("\r\033[2;43m[%s] %s\033[0m" % (time.strftime("%X",time.localtime()),"--> Non Trading Time !"))
+            sys.stdout.write("\r\033[2;41m[%s] %s\033[0m" % (time.strftime("%X",time.localtime()),"--> Non Trading Time !"))
         else:
             sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"-->                   "))
         sys.stdout.flush()
