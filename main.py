@@ -86,7 +86,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                         print show[L].replace('/','-'),
                     else: 
                         print show[L].replace('/','-') 
-                print '\n{0:-^60}'.format('')
+                print '\n\n{0:=^70}'.format('')
                         
                 #print '\n'+' '*13*(k) +'       ---->'
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
@@ -128,7 +128,7 @@ def none_trade_day():
             show = "\r%s 策略选股: %s [%s] ---> 购买日:%s" %((result["stockDate"], result["data"][0]["codeName"], \
                  result["data"][0]["code"], calendar.trade_calendar(result["stockDate"].replace("-","/"),2)))
         else:
-            show = "策略选股: None"
+            show = "\r策略选股: None"
     else: show = "\r[%s]  Login-Thread Alive: %s" % (time.strftime("%X",time.localtime()),trader.thread_1.isAlive())
         #df=pd.DataFrame(trader.login_message['Data'])
         #df=df.ix[:,[0,5,1,6]]
@@ -154,7 +154,6 @@ def none_trade_time():
     show_assets()
     print '\n{0:=^82}'.format('\033[2;41m NON TRADING TIME \033[0m')
     show_transaction()
-
     show_stocklist()
 
     while not calendar.trade_time() and calendar.trade_day():
@@ -366,8 +365,6 @@ def trade_time():
                 code=result["data"][0]["code"]
                 codename= result["data"][0]["codeName"]
                 print "%s:[%s] ---> 购买日:%s\n" %((result["stockDate"], codename,calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
-                #log.info(u"[%s]选出:%s\n" % ((result["stockDate"], result["data"][0]["codeName"]) if result!=False else (" ","[]")))
-
                 Wtbh=monitor_buy(code,codename)
                 print "委托编号: [%s]\n" %  Wtbh,
                 stock_in_position=show_stocklist()
