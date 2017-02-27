@@ -119,7 +119,7 @@ def none_trade_day():
     quotation.stockcode=False
     quotation.resulult=False
     show_assets()
-    print '\n\n{0:=^82}'.format('\033[20;44m NON TRADING DAY \033[0m')
+    print '\n\n{0:=^81}'.format('\033[20;44m NON TRADING DAY \033[0m')
     show_transaction()
     stock_in_position = show_stocklist()
     if stock_in_position == False:
@@ -339,7 +339,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
         time.sleep(1)
 
 def trade_time():
-    print '\n\n{0:=^82}'.format('\033[20;46m TRADING TIME \033[0m')
+    print '\n\n{0:=^81}'.format('\033[20;46m TRADING TIME \033[0m')
     show_transaction()
     if quotation.kill==1:
         quotation.__init__()
