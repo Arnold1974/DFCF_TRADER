@@ -179,7 +179,7 @@ def monitor_buy(code,codename):
     while calendar.trade_time() and calendar.trade_day():
         buy_condition_0 = quotation.result['code'][0]==code
         buy_condition_1 = (float(quotation.result['price'][0])-float(quotation.result['pre_close'][0]))*100/float(quotation.result['pre_close'][0])>-9
-        buy_condition_2 = time.localtime()[3:6]>=(9,25,10) and time.localtime()[3:6]<=(9,30,6)
+        buy_condition_2 = time.localtime()[3:6]>=(9,25,30) and time.localtime()[3:6]<=(9,40,6)
      
         if buy_condition_0 and buy_condition_1 and buy_condition_2:
             if float(quotation.result['open'][0]) == float(quotation.result['amount'][0]) ==0:

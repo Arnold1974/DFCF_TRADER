@@ -61,8 +61,8 @@ class Strategy(object):
                 print e;time.sleep(2)
             else:       
                 if r.json()['success']==False:
-                    print r.json()['data']['crmMessage']
-                    print u"抱歉，服务器繁忙，请稍后再试！"
+                    print "<traceback>: %s" % r.json()['data']['crmMessage']
+                    #print u"抱歉，服务器繁忙，请稍后再试！"
                     time.sleep(1)
                     continue
                 #print r.json()['data']['stockData']['list']['data'][0]['codeName']   
