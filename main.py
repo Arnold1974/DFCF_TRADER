@@ -291,12 +291,12 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                          and time.localtime()[3:6]>=(14,59,0) and price_updated <> True \
                          and float(quotation.result['low'][0]) <> float(dfcf_quote['topprice'])  
         
-        # .3. 卖出日，非一字涨停，如果涨停价也不能触及止盈价，则涨到 5% 就卖出，不用等收盘
+        # .3. 卖出日，非一字涨停，如果涨停价也不能触及止盈价，则已昨收盘价为基础，涨到 4% 就卖出，不用等收盘
         sell_condition_3 = sell_day == time.strftime("%Y/%m/%d",time.localtime(time.time())) \
                          and price_updated <> True \
                          and float(dfcf_quote['topprice']) < stop_sell_price \
                          and float(quotation.result['low'][0]) <> float(dfcf_quote['topprice']) \
-                         and float(quotation.result['high'][0]) >= float(quotation.result['open'][0]) * 1.05 \
+                         and float(quotation.result['high'][0]) >= float(quotation.result['pre_close'][0]) * 1.04 \
                          and time.localtime()[3:6]>=(9,30,0)
                                          
         #符合条件则下单卖出
