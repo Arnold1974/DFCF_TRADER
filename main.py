@@ -347,8 +347,11 @@ def trade_time():
     stock_in_position=show_stocklist() #获取持仓的数据买卖日期
 
     while calendar.trade_time() and calendar.trade_day():
-        if stock_in_position and int(stock_in_position['Kysl'])<>0: #如果不空仓,且有股票可卖,监视价格变化是否达到止损止盈           
+        if stock_in_position and int(stock_in_position['Kysl'])<>0: #如果不空仓,且有股票可卖,监视价格变化是否达到止损止盈     
+            print 'Enter into Sell Porcedure...'
             monitor_sell(stock_in_position['Zqdm'],stock_in_position['buy_day'],stock_in_position['sell_day'],stock_in_position['Kysl'])
+            stock_in_position=show_stocklist() #更新持仓的数据
+            
         elif stock_in_position == False:  #position is empty, 需要开仓
             result= strategy.traceback()
             if result == False: #没有选出目标

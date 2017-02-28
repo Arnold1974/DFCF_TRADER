@@ -241,7 +241,7 @@ class DFCF_Trader(object):
                 GetKyzjAndKml=self.s.post('https://jy.xzsec.com/Trade/GetKyzjAndKml'+self.url_suffix, \
                                      {'stockCode':stockcode,'stockName':stockname,'price':price,'tradeType':tradetype});
                 Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
-                print GetKyzjAndKml.json()
+                #print GetKyzjAndKml.json()
                 if Kmml=='0':
                     print '可交易数量为0'
                     time.sleep(5)
