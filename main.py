@@ -154,16 +154,33 @@ def none_trade_time():
     show_assets()
     print '\n{0:=^81}'.format('\033[2;41m NON TRADING TIME \033[0m')
     show_transaction()
-    show_stocklist()
-
+    
+    stock_in_position = show_stocklist()
+    if stock_in_position == False:
+        result = strategy.traceback()
+        if result != False:
+            show = "\r%s 策略选股: %s [%s] ---> 购买日:%s" %((result["stockDate"], result["data"][0]["codeName"], \
+                 result["data"][0]["code"], calendar.trade_calendar(result["stockDate"].replace("-","/"),2)))
+        else:
+            show = "\r策略选股: None"
+    else: show = "\r[%s]  Login-Thread Alive: %s" % (time.strftime("%X",time.localtime()),trader.thread_1.isAlive())
+ 
     while not calendar.trade_time() and calendar.trade_day():
+        if int(time.time()) % 2:
+            sys.stdout.write(show)
+        else:
+            sys.stdout.write('\033[1;41m'+ show + '\033[0m')
+        sys.stdout.flush()
+        time.sleep(1)
+
+        '''
         if int(time.time()) % 2:
             sys.stdout.write("\r\033[2;41m[%s] %s\033[0m" % (time.strftime("%X",time.localtime()),"--> Non Trading Time !"))
         else:
             sys.stdout.write("\r[%s] %s" % (time.strftime("%X",time.localtime()),"-->                   "))
         sys.stdout.flush()
         time.sleep(1)
-
+        '''
 def monitor_buy(code,codename):
     print '=== Monitor Price for Buy: %s===' % code
     quotation.stockcode=code
