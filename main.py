@@ -129,7 +129,7 @@ def none_trade_day():
                  result["data"][0]["code"], calendar.trade_calendar(result["stockDate"].replace("-","/"),2)))
         else:
             show = "\r策略选股: None"
-    else: show = "\r[%s]  Login-Thread Alive: %s" % (time.strftime("%X",time.localtime()),trader.thread_1.isAlive())
+    else: show = "\rLogin-Thread Alive: %s" % (trader.thread_1.isAlive(),)
         #df=pd.DataFrame(trader.login_message['Data'])
         #df=df.ix[:,[0,5,1,6]]
         #df.columns = ['Date', 'Time','Account','Name']
@@ -143,7 +143,7 @@ def none_trade_day():
         if int(time.time()) % 2:
             sys.stdout.write(show)
         else:
-            sys.stdout.write('\033[1;44m'+ show + '\033[0m')
+            sys.stdout.write('\033[1;44m'+ show + time.strftime("%X",time.localtime())+ '\033[0m')
         sys.stdout.flush()
         time.sleep(1)
 
@@ -163,13 +163,13 @@ def none_trade_time():
                  result["data"][0]["code"], calendar.trade_calendar(result["stockDate"].replace("-","/"),2)))
         else:
             show = "\r策略选股: None"
-    else: show = "\r[%s]  Login-Thread Alive: %s" % (time.strftime("%X",time.localtime()),trader.thread_1.isAlive())
+    else: show = "\rLogin-Thread Alive: %s" % (trader.thread_1.isAlive(),)
  
     while not calendar.trade_time() and calendar.trade_day():
         if int(time.time()) % 2:
             sys.stdout.write(show)
         else:
-            sys.stdout.write('\033[1;41m'+ show + '\033[0m')
+            sys.stdout.write('\033[1;41m'+ show + "  " + time.strftime("%X",time.localtime()) + '\033[0m')
         sys.stdout.flush()
         time.sleep(1)
 
@@ -182,7 +182,7 @@ def none_trade_time():
         time.sleep(1)
         '''
 def monitor_buy(code,codename):
-    print '=== Monitor Price for Buy: %s===' % code
+    print '=== Monitor Price for Buy: %s ===' % code
     quotation.stockcode=code
 
     while quotation.result is False:
@@ -278,10 +278,10 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
     #print '跌停价格: %s' % dfcf_quote['bottomprice']
     
     #卖出日，非一字涨停，如果涨停价也不能触及止盈价，则涨到 5% 就卖出，不用等收盘
-    if sell_day == time.strftime("%Y/%m/%d",time.localtime(time.time())) \
+    if sell_day <= time.strftime("%Y/%m/%d",time.localtime(time.time())) \
                    and price_updated <> True \
                    and float(dfcf_quote['topprice']) < stop_sell_price:
-       print u'今日涨停价达不到止盈价, 因此盘中价格达到 5% 就卖出!' 
+       print u'今日涨停价达不到止盈价, 因此盘中价格达到 4% 就卖出!' 
 
     quotation.show=1
     while calendar.trade_time() and calendar.trade_day() and int(stock_amount)<>0:
