@@ -118,9 +118,11 @@ def none_trade_day():
     quotation.kill=1
     quotation.stockcode=False
     quotation.resulult=False
-    show_assets()
+    #show_assets()
     print '\n\n{0:=^81}'.format('\033[20;44m NON TRADING DAY \033[0m')
     show_transaction()
+    show_assets()    
+    
     stock_in_position = show_stocklist()
     if stock_in_position == False:
         result = strategy.traceback()
@@ -151,9 +153,10 @@ def none_trade_time():
     quotation.kill=1
     quotation.stockcode=False
     quotation.resulult=False
-    show_assets()
+    #show_assets()
     print '\n{0:=^81}'.format('\033[2;41m NON TRADING TIME \033[0m')
     show_transaction()
+    show_assets()
     
     stock_in_position = show_stocklist()
     if stock_in_position == False:
@@ -167,7 +170,7 @@ def none_trade_time():
  
     while not calendar.trade_time() and calendar.trade_day():
         if int(time.time()) % 2:
-            sys.stdout.write(show)
+            sys.stdout.write(show + "  ")
         else:
             sys.stdout.write('\033[1;41m'+ show + "  " + time.strftime("%X",time.localtime()) + '\033[0m')
         sys.stdout.flush()
@@ -309,7 +312,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                          and float(quotation.result['low'][0]) <> float(dfcf_quote['topprice'])  
         
         # .3. 卖出日，非一字涨停，如果涨停价也不能触及止盈价，则已昨收盘价为基础，涨到 4% 就卖出，不用等收盘
-        sell_condition_3 = sell_day == time.strftime("%Y/%m/%d",time.localtime(time.time())) \
+        sell_condition_3 = sell_day <= time.strftime("%Y/%m/%d",time.localtime(time.time())) \
                          and price_updated <> True \
                          and float(dfcf_quote['topprice']) < stop_sell_price \
                          and float(quotation.result['low'][0]) <> float(dfcf_quote['topprice']) \
