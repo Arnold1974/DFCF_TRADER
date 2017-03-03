@@ -124,8 +124,8 @@ class Strategy(object):
 
         
 if __name__=="__main__":
-    test=Strategy("QUERY_2_DAYS_HARD",25,5,10) # 2天策略： 25|5|10
-    #test=Strategy("QUERY_4_DAYS",20,5,8) # 2天策略： 25|5|10
+    #test=Strategy("QUERY_2_DAYS_HARD",25,5,10) # 2天策略： 25|5|10
+    test=Strategy("QUERY_4_DAYS",20,5,8) # 2天策略： 25|5|10
     from trade_calendar import TradeCalendar
     calendar=TradeCalendar()
 
