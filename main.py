@@ -143,9 +143,9 @@ def none_trade_day():
 
     while not calendar.trade_day():
         if int(time.time()) % 2:
-            sys.stdout.write(show)
+            sys.stdout.write(show + "  ")
         else:
-            sys.stdout.write('\033[1;44m'+ show + time.strftime("%X",time.localtime())+ '\033[0m')
+            sys.stdout.write('\033[1;44m'+ show + "  " + time.strftime("%X",time.localtime())+ '\033[0m')
         sys.stdout.flush()
         time.sleep(1)
 
