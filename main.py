@@ -57,7 +57,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
         todaydealdata=trader.gettodaydealdata()
         show=[]
         if len(todaydealdata) <> 0 or len(hisdealdata) <> 0:
-            dealdata=hisdealdata if len(todaydealdata)!=0 else hisdealdata
+            dealdata=todaydealdata if len(todaydealdata)!=0 else hisdealdata
             if dealdata[-1]['Zqmc']==stocklist[i]['Zqmc'] and dealdata[-1]['Mmlb_bs']=='B':
                 buy_date=dealdata[-1]['Cjrq']
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
