@@ -88,6 +88,9 @@ class PriceQuotation(object):
                           quote['realtimequote']['zdf']))
             
             sys.stdout.flush()
+
+
+# -------------------获取历史数据-----------------------------------------------
     def get_yahoo_hist_price(self,stockcode='000001.ss',s_date='2017-01-01',e_date=time.strftime('%Y-%m-%d',time.localtime())):
         '''
         yahoo 的历史数据
@@ -108,11 +111,14 @@ class PriceQuotation(object):
         url+='&d='+d+'&e='+e+'&f='+f+'&g=d&a='+a+'&b='+b+'&c='+c+'&ignore=.csv' #注意：月份要比实际月份少 1 
         df= pd.read_csv(url)
         return df
-# ------------------------------------------------------------------
+
 
 
 
     def get_hist_data(self,code='600898',s_date='2017-01-01',e_date=time.strftime('%Y-%m-%d',time.localtime())):
+        '''
+        tushare 的历史数据
+        '''
         #stockcode=code
         #start=s_date
         #end=e_date
