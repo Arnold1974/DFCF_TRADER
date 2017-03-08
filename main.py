@@ -304,7 +304,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
         sell_condition_1 = float(quotation.result['low'][0]) <= stop_loss_price  \
                          and time.localtime()[3:6]>=(9,30,1)
 
-        # .2. 卖出日，没触及止盈点，并且不是一字涨停 (最低价不等于涨停价),收盘价卖出               
+        # .2. 卖出日，没触及止盈点，并且不是一字涨停 (最低价不等于涨停价),收盘价卖出（如果即时选股没有标的， 则根据k线情况保留到下个交易日）              
         #     sell_day 为策略理论卖出日，如果因其他原因该卖没卖， 则以后会出现sell_day < 当前日期
         #     而且止盈点也没有出现， 应该自行卖出或由程序隔日卖出。所以条件设置 sell_day <= 当前日
         sell_condition_2 = sell_day <= time.strftime("%Y/%m/%d",time.localtime(time.time())) \
@@ -319,13 +319,20 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                          and float(quotation.result['high'][0]) >= float(quotation.result['pre_close'][0]) * 1.07 \
                          and time.localtime()[3:6]>=(9,30,0)
                                          
+       
         #符合条件则下单卖出
         if sell_condition_0 and (sell_condition_1 or sell_condition_2 or sell_condition_3):
-            #如果停牌
+            # 如果停牌
             if  float(quotation.result['open'][0]) == float(quotation.result['amount'][0]) ==0:
                 print "\n%s %s: Suspension\n" % (quotation.result['date'][0],quotation.result['name'][0])
                 while calendar.trade_time() and calendar.trade_day():
                     time.sleep(2)
+            # 正常持股到期， 如果策略即时选股为空， 则根据K线走势决定是否顺延到下一个交易日
+            if sell_condition_2 == True and len(strategy.pickstock()) == 0 and float(quotation.result['price'][0]) > stock_holding_price['Open']:
+                print u"正常持股到期， 策略即时选股为空， 则根据K线走势顺延到下一个交易日"
+                while calendar.trade_time() and calendar.trade_day():
+                    time.sleep(2)
+                    
             quotation.show=0
             sys.stdout.write("\r")
             sys.stdout.flush()
