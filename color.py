@@ -10,7 +10,7 @@
 from colorama import  init, Fore, Back, Style  
 init(autoreset=True)  
 class Colored(object):  
-  
+    
     #  前景色:红色  背景色:默认  
     def red(self, s):  
         return Fore.RED + s + Fore.RESET  
@@ -21,7 +21,7 @@ class Colored(object):
   
     #  前景色:黄色  背景色:默认  
     def yellow(self, s):  
-        return Fore.YELLOW + s + Fore.RESET  
+        return Fore.YELLOW + s + Fore.RESET
   
     #  前景色:蓝色  背景色:默认  
     def blue(self, s):  
@@ -45,8 +45,28 @@ class Colored(object):
   
     #  前景色:白色  背景色:绿色  
     def white_green(self, s):  
-        return Fore.WHITE + Back.GREEN + s + Fore.RESET + Back.RESET  
-  
+        return Fore.LIGHTWHITE_EX +  Back.GREEN + s + Fore.RESET + Back.RESET  
+
+    #  前景色:白色  背景色:红色  
+    def white_red(self, s):  
+        return Fore.LIGHTWHITE_EX +  Back.RED + s
+ 
+    #  前景色:白色  背景色:青色  
+    def white_cyan(self, s):  
+        return Fore.LIGHTWHITE_EX +  Back.CYAN  + s
+
+    #  前景色:白色  背景色:红色  
+    def white_magenta(self, s):  
+        return Fore.LIGHTWHITE_EX +  Back.MAGENTA + s
+    
+     #  前景色:白色  背景色:蓝色  
+    def white_blue(self, s):  
+        return Fore.LIGHTWHITE_EX +  Back.BLUE  + s
+
+    #  前景色:白色  背景色:黄色  
+    def white_yellow(self, s):  
+        return Fore.LIGHTWHITE_EX +  Back.YELLOW + s   
+    
 color = Colored()  
 print color.red('I am red!')  
 print color.green('I am gree!')  
@@ -55,4 +75,11 @@ print color.blue('I am blue!')
 print color.magenta('I am magenta!')  
 print color.cyan('I am cyan!')  
 print color.white('I am white!')  
-print color.white_green('I am white green!')  
+print color.white_green('I am white green!')
+print color.white_red('I am white green!')
+print color.white_cyan('I am white green!')
+print color.white_magenta('I am white green!')
+print color.white_blue('I am white green!')
+print color.white_yellow('I am white green!') 
+print(Style.DIM + 'and in dim text')
+
