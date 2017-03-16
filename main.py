@@ -13,6 +13,8 @@ import time
 import pandas as pd
 #import winsound
 from voice import playsound
+import colorama
+colorama.init()
 
 
 def thread_login_keep_alive():
@@ -24,12 +26,13 @@ def show_assets():
     assets=trader.getassets()
     if assets:
         assets.update(trader.login_message['Data'][0])
-        show= '\n\033[2;36m'+\
+        show= '\n\033[0;36m'+\
               "%(khmc)s [%(Syspm1)s]\t         Logged at: [%(Date)s - %(Time)s]\n" +\
               '{0:-^70}'.format('') +'\n'+\
               "总资产: %(Zzc)11s   可用资金: %(Kyzj)11s   可取资金: %(Kqzj)11s\n" +\
               "总市值: %(Zxsz)11s   冻结资金: %(Djzj)11s   资金余额: %(Zjye)11s\n" +\
-              '{0:-^70}'.format('')+ '\033[0m'
+              '{0:-^70}'.format('') + '\033[0m'
+              
         print show % assets
         ''' 
         print '\033[2;36m'

@@ -136,10 +136,10 @@ if __name__=="__main__":
 #------------------------
     result= test.traceback()
     if result!=False:
-        print "策略选股: %s  %s [%s] ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"], \
+        print u"策略选股: %s  %s [%s] ---> 购买日:%s\n" %((result["stockDate"], result["data"][0]["codeName"], \
              result["data"][0]["code"], calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "," "))
     else:
-        print "回测选股: []"
+        print u"回测选股: []"
    
 ##--------------------------------
     stime='2017-01-01'
@@ -166,4 +166,4 @@ if __name__=="__main__":
     print '{0:-^70}\n'.format('End')
 
     import os
-    #os.system('pause')
+    os.system('pause')

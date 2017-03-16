@@ -110,7 +110,7 @@ class PriceQuotation(object):
         url='http://table.finance.yahoo.com/table.csv?s='+stockcode
         url+='&d='+d+'&e='+e+'&f='+f+'&g=d&a='+a+'&b='+b+'&c='+c+'&ignore=.csv' #注意：月份要比实际月份少 1 
         df= pd.read_csv(url)
-        return df
+        return df.sort(ascending=False)
 
 
 
