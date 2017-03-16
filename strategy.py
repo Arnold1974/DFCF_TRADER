@@ -152,11 +152,13 @@ if __name__=="__main__":
             show=r[i]
             if len(show["stock_name"])==3:
                 show["stock_name"]=show["stock_name"]+'  '
-            print "%s  %s  %8s  %6s %6s %6s   %1.3f" % \
+            print "%s  %s  %8s  %6s %6s %6s   %d  %1.3f" % \
                  (show["stock_name"], 
-                  show["bought_at"], show["sold_at"], 
+                  show["bought_at"],
+                  show["sold_at"], 
                   show["buying_price"],show["selling_price"], 
                   show["signal_return_rate"], 
+                  time.strptime(show["bought_at"],'%Y-%m-%d').tm_wday+1,
                   (1+float(show["signal_return_rate"])/100)*portfolio)                       
             portfolio *= 1+float(show["signal_return_rate"])/100
 
