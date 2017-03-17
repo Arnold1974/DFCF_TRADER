@@ -122,8 +122,7 @@ class PriceQuotation(object):
                 return tushare.get_k_data(code,s_date,e_date)
             except Exception as e:
                 print e
-                continue;time.sleep(1)
-
+                time.sleep(1)
 
 
     def get_holding_period_price(self,code,buy_day):
