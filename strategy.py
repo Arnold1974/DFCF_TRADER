@@ -70,7 +70,7 @@ class Strategy(object):
                 #print  r.json()['data']['stockData'] #{u'errorCode': 100002, u'errorMsg': u'\u672a\u67e5\u8be2\u5230\u63a8\u8350\u80a1\u7968\u4ee3\u7801', u'list': []}
                 try:
                     num=r.json()['data']['stockData']['list']['stockNum']
-                except TypeError as e:
+                except Exception as e: #TypeError as e:
                     print e
                     time.sleep(1)
                     continue
@@ -166,4 +166,4 @@ if __name__=="__main__":
     print '{0:-^70}\n'.format('End')
 
     import os
-    os.system('pause')
+    #os.system('pause')

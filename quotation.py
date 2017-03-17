@@ -91,7 +91,7 @@ class PriceQuotation(object):
 
 
 # -------------------获取历史数据-----------------------------------------------
-    def get_yahoo_hist_price(self,stockcode='000001.ss',s_date='2017-01-01',e_date=time.strftime('%Y-%m-%d',time.localtime())):
+    def get_yahoo_hist_data(self,stockcode='000001.ss',s_date='2017-01-01',e_date=time.strftime('%Y-%m-%d',time.localtime())):
         '''
         yahoo 的历史数据
         深市数据链接：http://table.finance.yahoo.com/table.csv?s=000001.sz
@@ -110,25 +110,27 @@ class PriceQuotation(object):
         url='http://table.finance.yahoo.com/table.csv?s='+stockcode
         url+='&d='+d+'&e='+e+'&f='+f+'&g=d&a='+a+'&b='+b+'&c='+c+'&ignore=.csv' #注意：月份要比实际月份少 1 
         df= pd.read_csv(url)
-        return df.sort(ascending=False)
+        return df.sort_index(ascending=False)
 
 
-
-
-    def get_hist_data(self,code='600898',s_date='2017-01-01',e_date=time.strftime('%Y-%m-%d',time.localtime())):
+    def get_tushare_hist_data(self,code='600898',s_date='2017-01-01',e_date=time.strftime('%Y-%m-%d',time.localtime())):
         '''
         tushare 的历史数据
         '''
-        #stockcode=code
-        #start=s_date
-        #end=e_date
-        return tushare.get_k_data(code,s_date,e_date)
+        while True:
+            try:
+                return tushare.get_k_data(code,s_date,e_date)
+            except Exception as e:
+                print e
+                continue;time.sleep(1)
+
+
 
     def get_holding_period_price(self,code,buy_day):
         '''
         tushare 的历史行情数据
         '''
-        df=self.get_hist_data(code,buy_day)
+        df=self.get_tushare_hist_data(code,buy_day)
         index=df[df['date']==buy_day].index[0] #获取购买日的行号
         stock_holding_price={}
         stock_holding_price['Open']=float(format(df.ix[index,'open'], '.2f'))#*(1-float(strategy.lowerIncome)/100)
@@ -149,7 +151,7 @@ class PriceQuotation(object):
         return stock_holding_price
 if __name__=="__main__":
     '''
-    df=PriceQuotation().get_hist_price('600898','2017-02-01')
+    df=PriceQuotation().get_yahoo_hist_data('600898','2017-02-01')
     index=df[df['Date']=='2017-02-10'].index[0]
     Open,High,Low=df.ix[index,'Open'],df.ix[index,'High'],df.ix[index,'Low']
     show_list=[]
@@ -157,9 +159,10 @@ if __name__=="__main__":
     
     print df
     print index,show_list
+    
     '''
     test=PriceQuotation()
-    df=test.get_hist_data('600300','2017-02-01')
+    df=test.get_tushare_hist_data('600300','2017-02-01')
     index=df[df['date']=='2017-02-10'].index[0]
     Open,High,Low=df.ix[index,'open'],df['high'].max(),df['low'].min()
     show_list=[]
