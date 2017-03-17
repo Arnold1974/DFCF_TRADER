@@ -165,5 +165,10 @@ if __name__=="__main__":
         print '%s        --->  %s' % (show["stock_name"], calendar.trade_calendar(show["bought_at"].replace("-","/"),int(test.hold_days)))
     print '{0:-^70}\n'.format('End')
 
-    import os
+    #import os
     #os.system('pause')
+    test.query = "DDE大单净量大于0.25；涨跌幅大于2%小于5%；市盈率小于45；非st股；非创业板；总市值从小到大排列"
+    while True:
+        result=test.pickstock()
+        sys.stdout.write( "\r即时选股:  @%s  %s [%s]" % ((time.strftime('%X',time.localtime()),result[0][1],result[0][0][:6])if len(result)!=0 else (" ","[]"," ")))
+        time.sleep(1)
