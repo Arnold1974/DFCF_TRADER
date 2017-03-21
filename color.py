@@ -121,7 +121,7 @@ else:
             return Fore.LIGHTWHITE_EX +  Back.YELLOW + s      
     color = Colored()
     
-'''
+
 print color.red('I am red!')  
 print color.green('I am gree!')  
 print color.yellow('I am yellow!')  
@@ -136,4 +136,3 @@ print color.white_magenta('I am white green!')
 print color.white_blue('I am white green!')
 print color.white_yellow('I am white green!') 
 print(Style.DIM + 'and in dim text')
-'''

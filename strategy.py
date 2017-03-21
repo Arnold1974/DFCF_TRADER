@@ -43,8 +43,10 @@ class Strategy(object):
             except Exception as e:
                 print e;time.sleep(1)
             else:
-                return r.json()["data"]["result"]["result"]
-
+                try:
+                    return r.json()["data"]["result"]["result"]
+                except ValueError as e: #ValueError: No JSON object could be decoded
+                    print '<pickstock>',e;time.sleep(2)
     #回测选股--------------------------------------------
     def traceback(self):
         traceback_params=self.config["traceback_params"]
@@ -71,7 +73,7 @@ class Strategy(object):
                 try:
                     num=r.json()['data']['stockData']['list']['stockNum']
                 except Exception as e: #TypeError as e:
-                    print e
+                    print '<traceback>',e
                     time.sleep(1)
                     continue
                 if num!=0:
@@ -101,7 +103,7 @@ class Strategy(object):
             try:
                 r=self.s.post(self.config["TRANSACTION_URL"],data=transaction_params)
             except Exception as e:
-                print e;time.sleep(2)
+                print '<transaction>',e;time.sleep(2)
             else:    
                 try:
                     if r.json()['success']==False:
@@ -113,13 +115,13 @@ class Strategy(object):
                         try:
                             return r.json()['data'] 
                         except TypeError as e:
-                            print e
+                            print '<transaction>',e
                             time.sleep(1)
                             continue
                         else:
                             return False
                 except ValueError as e: # NO JSON object could be decoded
-                    print e;time.sleep(2)
+                    print '<transaction>',e;time.sleep(2)
                         
 
         
@@ -167,8 +169,9 @@ if __name__=="__main__":
 
     #import os
     #os.system('pause')
-    test.query = "DDE大单净量大于0.25；涨跌幅大于2%小于5%；市盈率小于45；非st股；非创业板；总市值从小到大排列"
+    import random
+    test.query = "DDE大单净量大于0.25；涨跌幅大于2%小于10.5%；市盈率小于45；非st股；非创业板；总市值从小到大排列"
     while True:
         result=test.pickstock()
         sys.stdout.write( "\r即时选股:  @%s  %s [%s]" % ((time.strftime('%X',time.localtime()),result[0][1],result[0][0][:6])if len(result)!=0 else (" ","[]"," ")))
-        time.sleep(1)
+        time.sleep(random.randint(2,10))

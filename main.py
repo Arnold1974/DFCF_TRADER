@@ -130,11 +130,11 @@ def none_trade_day():
     if stock_in_position == False:
         result = strategy.traceback()
         if result != False:
-            show = "\r%s 策略选股: %s [%s] ---> 购买日:%s" %((result["stockDate"], result["data"][0]["codeName"], \
+            show = u"\r%s 策略选股: %s [%s] ---> 购买日:%s" %((result["stockDate"], result["data"][0]["codeName"], \
                  result["data"][0]["code"], calendar.trade_calendar(result["stockDate"].replace("-","/"),2)))
         else:
-            show = "\r策略选股: None"
-    else: show = "\rLogin-Thread Alive: %s" % (trader.thread_1.isAlive(),)
+            show = u"\r策略选股: None"
+    else: show = u"\rLogin-Thread Alive: %s" % (trader.thread_1.isAlive(),)
         #df=pd.DataFrame(trader.login_message['Data'])
         #df=df.ix[:,[0,5,1,6]]
         #df.columns = ['Date', 'Time','Account','Name']
@@ -165,11 +165,11 @@ def none_trade_time():
     if stock_in_position == False:
         result = strategy.traceback()
         if result != False:
-            show = "\r%s 策略选股: %s [%s] ---> 购买日:%s" %((result["stockDate"], result["data"][0]["codeName"], \
+            show = u"\r%s 策略选股: %s [%s] ---> 购买日:%s" %((result["stockDate"], result["data"][0]["codeName"], \
                  result["data"][0]["code"], calendar.trade_calendar(result["stockDate"].replace("-","/"),2)))
         else:
-            show = "\r策略选股: None"
-    else: show = "\rLogin-Thread Alive: %s" % (trader.thread_1.isAlive(),)
+            show = u"\r策略选股: None"
+    else: show = u"\rLogin-Thread Alive: %s" % (trader.thread_1.isAlive(),)
  
     while not calendar.trade_time() and calendar.trade_day():
         if int(time.time()) % 2:
