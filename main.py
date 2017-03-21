@@ -331,7 +331,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                 while calendar.trade_time() and calendar.trade_day():
                     time.sleep(2)
             # 正常持股到期， 如果策略即时选股为空， 则根据K线走势决定是否顺延到下一个交易日
-            if sell_condition_2 == True and len(strategy.pickstock()) == 0 and float(quotation.result['price'][0]) > stock_holding_price['Open'] * 1.05:
+            if sell_condition_2 == True and len(strategy.pickstock()) == 0: # and float(quotation.result['price'][0]) > stock_holding_price['Open'] * 1.05:
                 print u"正常持股到期， 策略即时选股为空， 则根据K线走势顺延到下一个交易日"
                 while calendar.trade_time() and calendar.trade_day():
                     time.sleep(2)
