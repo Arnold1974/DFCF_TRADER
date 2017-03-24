@@ -243,7 +243,7 @@ class DFCF_Trader(object):
                 Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
                 #print GetKyzjAndKml.json()
                 if Kmml=='0':
-                    print '可交易数量为0'
+                    print u'可交易数量为0'
                     time.sleep(5)
                     break
             except ValueError: # ValueError: No JSON object could be decoded 超时返回登录前网页

@@ -53,7 +53,7 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
             #转换盈亏比例为2位浮点百分小数
             stocklist[i]['Ykbl']=str(float('%.2f' % (float(stocklist[i]['Ykbl'])*100)))+'%'
             stocklist[i]['Cwbl']=str('%.0f' % (float(stocklist[i]['Cwbl'])*100))+'%'
-            print '\033[1;42m%(Zqmc)s ==> 持仓:%(Zqsl)4s 可用:%(Kysl)4s  仓位:%(Cwbl)3s  涨跌:%(Ykbl)5s  盈亏:%(Ljyk)8s\033[0m' % stocklist[i]
+            print '\033[1;42m%(Zqmc)s ==> 持仓:%(Zqsl)4s 可用:%(Kysl)4s  仓位:%(Cwbl)3s  涨跌:%(Ykbl)8s  盈亏:%(Ljyk)8s\033[0m' % stocklist[i]
         st=time.strftime("%Y-%m-%d",time.localtime(time.time()-864000))
         et=time.strftime("%Y-%m-%d",time.localtime(time.time()))
         hisdealdata=trader.gethisdealdata(st=st,et=et)
@@ -346,7 +346,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                 #os.system("say order completed")
                 #winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
                 playsound(mac_say='transaction completed',win_sound='./wav/transaction completed.wav',frequency=450, duration=150)
-                print "委托编号: [%s]\n" %  Wtbh,
+                print u"委托编号: [%s]\n" %  Wtbh,
 
                 #查询当日委托状态， 如果未成则等待
                 while trader.getordersdata()[-1]['Wtzt'] <> '已成':
@@ -398,9 +398,9 @@ def trade_time():
             else: #选出目标， 开仓
                 code=result["data"][0]["code"]
                 codename= result["data"][0]["codeName"]
-                print "%s:[%s] ---> 购买日:%s\n" %((result["stockDate"], codename,calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
+                print u"%s:[%s] ---> 购买日:%s\n" %((result["stockDate"], codename,calendar.trade_calendar(result["stockDate"].replace("-","/"),2)) if result!=False else (" ","[]"," "))
                 Wtbh=monitor_buy(code,codename)
-                print "委托编号: [%s]\n" %  Wtbh,
+                print u"委托编号: [%s]\n" %  Wtbh,
                 stock_in_position=show_stocklist()
 
         else:
