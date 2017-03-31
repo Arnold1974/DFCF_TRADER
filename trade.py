@@ -7,14 +7,19 @@ import requests
 import json,re
 import threading
 import time,log
+from verifycode import VerifyCode
 from voice import playsound
 #from winsound import Beep
 #import winsound
-
+import random,string
+from PIL import Image
+import cStringIO
+import matplotlib.pyplot as plt
 
 class DFCF_Trader(object):
     def __init__(self):
         self.s = requests.session()
+        self.verify_code=VerifyCode()
         
         self.tradetime_flag=False
         self.login_flag=False
@@ -66,8 +71,33 @@ class DFCF_Trader(object):
                    'Connection':'keep-alive',
                    'Upgrade-Insecure-Requests':'1'         
                    } 
-        self.s.headers.update(headers) 
-        res=self.s.post('https://jy.xzsec.com/Login/Authentication',json.load(file("./config/dfcf.json")))
+        self.s.headers.update(headers)
+        
+        #获取验证码：
+        login_params=json.load(file("./config/dfcf.json"))
+
+        randNum="%.16f" % float(random.random())
+        url_yzm="https://jy.xzsec.com/Login/YZM?randNum=" + randNum
+        #img = Image.open(cStringIO.StringIO(self.s.get(url_yzm).content))
+        #img.show()
+        #vcode=raw_input('Enter:')
+        vcode="";digits=list(string.digits)
+        while True:
+            vcode,im=self.verify_code.get_verify_code(url_yzm)
+            if len(vcode) == 4:                        
+                for k in xrange(4):
+                    if vcode[k] not in digits: #[str(x) for x in xrange(10)]:
+                        break
+                else:
+                    plt.figure("verify code")
+                    plt.imshow(im)
+                    plt.show()
+                    print  "\rCode:[%4s]    Length:%2d" % (vcode, len(vcode))
+                    break
+                
+        login_params.update({'identifyCode':vcode,'randNumber':randNum})      
+        
+        res=self.s.post('https://jy.xzsec.com/Login/Authentication',login_params)
         
         #获取 validatekey：
         get_validatekey=self.s.get('https://jy.xzsec.com/Trade/Buy')

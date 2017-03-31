@@ -45,7 +45,8 @@ except ImportError:
         WHITE = '\033[37m'     # 白色      
         #: no color  
         RESET = '\033[0m'      # 终端默认颜色  
-      
+ 
+     
         def color_str(self, color, s):  
             return '{}{}{}'.format(  
                 getattr(self, color),  
@@ -136,3 +137,4 @@ print color.white_magenta('I am white green!')
 print color.white_blue('I am white green!')
 print color.white_yellow('I am white green!') 
 print(Style.DIM + 'and in dim text')
+

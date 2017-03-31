@@ -11,18 +11,20 @@ except ImportError:
     raise SystemExit
 
 #将图片放到内存中
-import cStringIO, urllib2
+import cStringIO,  requests, random , string
 import matplotlib.pyplot as plt
 import sys
-url_dfcf="https://jy.xzsec.com/Login/YZM?randNum=0.5609794557094574"
+url_yzm="https://jy.xzsec.com/Login/YZM?randNum=0.5609794557094574"
 
 class VerifyCode(object):
-    def get_verify_code(self):
-        #url ="http://www.qqct.com.cn/console/captcha"
+    def __init__(self):
+        self.s = requests.session()
         
-        file = urllib2.urlopen(url_dfcf)
-        tmpIm = cStringIO.StringIO(file.read())
-        im = Image.open(tmpIm)
+    def get_verify_code(self,url_yzm):
+        #url ="http://www.qqct.com.cn/console/captcha"
+
+        img = Image.open(cStringIO.StringIO(self.s.get(url_yzm).content))
+     
         '''
         im_1=im.crop((10,0,85,35)) #crop() : 从图像中提取出某个矩形大小的图像。它接收一个四元素的元组作为参数，
                             #各元素为（left, upper, right, lower），坐标系统的原点（0, 0）是左上角。
@@ -39,7 +41,7 @@ class VerifyCode(object):
         #print im.format, im.size, im.mode
         #im.show()
         '''
-        vcode = pytesseract.image_to_string(image=im, lang="eng", config="-psm 7")
+        vcode = pytesseract.image_to_string(image=img, lang="eng", config="-psm 7")
       
         #对于识别成字母的 采用该表进行修正  
         rep={'O':'0',  
@@ -50,22 +52,33 @@ class VerifyCode(object):
             };  
         for r in rep:  
             vcode = vcode.replace(r,rep[r]) 
-        return vcode,im
+        return vcode,img
 
 if __name__=="__main__":
+    randNum="%.16f" % float(random.random())
+    url_yzm="https://jy.xzsec.com/Login/YZM?randNum=" + randNum
+    
     test=VerifyCode()
-    i=0;vcode=""
-    while len(vcode)<>10 and i<1000:
-        vcode,im=test.get_verify_code()     
+    i=0;vcode="";digits=list(string.digits)
+    while len(vcode)<>100 and i<1000:
+        vcode,im=test.get_verify_code(url_yzm)     
         if len(vcode)==4:
+           
             for k in xrange(4):
-                if vcode[k] not in [str(x) for x in xrange(10)]:
+                if vcode[k] not in digits: #[str(x) for x in xrange(10)]:
                     break
             else:
                 plt.figure("verify code")
                 plt.imshow(im)
                 plt.show()
                 print  "\rCode:[%4s]    Length:%2d" % (vcode, len(vcode))
+            '''
+            try:
+                int(vcode)
+                break
+            except Exception: 
+                continue
+            '''
         sys.stdout.write( "\rCode:[%8s]    Length:%2d   Count: %d" % (vcode, len(vcode),i))
         sys.stdout.flush()
         i+=1

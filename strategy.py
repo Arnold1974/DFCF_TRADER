@@ -28,6 +28,7 @@ class Strategy(object):
         self.upperIncome=str(upperIncome)
         self.lowerIncome=str(lowerIncome)
         self.fallIncome=str(fallIncome)
+        self.proxie=self.config["proxie"]
         print '\n{0:-^70}'.format('')
         print u"[策略]:  %s   [止盈回撤止损]: %s|%s|%s   [满仓]: %s 只" % (arg_query,self.upperIncome,self.fallIncome,self.lowerIncome,self.stockHoldCount)
         print '{0:-^70}\n'.format('')
@@ -37,9 +38,10 @@ class Strategy(object):
     def pickstock(self):
         pickstock_params=self.config["pickstock_params"]
         pickstock_params.update({"w":self.query})
+
         while True:
             try:
-                r=self.s.get(self.config["PICKSTOCK_URL"],params=pickstock_params)
+                r=self.s.get(self.config["PICKSTOCK_URL"],params=pickstock_params,proxies=self.proxie)
             except Exception as e:
                 print e;time.sleep(1)
             else:
@@ -59,7 +61,7 @@ class Strategy(object):
                                 "endDate":" "})        
         while True:
             try:
-                r=self.s.post(self.config["STRATEGY_URL"],data=traceback_params,timeout=10)
+                r=self.s.post(self.config["STRATEGY_URL"],data=traceback_params,timeout=10,proxies=self.proxie)
             except Exception as e:
                 print e;time.sleep(2)
             else:       
@@ -101,7 +103,7 @@ class Strategy(object):
                           
         while True:
             try:
-                r=self.s.post(self.config["TRANSACTION_URL"],data=transaction_params)
+                r=self.s.post(self.config["TRANSACTION_URL"],data=transaction_params,proxies=self.proxie)
             except Exception as e:
                 print '<transaction>',e;time.sleep(2)
             else:    
@@ -128,7 +130,7 @@ class Strategy(object):
 if __name__=="__main__":
     
     test=Strategy("QUERY_2_DAYS_HARD",25,5,10) # 2天策略： 25|5|10
-    test=Strategy("QUERY_4_DAYS",20,5,8) # 2天策略： 25|5|10
+    #test=Strategy("QUERY_4_DAYS",20,5,8) # 2天策略： 25|5|10
     from trade_calendar import TradeCalendar
     calendar=TradeCalendar()
 
@@ -171,7 +173,9 @@ if __name__=="__main__":
     #os.system('pause')
     import random
     test.query = "DDE大单净量大于0.25；涨跌幅大于2%小于10.5%；市盈率小于45；非st股；非创业板；总市值从小到大排列"
+    '''
     while True:
         result=test.pickstock()
         sys.stdout.write( "\r即时选股:  @%s  %s [%s]" % ((time.strftime('%X',time.localtime()),result[0][1],result[0][0][:6])if len(result)!=0 else (" ","[]"," ")))
-        time.sleep(random.randint(2,10))
+        time.sleep(random.randint(20,100))
+    '''
