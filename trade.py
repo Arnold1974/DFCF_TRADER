@@ -89,9 +89,9 @@ class DFCF_Trader(object):
                     if vcode[k] not in digits: #[str(x) for x in xrange(10)]:
                         break
                 else:
-                    plt.figure("verify code")
-                    plt.imshow(im)
-                    plt.show()
+                    #plt.figure("verify code")
+                    #plt.imshow(im)
+                    #plt.show()
                     print  "\rCode:[%4s]    Length:%2d" % (vcode, len(vcode))
                     break
                 
