@@ -81,7 +81,7 @@ class DFCF_Trader(object):
         #img = Image.open(cStringIO.StringIO(self.s.get(url_yzm).content))
         #img.show()
         #vcode=raw_input('Enter:')
-        vcode="";digits=list(string.digits)
+        vcode=""; digits=list(string.digits); i=0
         while True:
             vcode,im=self.verify_code.get_verify_code(url_yzm)
             if len(vcode) == 4:                        
@@ -94,7 +94,10 @@ class DFCF_Trader(object):
                     #plt.show()
                     print  "\rCode:[%4s]    Length:%2d" % (vcode, len(vcode))
                     break
-                
+            sys.stdout.write(u"\r验证码:%10s " % (vcode))
+            sys.stdout.flush()
+            i+=1
+            
         login_params.update({'identifyCode':vcode,'randNumber':randNum})      
         
         res=self.s.post('https://jy.xzsec.com/Login/Authentication',login_params)
