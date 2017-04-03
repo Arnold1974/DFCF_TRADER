@@ -92,9 +92,9 @@ class DFCF_Trader(object):
                     #plt.figure("verify code")
                     #plt.imshow(im)
                     #plt.show()
-                    print  "\rCode:[%4s]    Length:%2d" % (vcode, len(vcode))
+                    print  "\rCode:[%4s]    Retry Times:%2d" % (vcode, i)
                     break
-            sys.stdout.write(u"\r验证码:%10s " % (vcode))
+            sys.stdout.write(u"\r验证码识别:%s " % (vcode))
             sys.stdout.flush()
             i+=1
             
