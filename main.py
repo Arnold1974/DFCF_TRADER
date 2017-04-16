@@ -434,7 +434,7 @@ if __name__=="__main__":
     if len(args)==5:
         strategy=Strategy(args[1],args[2],args[3],args[4])    
     else:
-        strategy=Strategy("QUERY_2_DAYS_HARD",25,5,10)
+        strategy=Strategy("QUERY_4_DAYS",20,5,8)
     time.sleep(.5)
     trader=DFCF_Trader()
     calendar=TradeCalendar()
