@@ -227,9 +227,9 @@ def monitor_buy(code,codename):
                 #return Wtbh             
                 #按照涨停价-0.01挂单，如果成交价格为开盘价， 则还有10%的资金未利用        
                 Wtbh_02 = None
-                if round(float(quotation.result['open'])*0.98,2)>=float(dfcf_quote['bottomprice']):
-                    log.info("Begin Buy -->  %s %s" % (codename,format(float(quotation.result['open'])*0.98, '.2f')))
-                    Wtbh_02=trader.deal(code,codename,format(float(quotation.result['open'])*0.98, '.2f'),'B')                
+                if round(float(quotation.result['pre_close'])*0.98,2)>=float(dfcf_quote['bottomprice']):
+                    log.info("Begin Buy -->  %s %s" % (codename,format(float(quotation.result['pre_close'])*0.98, '.2f')))
+                    Wtbh_02=trader.deal(code,codename,format(float(quotation.result['pre_close'])*0.98, '.2f'),'B')                
                     log.info('Deal Done!')
                 #--------------------------------------------------------------------------    
                 return Wtbh + " | " + Wtbh_02 if Wtbh_02 is not None else Wtbh
