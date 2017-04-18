@@ -359,9 +359,9 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                 stock_amount=trader.getstocklist()[-1]['Kysl'] 
             else:
                 break
-        #每天中午12：30刷新持仓， 同时也可让Login 的 180分钟 有效期重新开始计算
+        #每天中午12：11刷新持仓， 同时也可让Login 的 180分钟 有效期重新开始计算
         if time.localtime()[3]==12 and \
-           time.localtime()[4]==35 and \
+           time.localtime()[4]==11 and \
            time.localtime()[5]>10 and \
            time.localtime()[5]<12:
             quotation.show=0
