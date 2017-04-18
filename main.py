@@ -335,7 +335,7 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                 print u"正常持股到期， 策略即时选股为空， 则根据K线走势顺延到下一个交易日"
                 while calendar.trade_time() and calendar.trade_day():
                     time.sleep(2)
-                    
+                break    
             quotation.show=0
             sys.stdout.write("\r")
             sys.stdout.flush()
