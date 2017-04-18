@@ -171,7 +171,7 @@ if __name__=="__main__":
 
     #import os
     #os.system('pause')
-    import random
+    #import random
     test.query = "DDE大单净量大于0.25；涨跌幅大于2%小于10.5%；市盈率小于45；非st股；非创业板；总市值从小到大排列"
     '''
     while True:
