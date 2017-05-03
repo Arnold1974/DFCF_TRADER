@@ -5,7 +5,7 @@
 import sys
 import requests
 import json,re
-import threading
+import threading,Queue
 import time,log
 from verifycode import VerifyCode
 from voice import playsound
@@ -20,13 +20,18 @@ class DFCF_Trader(object):
     def __init__(self):
         self.s = requests.session()
         self.verify_code=VerifyCode()
+        self.queue=Queue.Queue(maxsize=10)
         
         self.tradetime_flag=False
         self.login_flag=False
         self.kill=0
         self.thread_1 = threading.Thread(target=self.login,name='Thread-login')
+        self.thread_2 = threading.Thread(target=self.generate_vcode_queue,name='Thread-queue')
         self.thread_1.setDaemon(True)
+        self.thread_2.setDaemon(True)
+        self.thread_2.start()
         self.thread_1.start()
+        
 
 #登陆
     def login(self):
@@ -72,34 +77,36 @@ class DFCF_Trader(object):
                    'Upgrade-Insecure-Requests':'1'         
                    } 
         self.s.headers.update(headers)
-        
-        #获取验证码：
         login_params=json.load(file("./config/dfcf.json"))
 
-        randNum="%.16f" % float(random.random())
-        url_yzm="https://jy.xzsec.com/Login/YZM?randNum=" + randNum
-        #img = Image.open(cStringIO.StringIO(self.s.get(url_yzm).content))
-        #img.show()
-        #vcode=raw_input('Enter:')
-        vcode=""; digits=list(string.digits); i=0
-        while True:
-            vcode,im=self.verify_code.get_verify_code(url_yzm)
-            if len(vcode) == 4:                        
-                for k in xrange(4):
-                    if vcode[k] not in digits: #[str(x) for x in xrange(10)]:
+        #获取验证码：
+        try:
+            randNum,vcode=self.queue.get(block=False)
+            print "use queue: %d, vcode: %s, randNum: %s" % (self.queue.qsize(),vcode,randNum)
+        except:
+            randNum="%.16f" % float(random.random())
+            url_yzm="https://jy.xzsec.com/Login/YZM?randNum=" + randNum
+            #img = Image.open(cStringIO.StringIO(self.s.get(url_yzm).content))
+            #img.show()
+            #vcode=raw_input('Enter:')
+            vcode=""; digits=list(string.digits); i=0
+            while True:
+                vcode,im=self.verify_code.get_verify_code(url_yzm)
+                if len(vcode) == 4:                        
+                    for k in xrange(4):
+                        if vcode[k] not in digits: #[str(x) for x in xrange(10)]:
+                            break
+                    else:
+                        #plt.figure("verify code")
+                        #plt.imshow(im)
+                        #plt.show()
+                        print  "\rCode:[%4s]    Retry Times:%2d" % (vcode, i)
                         break
-                else:
-                    #plt.figure("verify code")
-                    #plt.imshow(im)
-                    #plt.show()
-                    print  "\rCode:[%4s]    Retry Times:%2d" % (vcode, i)
-                    break
-            sys.stdout.write(u"\r验证码识别:%s " % (vcode))
-            sys.stdout.flush()
-            i+=1
-            
-        login_params.update({'identifyCode':vcode,'randNumber':randNum})      
-        
+                sys.stdout.write(u"\r验证码识别:%s " % (vcode))
+                sys.stdout.flush()
+                i+=1
+
+        login_params.update({'identifyCode':vcode,'randNumber':randNum})            
         res=self.s.post('https://jy.xzsec.com/Login/Authentication',login_params)
         
         #获取 validatekey：
@@ -118,6 +125,27 @@ class DFCF_Trader(object):
                     self.login_message += key +" %s" % res.json()["Data"][i][key]
         '''        
         return self.login_message
+
+#生成验证码队列
+    def generate_vcode_queue(self):
+        while True:
+            if self.kill==1:
+                break
+            randNum="%.16f" % float(random.random())
+            url_yzm="https://jy.xzsec.com/Login/YZM?randNum=" + randNum
+            vcode=""; digits=list(string.digits)
+            while True:
+                vcode,im=self.verify_code.get_verify_code(url_yzm)
+                if len(vcode) == 4:                        
+                    for k in xrange(4):
+                        if vcode[k] not in digits: #[str(x) for x in xrange(10)]:
+                            break
+                    else:
+                        print  "qsize: %2d" % self.queue.qsize()
+                        break
+            self.queue.put([randNum, vcode],block=True)
+            time.sleep(.5)
+
         
 #资产列表
     def getassets(self):
