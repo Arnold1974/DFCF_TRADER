@@ -62,7 +62,6 @@ class DFCF_Trader(object):
                     #Beep(600,500)
                     playsound(mac_say='connection lost',win_sound='./wav/connection lost.wav',frequency=600, duration=500)
                     time.sleep(1)
-                    
                     log.info("Login connection lost !!!")
             time.sleep(.5)
             
@@ -109,6 +108,9 @@ class DFCF_Trader(object):
         login_params.update({'identifyCode':vcode,'randNumber':randNum})            
         res=self.s.post('https://jy.xzsec.com/Login/Authentication',login_params)
         
+        if int(res.json()["Status"]) <> 0:
+            return
+        
         #获取 validatekey：
         get_validatekey=self.s.get('https://jy.xzsec.com/Trade/Buy')
         if re.search(r'em_validatekey.*?>',get_validatekey.text).group():
@@ -116,15 +118,18 @@ class DFCF_Trader(object):
             #print "\nvalidatekey: %s" % self.validatekey
             self.url_suffix='?validatekey='+self.validatekey
             
-            self.login_flag=True if int(res.json()["Status"])==0 else False         
+            self.login_flag=True        
             self.login_message=res.json()
+            return self.login_message
+        else:
+            return
         '''
         self.login_message= "message(%s), Status(%s)" % (res.json()["Message"], res.json()["Status"])
         for i in xrange(len(res.json()["Data"])):
             for key  in res.json()["Data"][i]:
                     self.login_message += key +" %s" % res.json()["Data"][i][key]
         '''        
-        return self.login_message
+        
 
 #生成验证码队列
     def generate_vcode_queue(self):
