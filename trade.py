@@ -41,7 +41,7 @@ class DFCF_Trader(object):
                 break
             if not self.login_flag:
                 #print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Logging...')
-                log.info('Logging...')
+                log.info('Logging ...')
                 try:
                     self.__authorization()
                     #print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Login Success!')
@@ -149,7 +149,7 @@ class DFCF_Trader(object):
                         print  "qsize: %2d" % self.queue.qsize()
                         break
             self.queue.put([randNum, vcode],block=True)
-            time.sleep(.5)
+            #time.sleep(.5)
 
         
 #资产列表
