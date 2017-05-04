@@ -333,8 +333,11 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                 print "\n%s %s: Suspension\n" % (quotation.result['date'][0],quotation.result['name'][0])
                 while calendar.trade_time() and calendar.trade_day():
                     time.sleep(2)
-            # 正常持股到期， 如果策略即时选股为空，并且盈利 7个点以上，则根据K线走势决定是否顺延到下一个交易日
-            if sell_condition_2 == True and len(strategy.pickstock()) == 0 and float(quotation.result['price'][0]) > stock_holding_price['Open'] * 1.07:
+            # 正常持股到期， 如果策略即时选股为空，并且盈利 7个点以上，红柱，距离最高价不低于1%， 则顺延到下一个交易日
+            if sell_condition_2 == True and len(strategy.pickstock()) == 0 \
+               and float(quotation.result['price'][0]) > float(quotation.result['open'][0]) \
+               and float(quotation.result['price'][0]) >= (float(quotation.result['high'][0]) - float(quotation.result['pre_close'][0])*0.01)\
+               and float(quotation.result['price'][0]) > stock_holding_price['Open'] * 1.07:
                 print u"正常持股到期， 策略即时选股为空，且盈利超过7个点，则顺延到下一个交易日"
                 while calendar.trade_time() and calendar.trade_day():
                     time.sleep(2)

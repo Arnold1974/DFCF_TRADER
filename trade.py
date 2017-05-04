@@ -20,7 +20,7 @@ class DFCF_Trader(object):
     def __init__(self):
         self.s = requests.session()
         self.verify_code=VerifyCode()
-        self.queue=Queue.Queue(maxsize=10)
+        self.queue=Queue.Queue(maxsize=5)
         
         self.tradetime_flag=False
         self.login_flag=False
@@ -146,7 +146,7 @@ class DFCF_Trader(object):
                         if vcode[k] not in digits: #[str(x) for x in xrange(10)]:
                             break
                     else:
-                        print  "qsize: %2d" % self.queue.qsize()
+                        #print  "qsize: %2d" % self.queue.qsize()
                         break
             self.queue.put([randNum, vcode],block=True)
             #time.sleep(.5)
