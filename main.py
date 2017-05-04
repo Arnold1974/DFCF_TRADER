@@ -211,7 +211,9 @@ def monitor_buy(code,codename):
             quotation.show=0
             print '\n'
             log.info("Begin Buy -->  %s" % codename)
-            Wtbh=trader.deal(code,codename,str(float(dfcf_quote['topprice'])-0.01),'B') #['topprice']
+            #Wtbh=trader.deal(code,codename,str(float(dfcf_quote['topprice'])-0.01),'B') 
+            Wtbh=trader.deal(code,codename,format(float(dfcf_quote['fivequote']['yesClosePrice'])*0.98, '.2f'),'B') 
+            
 
             if Wtbh is not None:
                 log.info('Buy Order Accomplished!')
@@ -227,9 +229,9 @@ def monitor_buy(code,codename):
                 #return Wtbh             
                 #按照涨停价-0.01挂单，如果成交价格为开盘价， 则还有10%的资金未利用        
                 Wtbh_02 = None
-                if round(float(quotation.result['pre_close'])*0.98,2)>=float(dfcf_quote['bottomprice']):
-                    log.info("Begin Buy -->  %s %s" % (codename,format(float(quotation.result['pre_close'])*0.98, '.2f')))
-                    Wtbh_02=trader.deal(code,codename,format(float(quotation.result['pre_close'])*0.98, '.2f'),'B')                
+                if round(float(quotation.result['pre_close'])*0.97,2)>=float(dfcf_quote['bottomprice']):
+                    log.info("Begin Buy -->  %s %s" % (codename,format(float(quotation.result['pre_close'])*0.97, '.2f')))
+                    Wtbh_02=trader.deal(code,codename,format(float(quotation.result['pre_close'])*0.97, '.2f'),'B')                
                     log.info('Deal Done!')
                 #--------------------------------------------------------------------------    
                 return Wtbh + " | " + Wtbh_02 if Wtbh_02 is not None else Wtbh
@@ -316,13 +318,13 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
         
         # .3. 卖出日，非一字涨停，如果涨停价也不能触及止盈价，则已昨收盘价为基础，涨到 4% 后，最高点回落 1% 就卖出，不用等收盘
         sell_condition_3 = sell_day <= time.strftime("%Y/%m/%d",time.localtime(time.time())) \
+                         and time.localtime()[3:6]>=(9,30,0) \
                          and price_updated <> True \
                          and float(dfcf_quote['topprice']) < stop_sell_price \
                          and float(quotation.result['low'][0]) <> float(dfcf_quote['topprice']) \
                          and float(quotation.result['high'][0]) >= float(quotation.result['pre_close'][0]) * 1.04 \
-                         and float(quotation.result['price'][0]) < (float(quotation.result['high'][0])-float(quotation.result['pre_close'][0]) * 0.01)  \
-                         and time.localtime()[3:6]>=(9,30,0)
-                                         
+                         and float(quotation.result['price'][0]) < (float(quotation.result['high'][0])-float(quotation.result['pre_close'][0]) *0.0025*(10-(float(quotation.result['high'][0])-float(quotation.result['pre_close'][0]))/float(quotation.result['pre_close'][0])*100))
+                         #and float(quotation.result['price'][0]) < (float(quotation.result['high'][0])-float(quotation.result['pre_close'][0]) * 0.01)  \                
        
         #符合条件则下单卖出
         if sell_condition_0 and (sell_condition_1 or sell_condition_2 or sell_condition_3):
@@ -331,9 +333,9 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                 print "\n%s %s: Suspension\n" % (quotation.result['date'][0],quotation.result['name'][0])
                 while calendar.trade_time() and calendar.trade_day():
                     time.sleep(2)
-            # 正常持股到期， 如果策略即时选股为空， 则根据K线走势决定是否顺延到下一个交易日
-            if sell_condition_2 == True and len(strategy.pickstock()) == 0: # and float(quotation.result['price'][0]) > stock_holding_price['Open'] * 1.05:
-                print u"正常持股到期， 策略即时选股为空， 则根据K线走势顺延到下一个交易日"
+            # 正常持股到期， 如果策略即时选股为空，并且盈利 7个点以上，则根据K线走势决定是否顺延到下一个交易日
+            if sell_condition_2 == True and len(strategy.pickstock()) == 0 and float(quotation.result['price'][0]) > stock_holding_price['Open'] * 1.07:
+                print u"正常持股到期， 策略即时选股为空，且盈利超过7个点，则顺延到下一个交易日"
                 while calendar.trade_time() and calendar.trade_day():
                     time.sleep(2)
                 break    
