@@ -61,8 +61,8 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
         show=[]
         if len(todaydealdata) <> 0 or len(hisdealdata) <> 0:
             dealdata=todaydealdata if len(todaydealdata)!=0 else hisdealdata
-            if dealdata[-1]['Zqmc']==stocklist[i]['Zqmc'] and dealdata[-1]['Mmlb_bs']=='B':
-                buy_date=dealdata[-1]['Cjrq']
+            if dealdata[0]['Zqmc']==stocklist[0]['Zqmc'] and dealdata[0]['Mmlb_bs']=='B':
+                buy_date=dealdata[0]['Cjrq']
                 buy_date='%s%s%s%s/%s%s/%s%s' % tuple(list(buy_date))
                 buy_date_for_return=buy_date.replace('/','-')
 
@@ -93,10 +93,10 @@ def show_stocklist(): #获取持仓股票的买入日期，持仓数据中不显
                         
                 #print '\n'+' '*13*(k) +'       ---->'
                 #print '买入日: %s   卖出日: %s' % (buy_date, calendar.trade_calendar(buy_date,4))
-                stocklist[i]['sell_day']=calendar.trade_calendar(buy_date,int(strategy.hold_days))
-                stocklist[i]['buy_day']=buy_date_for_return
+                stocklist[0]['sell_day']=calendar.trade_calendar(buy_date,int(strategy.hold_days))
+                stocklist[0]['buy_day']=buy_date_for_return
 
-    return stocklist[i]
+    return stocklist[0]
 
 def show_transaction():
     start_day=time.strftime("%Y",time.localtime())+'-01-01'
@@ -221,7 +221,7 @@ def monitor_buy(code,codename):
                 #winsound.PlaySound('./wav/transaction completed.wav',winsound.SND_ASYNC)
                 playsound(mac_say='transaction completed',win_sound='./wav/transaction completed.wav',frequency=450, duration=150)
                 #查询当日委托状态， 如果未成则等待
-                while trader.getordersdata()[-1]['Wtzt'] <> '已成':
+                while trader.getordersdata()[0]['Wtzt'] <> '已成':
                     sys.stdout.write("\r委托编号:[%s] 还未成交!" % Wtbh)
                     sys.stdout.flush()
                     time.sleep(5)
@@ -355,14 +355,14 @@ def monitor_sell(code,buy_day,sell_day,stock_amount):
                 print u"委托编号: [%s]\n" %  Wtbh,
 
                 #查询当日委托状态， 如果未成则等待
-                while trader.getordersdata()[-1]['Wtzt'] <> '已成':
+                while trader.getordersdata()[0]['Wtzt'] <> '已成':
                     sys.stdout.write("\r委托编号: [%s] 还未成交!" % Wtbh)
                     sys.stdout.flush()
                     time.sleep(5)
                 sys.stdout.write("\r")
                 sys.stdout.flush()
                 log.info('Deal Done!')
-                stock_amount=trader.getstocklist()[-1]['Kysl'] 
+                stock_amount=trader.getstocklist()[0]['Kysl'] 
             else:
                 break
         #每天中午12：11刷新持仓， 同时也可让Login 的 180分钟 有效期重新开始计算
@@ -440,7 +440,7 @@ if __name__=="__main__":
     if len(args)==5:
         strategy=Strategy(args[1],args[2],args[3],args[4])    
     else:
-        strategy=Strategy("QUERY_4_DAYS",20,5,8)
+        strategy=Strategy("QUERY_2_DAYS_HARD",20,5,10)
     time.sleep(.5)
     trader=DFCF_Trader()
     calendar=TradeCalendar()

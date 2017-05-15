@@ -20,18 +20,33 @@ class DFCF_Trader(object):
     def __init__(self):
         self.s = requests.session()
         self.verify_code=VerifyCode()
-        self.queue=Queue.Queue(maxsize=5)
+        self.queue=Queue.Queue(maxsize=20)
         
         self.tradetime_flag=False
         self.login_flag=False
         self.kill=0
+        '''
+        for i in xrange(5):
+            thread_queue = threading.Thread(target=self.generate_vcode_queue,name='Thread-queue')
+            thread_queue.setDaemon(True)
+            thread_queue.start()
+        for i in xrange(5):
+            thread_login=threading.Thread(target=self.login,name='Thread-login-'+str(i))
+            thread_login.setDaemon(True)
+            thread_login.start()
+        '''         
         self.thread_1 = threading.Thread(target=self.login,name='Thread-login')
         self.thread_2 = threading.Thread(target=self.generate_vcode_queue,name='Thread-queue')
+        self.thread_3 = threading.Thread(target=self.generate_vcode_queue,name='Thread-queue-2')
+        self.thread_4 = threading.Thread(target=self.generate_vcode_queue,name='Thread-queue-3')      
         self.thread_1.setDaemon(True)
         self.thread_2.setDaemon(True)
+        self.thread_3.setDaemon(True)
+        self.thread_4.setDaemon(True)
         self.thread_2.start()
-        self.thread_1.start()
-        
+        self.thread_3.start()
+        self.thread_4.start()
+        self.thread_1.start()   
 
 #登陆
     def login(self):
