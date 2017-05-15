@@ -212,7 +212,7 @@ def monitor_buy(code,codename):
             print '\n'
             log.info("Begin Buy -->  %s" % codename)
             #Wtbh=trader.deal(code,codename,str(float(dfcf_quote['topprice'])-0.01),'B') 
-            Wtbh=trader.deal(code,codename,format(float(dfcf_quote['fivequote']['yesClosePrice'])*0.98, '.2f'),'B') 
+            Wtbh=trader.deal(code,codename,format(float(dfcf_quote['fivequote']['yesClosePrice'])*0.965, '.2f'),'B') 
             
 
             if Wtbh is not None:
@@ -229,9 +229,9 @@ def monitor_buy(code,codename):
                 #return Wtbh             
                 #按照涨停价-0.01挂单，如果成交价格为开盘价， 则还有10%的资金未利用        
                 Wtbh_02 = None
-                if round(float(quotation.result['pre_close'])*0.97,2)>=float(dfcf_quote['bottomprice']):
-                    log.info("Begin Buy -->  %s %s" % (codename,format(float(quotation.result['pre_close'])*0.97, '.2f')))
-                    Wtbh_02=trader.deal(code,codename,format(float(quotation.result['pre_close'])*0.97, '.2f'),'B')                
+                if round(float(quotation.result['pre_close'])*0.96,2)>=float(dfcf_quote['bottomprice']):
+                    log.info("Begin Buy -->  %s %s" % (codename,format(float(quotation.result['pre_close'])*0.96, '.2f')))
+                    Wtbh_02=trader.deal(code,codename,format(float(quotation.result['pre_close'])*0.96, '.2f'),'B')                
                     log.info('Deal Done!')
                 #--------------------------------------------------------------------------    
                 return Wtbh + " | " + Wtbh_02 if Wtbh_02 is not None else Wtbh
