@@ -20,36 +20,111 @@ class DFCF_Trader(object):
     def __init__(self):
         self.s = requests.session()
         self.verify_code=VerifyCode()
-        self.queue=Queue.Queue(maxsize=20)
+        self.queue=Queue.Queue(maxsize=15)
         
         self.tradetime_flag=False
         self.login_flag=False
         self.kill=0
-        '''
+
         for i in xrange(5):
-            thread_queue = threading.Thread(target=self.generate_vcode_queue,name='Thread-queue')
+            thread_queue = threading.Thread(target=self.generate_vcode_queue,name='Thread-queue-'+str(i))
             thread_queue.setDaemon(True)
             thread_queue.start()
-        for i in xrange(5):
-            thread_login=threading.Thread(target=self.login,name='Thread-login-'+str(i))
-            thread_login.setDaemon(True)
-            thread_login.start()
-        '''         
-        self.thread_1 = threading.Thread(target=self.login,name='Thread-login')
-        self.thread_2 = threading.Thread(target=self.generate_vcode_queue,name='Thread-queue')
-        self.thread_3 = threading.Thread(target=self.generate_vcode_queue,name='Thread-queue-2')
-        self.thread_4 = threading.Thread(target=self.generate_vcode_queue,name='Thread-queue-3')      
-        self.thread_1.setDaemon(True)
-        self.thread_2.setDaemon(True)
-        self.thread_3.setDaemon(True)
-        self.thread_4.setDaemon(True)
-        self.thread_2.start()
-        self.thread_3.start()
-        self.thread_4.start()
-        self.thread_1.start()   
+        self.thread_login=threading.Thread(target=self.login,name='Thread-login')
+        self.thread_login.setDaemon(True)
+        self.thread_login.start()
+ 
 
 #登陆
     def login(self):
+        #log.info('%s Active...' % threading.current_thread().name)
+        while True:
+            if self.kill==1:
+                break
+            if not self.login_flag:
+                #print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Logging...')
+                log.info('Logging ...')
+                for i in xrange(2):
+                    self.thread_auth = threading.Thread(target=self.__authorization,name='Thread-auth-'+str(i))                   
+                    self.thread_auth.setDaemon(True)
+                    self.thread_auth.start()
+                while self.login_flag==False:
+                    time.sleep(.5)
+                print  '[%s] : %s' % (time.strftime('%H:%M:%S') ,'Login Success!')
+                playsound(mac_say='login success',win_sound='./wav/login success.wav',frequency=450, duration=150)
+
+            time.sleep(.5)
+            
+    def __authorization(self):
+        while self.login_flag==False:
+            headers = {'Host': 'jy.xzsec.com',
+                       'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:50.0) Gecko/20100101 Firefox/50.0',
+                       'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                       'Accept-Language':'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3',
+                       'Accept-Encoding':'gzip, deflate, br',
+                       'Referer':'https://jy.xzsec.com/Trade/Buy',
+                       'Connection':'keep-alive',
+                       'Upgrade-Insecure-Requests':'1'         
+                       } 
+            self.s.headers.update(headers)
+            login_params=json.load(file("./config/dfcf.json"))
+    
+            #获取验证码：
+            try:
+                randNum,vcode=self.queue.get(block=False)
+                print "use queue: %d, vcode: %s, randNum: %s" % (self.queue.qsize(),vcode,randNum)
+            except:
+                randNum="%.16f" % float(random.random())
+                url_yzm="https://jy.xzsec.com/Login/YZM?randNum=" + randNum
+                #img = Image.open(cStringIO.StringIO(self.s.get(url_yzm).content))
+                #img.show()
+                #vcode=raw_input('Enter:')
+                vcode=""; digits=list(string.digits); i=0
+                while True:
+                    if self.login_flag==True: return
+                    vcode,im=self.verify_code.get_verify_code(url_yzm)
+                    if len(vcode) == 4:                        
+                        for k in xrange(4):
+                            if vcode[k] not in digits: #[str(x) for x in xrange(10)]:
+                                break
+                        else:
+                            #plt.figure("verify code")
+                            #plt.imshow(im)
+                            #plt.show()
+                            print  "\rCode:[%4s]    Retry Times:%2d" % (vcode, i)
+                            break
+                    sys.stdout.write(u"\r验证码识别:%s " % (vcode))
+                    sys.stdout.flush()
+                    i+=1
+            
+            if self.login_flag==True: return
+
+            login_params.update({'identifyCode':vcode,'randNumber':randNum})            
+            res=self.s.post('https://jy.xzsec.com/Login/Authentication',login_params)
+            
+            if int(res.json()["Status"]) <> 0:
+                playsound(mac_say='login failed',win_sound='./wav/login failed.wav',frequency=450, duration=150)
+                continue
+ 
+            if self.login_flag==True: return
+            
+            #获取 validatekey：
+            get_validatekey=self.s.get('https://jy.xzsec.com/Trade/Buy')
+            if re.search(r'em_validatekey.*?>',get_validatekey.text).group():
+                self.validatekey= re.search(r'em_validatekey.*?>',get_validatekey.text).group()[37:73]
+                #print "\nvalidatekey: %s" % self.validatekey
+                self.url_suffix='?validatekey='+self.validatekey
+                
+                self.login_flag=True        
+                self.login_message=res.json()
+                return self.login_message
+            else:
+                continue
+
+
+
+#登陆
+    def login_a(self):
         #log.info('%s Active...' % threading.current_thread().name)
         while True:
             if self.kill==1:
@@ -80,7 +155,7 @@ class DFCF_Trader(object):
                     log.info("Login connection lost !!!")
             time.sleep(.5)
             
-    def __authorization(self):
+    def __authorization_a(self):
         headers = {'Host': 'jy.xzsec.com',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:50.0) Gecko/20100101 Firefox/50.0',
                    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',

@@ -169,7 +169,7 @@ def none_trade_time():
                  result["data"][0]["code"], calendar.trade_calendar(result["stockDate"].replace("-","/"),2)))
         else:
             show = u"\r策略选股: None"
-    else: show = u"\rLogin-Thread Alive: %s" % (trader.thread_1.isAlive(),)
+    else: show = u"\rLogin-Thread Alive: %s" % (trader.thread_login.isAlive(),)
  
     while not calendar.trade_time() and calendar.trade_day():
         if int(time.time()) % 2:
