@@ -212,9 +212,24 @@ def monitor_buy(code,codename):
             print '\n'
             log.info("Begin Buy -->  %s" % codename)
             #Wtbh=trader.deal(code,codename,str(float(dfcf_quote['topprice'])-0.01),'B') 
-            Wtbh=trader.deal(code,codename,format(float(dfcf_quote['fivequote']['yesClosePrice'])*0.965, '.2f'),'B') 
-            
-
+            Wtbh=''
+            for fen_cang in xrange(2,0,-1):
+                print '\n'
+                log.info("Begin Buy -->  %s %s" % (codename,format(float(quotation.result['pre_close'])*(0.965+fen_cang/100.0), '.2f')))
+                Wtbh+= " | " + trader.deal(code,codename,format(float(dfcf_quote['fivequote']['yesClosePrice'])*(0.965+fen_cang/100.0), '.2f'),fen_cang,'B') 
+                if Wtbh is not None:
+                    log.info('Buy Order Accomplished!')
+                    playsound(mac_say='transaction completed',win_sound='./wav/transaction completed.wav',frequency=450, duration=150)            
+                    #查询当日委托状态， 如果未成则等待
+                    while trader.getordersdata()[0]['Wtzt'] <> '已成':
+                        sys.stdout.write("\r委托编号:[%s] 还未成交!" % Wtbh)
+                        sys.stdout.flush()
+                        time.sleep(5)
+                    log.info('Deal Done!')
+                else:
+                    return 'buy order failed!'
+            return Wtbh
+            '''
             if Wtbh is not None:
                 log.info('Buy Order Accomplished!')
                 #os.system("say order completed")
@@ -237,7 +252,7 @@ def monitor_buy(code,codename):
                 return Wtbh + " | " + Wtbh_02 if Wtbh_02 is not None else Wtbh
             else:
                 return 'buy order failed!'
-            
+            '''
         '''
         if quotation.result['code']==code \
            and float(quotation.result['realtimequote']['currentPrice'])>10.80 \

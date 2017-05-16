@@ -391,12 +391,14 @@ class DFCF_Trader(object):
         return RevokeOrders
 
 #下单
-    def deal(self,stockcode,stockname,price,tradetype):
+    def deal(self,stockcode,stockname,price,fen_cang,tradetype):
         while True:
             try:
                 GetKyzjAndKml=self.s.post('https://jy.xzsec.com/Trade/GetKyzjAndKml'+self.url_suffix, \
-                                     {'stockCode':stockcode,'stockName':stockname,'price':price,'tradeType':tradetype});
-                Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
+                                     {'stockCode':stockcode,'zqmc':stockname,'price':price,'tradeType':tradetype});
+                #Kmml=GetKyzjAndKml.json()["Data"]["Kmml"]
+                Kyzj=GetKyzjAndKml.json()["Data"]["Kyzj"]
+                Kmml=str(int(float(Kyzj)/float(price)/100/fen_cang))
                 #print GetKyzjAndKml.json()
                 if Kmml=='0':
                     print u'可交易数量为0'
