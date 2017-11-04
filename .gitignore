@@ -54,6 +54,13 @@ coverage.xml
 *,cover
 .hypothesis/
 
+trade.*
+verifycode.*
+*.wav
+st*.*
+qu*.*
+stoc*.*
+
 # Translations
 *.mo
 *.pot
